@@ -1,10 +1,10 @@
-package chathack.writer;
+package chathack.builder;
 
 import java.nio.ByteBuffer;
 import chathack.common.trame.Message;
 
-public class MessageWriter implements IWriter<Message> {
-  private final StringWriter writer = new StringWriter();
+public class MessageBuilder implements IBuilder<Message> {
+  private final StringBuilder writer = new StringBuilder();
 
   @Override
   public ByteBuffer build(Message msg) {

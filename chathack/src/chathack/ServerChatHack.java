@@ -10,6 +10,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,6 +22,7 @@ public class ServerChatHack {
   private final Selector selector;
   private final ServerSocketChannel serverSocketChannel;
   private final SocketChannel dbChannel;
+  private final HashMap<String, Integer> map = new HashMap<>();
   private DatabaseContext databaseContext;
   private final InetSocketAddress databaseAddress;
 
@@ -32,12 +34,18 @@ public class ServerChatHack {
     selector = Selector.open();
   }
 
-  private void dbConnection() throws IOException {
-    dbChannel.configureBlocking(false);
-    var dbKey = dbChannel.register(selector, SelectionKey.OP_CONNECT);
-    databaseContext = new DatabaseContext(dbKey);
-    dbKey.attach(databaseContext);
-    dbChannel.connect(databaseAddress);
+
+  public boolean registerClient(String login) {
+    if (!isAvailableLogin(login))
+      return false;
+
+    var id = map.values().stream().reduce(Math::max).orElse(0) + 1;
+    map.put(login, id);
+    return true;
+  }
+
+  private boolean isAvailableLogin(String login) {
+    return map.containsKey(login);
   }
 
   public void launch() throws IOException {
@@ -57,6 +65,13 @@ public class ServerChatHack {
     }
   }
 
+  private void dbConnection() throws IOException {
+    dbChannel.configureBlocking(false);
+    var dbKey = dbChannel.register(selector, SelectionKey.OP_CONNECT);
+    databaseContext = new DatabaseContext(dbKey);
+    dbKey.attach(databaseContext);
+    dbChannel.connect(databaseAddress);
+  }
 
   private void treatKey(SelectionKey key) {
     printSelectedKey(key);
@@ -199,7 +214,4 @@ public class ServerChatHack {
     return String.join(" and ", list);
   }
 
-  public boolean checkAnonymousLogin() {
-    return false;
-  }
 }

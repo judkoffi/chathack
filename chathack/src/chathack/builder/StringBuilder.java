@@ -1,9 +1,9 @@
-package chathack.writer;
+package chathack.builder;
 
 import java.nio.ByteBuffer;
 import chathack.utils.Helper;
 
-public class StringWriter implements IWriter<String> {
+public class StringBuilder implements IBuilder<String> {
 
   @Override
   public ByteBuffer build(String value) {

@@ -1,8 +1,8 @@
-package chathack.writer;
+package chathack.builder;
 
 import java.nio.ByteBuffer;
 
-public class IntWriter implements IWriter<Integer> {
+public class IntBuilder implements IBuilder<Integer> {
 
   @Override
   public ByteBuffer build(Integer value) {

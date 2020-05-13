@@ -1,5 +1,6 @@
 package chathack.context;
 
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import chathack.ServerChatHack;
 import chathack.common.reader.ByteReader;
@@ -23,13 +24,28 @@ public class ServerContext extends BaseContext {
   private void handler(OpCode opcode) {
     switch (opcode) {
       case ANONYMOUS_CLIENT_CONNECTION:
-        while (stringReader.process(bbin) != ProcessStatus.DONE) {
-
+        ProcessStatus status = null;
+        while ((status = stringReader.process(bbin)) != ProcessStatus.DONE) {
+          if (status == ProcessStatus.ERROR) {
+            silentlyClose();
+            return;
+          }
+          if (status == ProcessStatus.REFILL) {
+            return;
+          }
         }
+        var login = stringReader.get();
+        stringReader.reset();
 
-        if (server.checkAnonymousLogin()) {
-
+        var response = ByteBuffer.allocate(10);
+        if (!server.registerClient(login)) {
+        } else {
+          // send connection success message
         }
+        
+        
+        queue.add(response);
+
         break;
       case AUTHENTICATED_CLIENT_CONNECTION:
 

@@ -1,7 +1,7 @@
-package chathack.writer;
+package chathack.builder;
 
 import java.nio.ByteBuffer;
 
-public interface IWriter<E> {
+public interface IBuilder<E> {
   public ByteBuffer build(E value);
 }
