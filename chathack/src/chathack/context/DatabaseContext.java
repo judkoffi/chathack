@@ -2,8 +2,12 @@ package chathack.context;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
+import chathack.common.reader.IReader;
+import chathack.common.reader.MessageReader;
+import chathack.common.trame.Message;
 
 public class DatabaseContext extends BaseContext {
+  private final MessageReader messageReader = new MessageReader();
 
   public DatabaseContext(SelectionKey key) {
     super(key);
@@ -11,6 +15,21 @@ public class DatabaseContext extends BaseContext {
 
   @Override
   public void processIn() {
+    for (;;) {
+      IReader.ProcessStatus status = messageReader.process(bbin);
+      switch (status) {
+        case DONE:
+          Message msg = messageReader.get();
+          messageReader.reset();
+          System.out.println("message read : " + msg);
+          break;
+        case REFILL:
+          return;
+        case ERROR:
+          silentlyClose();
+          return;
+      }
+    }
 
   }
 
@@ -23,7 +42,6 @@ public class DatabaseContext extends BaseContext {
     if (!sc.finishConnect()) {
       return; // the selector gave a bad hint
     }
-    System.out.println("klnkn");
     updateInterestOps();
   }
 }

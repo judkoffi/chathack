@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import chathack.context.BaseContext;
 import chathack.context.DatabaseContext;
 import chathack.context.ServerContext;
 
@@ -74,11 +73,22 @@ public class ServerChatHack {
       throw new UncheckedIOException(ioe);
     }
     try {
+      var attach = key.attachment();
+
       if (key.isValid() && key.isWritable()) {
-        ((BaseContext) key.attachment()).doWrite();
+        if (databaseContext == attach) {
+          databaseContext.doRead();
+        } else {
+          ((ServerContext) key.attachment()).doWrite();
+        }
       }
+
       if (key.isValid() && key.isReadable()) {
-        ((BaseContext) key.attachment()).doRead();
+        if (databaseContext == attach) {
+          databaseContext.doRead();
+        } else {
+          ((ServerContext) key.attachment()).doRead();
+        }
       }
     } catch (IOException e) {
       logger.log(Level.INFO, "Connection closed with client due to IOException", e);
@@ -103,8 +113,6 @@ public class ServerChatHack {
       // ignore exception
     }
   }
-
-
 
   public static void main(String[] args) throws NumberFormatException, IOException {
     if (args.length != 3) {
@@ -189,5 +197,9 @@ public class ServerChatHack {
     if (key.isWritable())
       list.add("WRITE");
     return String.join(" and ", list);
+  }
+
+  public boolean checkAnonymousLogin() {
+    return false;
   }
 }

@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Queue;
 
 public abstract class BaseContext implements IContext {
@@ -90,4 +91,17 @@ public abstract class BaseContext implements IContext {
     }
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof BaseContext))
+      return false;
+
+    BaseContext context = (BaseContext) obj;
+    return context.key.equals(key) && context.sc.equals(sc);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(key, sc);
+  }
 }
