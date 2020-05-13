@@ -1,7 +1,7 @@
 package chathack.common.reader;
 
-import static chathack.common.Helper.BUFFER_SIZE;
-import static chathack.common.Helper.DEFAULT_CHARSET;
+import static chathack.utils.Helper.BUFFER_SIZE;
+import static chathack.utils.Helper.DEFAULT_CHARSET;
 import java.nio.ByteBuffer;
 
 public class StringReader implements IReader<String> {

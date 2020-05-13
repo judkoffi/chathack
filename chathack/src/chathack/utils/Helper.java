@@ -1,7 +1,8 @@
-package chathack.common;
+package chathack.utils;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import chathack.common.trame.Request.OpCode;
 
 /**
  * Class use to store constants, shared values

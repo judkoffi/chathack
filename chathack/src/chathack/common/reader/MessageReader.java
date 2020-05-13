@@ -2,8 +2,6 @@
 package chathack.common.reader;
 
 import java.nio.ByteBuffer;
-import chathack.common.Helper;
-import chathack.common.OpCode;
 import chathack.common.trame.Message;
 
 public class MessageReader implements IReader<Message> {
@@ -16,7 +14,6 @@ public class MessageReader implements IReader<Message> {
   private State state = State.WAITING_LOGIN;
   private final StringReader stringReader = new StringReader();
   private String login;
-  private OpCode opCode;
 
   private ProcessStatus processPart(ByteBuffer bb) {
     var sizeStatus = stringReader.process(bb);
@@ -38,11 +35,6 @@ public class MessageReader implements IReader<Message> {
   public ProcessStatus process(ByteBuffer bb) {
     switch (state) {
       case WAITING_LOGIN: {
-        bb.flip();
-        byte op = bb.get();
-        bb.compact();
-        opCode = Helper.byteToOpCode(op);
-
         var status = processPart(bb);
         if (status != ProcessStatus.DONE)
           return status;
@@ -59,7 +51,7 @@ public class MessageReader implements IReader<Message> {
 
         state = State.DONE;
         var msg = stringReader.get();
-        message = new Message(opCode, login, msg);
+        message = new Message(login, msg);
         return ProcessStatus.DONE;
       }
       default:

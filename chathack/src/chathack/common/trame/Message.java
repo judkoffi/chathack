@@ -1,18 +1,15 @@
 package chathack.common.trame;
 
-import static chathack.common.Helper.DEFAULT_CHARSET;
+import static chathack.utils.Helper.DEFAULT_CHARSET;
 import java.nio.ByteBuffer;
-import chathack.common.Helper;
-import chathack.common.OpCode;
+import chathack.utils.Helper;
 
 public class Message {
-  final OpCode opcode;
   final String login;
   final String value;
   final ByteBuffer bb;
 
-  public Message(OpCode opcode, String login, String value) {
-    this.opcode = opcode;
+  public Message(String login, String value) {
     this.login = login;
     this.value = value;
     this.bb = ByteBuffer.allocate(Helper.BUFFER_SIZE);
@@ -22,7 +19,6 @@ public class Message {
   private void fillBuffer() {
     ByteBuffer loginBuffer = DEFAULT_CHARSET.encode(login);
     ByteBuffer messageBuffer = DEFAULT_CHARSET.encode(value);
-    bb.put(Helper.opcodeToByte(opcode));
     bb.putInt(loginBuffer.limit());
     bb.put(loginBuffer);
     bb.putInt(messageBuffer.limit());
@@ -43,10 +39,6 @@ public class Message {
 
   public int getTotalSize() {
     return bb.limit();
-  }
-
-  public OpCode getOpcode() {
-    return opcode;
   }
 
   @Override

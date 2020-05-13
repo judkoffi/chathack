@@ -1,4 +1,4 @@
-package chathack.client;
+package chathack;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -13,24 +13,27 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
-import chathack.common.OpCode;
 import chathack.common.reader.IReader;
 import chathack.common.reader.MessageReader;
 import chathack.common.trame.Message;
 
 public class ClientChatDone {
-  private static class Context {
-    private final SelectionKey key;
-    private final SocketChannel sc;
-    private final ByteBuffer bbin = ByteBuffer.allocate(BUFFER_SIZE);
-    private final ByteBuffer bbout = ByteBuffer.allocate(BUFFER_SIZE);
-    private final Queue<ByteBuffer> queue = new LinkedList<>(); // buffers read-mode
-    private final MessageReader messageReader = new MessageReader();
+
+  static private class Context {
+
+    final private SelectionKey key;
+    final private SocketChannel sc;
+    final private ByteBuffer bbin = ByteBuffer.allocate(BUFFER_SIZE);
+    final private ByteBuffer bbout = ByteBuffer.allocate(BUFFER_SIZE);
+    final private Queue<ByteBuffer> queue = new LinkedList<>(); // buffers read-mode
+    final private MessageReader messageReader = new MessageReader();
     private boolean closed = false;
+
 
     private Context(SelectionKey key) {
       this.key = key;
       this.sc = (SocketChannel) key.channel();
+
     }
 
     /**
@@ -44,9 +47,9 @@ public class ClientChatDone {
         IReader.ProcessStatus status = messageReader.process(bbin);
         switch (status) {
           case DONE:
-            var msg = messageReader.get();
-            System.out.println("[" + msg.getLogin() + "] >> " + msg.getValue());
+            Message msg = messageReader.get();
             messageReader.reset();
+            System.out.println("message read : " + msg);
             break;
           case REFILL:
             return;
@@ -55,6 +58,7 @@ public class ClientChatDone {
             return;
         }
       }
+
     }
 
     /**
@@ -75,10 +79,12 @@ public class ClientChatDone {
     private void processOut() {
       while (!queue.isEmpty()) {
         var bb = queue.peek();
-        if (bb.remaining() > bbout.remaining())
+        if (bb.remaining() <= bbout.remaining()) {
+          queue.remove();
+          bbout.put(bb);
+        } else {
           return;
-        queue.remove();
-        bbout.put(bb);
+        }
       }
     }
 
@@ -155,14 +161,17 @@ public class ClientChatDone {
     }
 
     public void doConnect() throws IOException {
-      if (!sc.finishConnect())
+      if (!sc.finishConnect()) {
         return; // the selector gave a bad hint
-      key.interestOps(SelectionKey.OP_READ);
+      }
+
+      // key.interestOps(SelectionKey.OP_READ);
+      updateInterestOps();
     }
   }
 
-  private static final int BUFFER_SIZE = 10_000;
-  private static final Logger logger = Logger.getLogger(ClientChatDone.class.getName());
+  static private int BUFFER_SIZE = 10_000;
+  static private Logger logger = Logger.getLogger(ClientChatDone.class.getName());
 
 
   private final SocketChannel sc;
@@ -173,7 +182,6 @@ public class ClientChatDone {
   private final ArrayBlockingQueue<String> commandQueue = new ArrayBlockingQueue<>(10);
   private Context uniqueContext;
 
-
   public ClientChatDone(String login, InetSocketAddress serverAddress) throws IOException {
     this.serverAddress = serverAddress;
     this.login = login;
@@ -183,14 +191,16 @@ public class ClientChatDone {
   }
 
   private void consoleRun() {
-    try (var scan = new Scanner(System.in)) {
+    try {
+      var scan = new Scanner(System.in);
       while (scan.hasNextLine()) {
         var msg = scan.nextLine();
+
         sendCommand(msg);
+
       }
     } catch (InterruptedException e) {
       logger.info("Console thread has been interrupted");
-      return;
     } finally {
       logger.info("Console thread stopping");
     }
@@ -206,7 +216,7 @@ public class ClientChatDone {
 
   private void sendCommand(String msg) throws InterruptedException {
     synchronized (commandQueue) {
-      commandQueue.put(msg);
+      this.commandQueue.put(msg);
       selector.wakeup();
     }
   }
@@ -216,13 +226,17 @@ public class ClientChatDone {
    */
 
   private void processCommands() {
-    synchronized (commandQueue) {
-      var line = commandQueue.poll();
-      if (line != null) {
-        var msg = new Message(OpCode.ANONYMOUS_CLIENT_CONNECTION, login, line);
-        uniqueContext.queueMessage(msg.toBuffer());
+    for (;;) {
+      synchronized (commandQueue) {
+        var line = this.commandQueue.poll();
+        if (line == null) {
+          return;
+        }
+
+        this.uniqueContext.queueMessage(new Message(login, line).toBuffer());
       }
     }
+
   }
 
   public void launch() throws IOException {
@@ -237,13 +251,14 @@ public class ClientChatDone {
     while (!Thread.interrupted()) {
       try {
         selector.select(this::treatKey);
-        processCommands();
 
-        if (uniqueContext.closed) {
-          console.interrupt();
-          silentlyClose(key);
-          return;
-        }
+        processCommands();
+        // if (uniqueContext.closed) {
+        // console.interrupt();
+        // silentlyClose(key);
+        // return;
+        // }
+
       } catch (UncheckedIOException tunneled) {
         throw tunneled.getCause();
       }

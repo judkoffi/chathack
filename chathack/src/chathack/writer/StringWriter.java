@@ -1,7 +1,7 @@
 package chathack.writer;
 
 import java.nio.ByteBuffer;
-import chathack.common.Helper;
+import chathack.utils.Helper;
 
 public class StringWriter implements IWriter<String> {
 

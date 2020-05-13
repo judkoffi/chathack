@@ -1,4 +1,4 @@
-package chathack.client;
+package chathack;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
