@@ -43,6 +43,4 @@ public class Client {
 		this.sc = SocketChannel.open();
 		this.selector = Selector.open();
 	}
-
-	//TODO
 }
