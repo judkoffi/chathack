@@ -19,13 +19,11 @@ import chathack.context.ServerContext;
 
 public class ServerChatHack {
   private static final Logger logger = Logger.getLogger(ServerChatHack.class.getName());
-
   private final Selector selector;
   private final ServerSocketChannel serverSocketChannel;
   private final SocketChannel dbChannel;
   private DatabaseContext databaseContext;
   private final InetSocketAddress databaseAddress;
-
 
   public ServerChatHack(int port, String dbHostname, int dbPort) throws IOException {
     serverSocketChannel = ServerSocketChannel.open();
@@ -35,15 +33,18 @@ public class ServerChatHack {
     selector = Selector.open();
   }
 
-  public void launch() throws IOException {
-    serverSocketChannel.configureBlocking(false);
-    serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
-
+  private void dbConnection() throws IOException {
     dbChannel.configureBlocking(false);
     var dbKey = dbChannel.register(selector, SelectionKey.OP_CONNECT);
     databaseContext = new DatabaseContext(dbKey);
     dbKey.attach(databaseContext);
     dbChannel.connect(databaseAddress);
+  }
+
+  public void launch() throws IOException {
+    serverSocketChannel.configureBlocking(false);
+    serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+    dbConnection();
 
     while (!Thread.interrupted()) {
       // System.out.println("Starting select");
