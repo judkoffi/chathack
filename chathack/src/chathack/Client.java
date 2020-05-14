@@ -138,8 +138,10 @@ public class Client {
 	private final Selector selector;
 	private final InetSocketAddress serverAddress;
 	private final ArrayBlockingQueue<String> commandQueue = new ArrayBlockingQueue<>(10);
-	 private Context uniqueContext;
+	private Context uniqueContext;
 	private final String login;
+	private String password;
+	private Thread console = new Thread(this::consoleRun);
 
 	
 	public Client(InetSocketAddress serverAddress, String path, String login) throws IOException {
@@ -150,12 +152,10 @@ public class Client {
 	
 	}
 	
-	public Client(InetSocketAddress serverAddress, String path, String login, String password) throws IOException {
-		this.serverAddress = serverAddress;
-		this.login = login;
-		this.sc = SocketChannel.open();
-		this.selector = Selector.open();
-		//path to file
+	public Client(InetSocketAddress serverAddress, String path, String login, String password) throws IOException {	
+		this(serverAddress,path,login); //call the other constructeur
+		this.password = password;
+		
 	}
 	
 	private void consoleRun() {
@@ -182,21 +182,22 @@ public class Client {
 	
 	private void processCommands() {
 		for (;;) {
+
 			synchronized (commandQueue) {
 				var line = this.commandQueue.poll();
 				if (line == null) {
 					return;
 				}
-				
-				switch(line.charAt(0)) {
+
+				switch (line.charAt(0)) {
 				case '/':
 					System.out.println("send files");
 					break;
-					
+
 				case '@':
 					System.out.println("private message");
 					break;
-					
+
 				default:
 					System.out.println("public message");
 					return;
@@ -214,7 +215,7 @@ public class Client {
 	        key.attach(uniqueContext);
 	        sc.connect(serverAddress);
 
-	       // console.start();
+	       console.start();
 
 	        while(!Thread.interrupted()) {
 	            try {
@@ -256,12 +257,13 @@ public class Client {
 	    }
 
 	 private static void usage() {
-		 System.out.println("usage : Client hostname port login password (optional)");
+		 System.out.println("usage : Client hostname port pathToDirectory login password (optional)");
 	 }
 	 
 	 public static void main(String[] args) throws NumberFormatException, IOException {
 		if (args.length == 4) {
 			// IP address server ,nb port, path, login
+			
 			new Client(new InetSocketAddress(args[0], Integer.parseInt(args[1])), args[2], args[3]).launch();
 
 		} else if (args.length == 5) {
