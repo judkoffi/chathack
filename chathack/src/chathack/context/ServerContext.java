@@ -1,6 +1,7 @@
 package chathack.context;
 
 import java.nio.channels.SelectionKey;
+import chathack.ServerChatHack;
 import chathack.common.reader.FrameReader;
 import chathack.common.reader.IReader;
 import chathack.frame.IFrame;
@@ -8,15 +9,15 @@ import chathack.frame.ServerFrameVisitor;
 
 public class ServerContext extends BaseContext {
   private final FrameReader reader = new FrameReader();
+  private final ServerFrameVisitor serverFrameVisitor;
 
-  //private final ServerFrameVisitor serverFrameVisitor = new ServerFrameVisitor(context, server)
-
-  public ServerContext(SelectionKey key) {
+  public ServerContext(SelectionKey key, ServerChatHack server) {
     super(key);
+    this.serverFrameVisitor = new ServerFrameVisitor(this, server);
   }
 
   private void handler(IFrame frame) {
-    //frame.accept(frameVisitor);
+    frame.accept(serverFrameVisitor);
   }
 
   @Override

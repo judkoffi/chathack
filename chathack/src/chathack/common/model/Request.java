@@ -1,4 +1,4 @@
-package chathack.common.trame;
+package chathack.common.model;
 
 import java.nio.ByteBuffer;
 import chathack.utils.Helper;

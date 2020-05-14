@@ -77,8 +77,6 @@ public abstract class BaseContext implements IContext {
     bbout.compact();
     processOut();
     updateInterestOps();
-
-
   }
 
 

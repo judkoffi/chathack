@@ -24,7 +24,7 @@ public class ServerChatHack {
   private final Selector selector;
   private final ServerSocketChannel serverSocketChannel;
   private final SocketChannel dbChannel;
-  private final HashMap<String, Integer> map = new HashMap<>();
+  private final HashMap<String, SelectionKey> map = new HashMap<>();
   private DatabaseContext databaseContext;
   private final InetSocketAddress databaseAddress;
 
@@ -40,16 +40,13 @@ public class ServerChatHack {
   public boolean registerClient(String login) {
     if (!isAvailableLogin(login))
       return false;
-
-    var id = map.values().stream().reduce(Math::max).orElse(0) + 1;
-    map.put(login, id);
+    // map.put(login, );
     return true;
   }
 
   private boolean isAvailableLogin(String login) {
     return map.containsKey(login);
   }
-
 
   public void broadcast(ByteBuffer bb) {
     // TODO Auto-generated method stub
@@ -62,14 +59,14 @@ public class ServerChatHack {
     dbConnection();
 
     while (!Thread.interrupted()) {
-      // System.out.println("Starting select");
+      System.out.println("Starting select");
       printKeys();
       try {
         selector.select(this::treatKey);
       } catch (UncheckedIOException tunneled) {
         throw tunneled.getCause();
       }
-      // System.out.println("Select finished");
+      System.out.println("Select finished");
     }
   }
 
@@ -92,9 +89,9 @@ public class ServerChatHack {
         databaseContext.doConnect();
       }
     } catch (IOException ioe) {
-      // lambda call in select requires to tunnel IOException
       throw new UncheckedIOException(ioe);
     }
+
     try {
       var attach = key.attachment();
 
@@ -102,7 +99,7 @@ public class ServerChatHack {
         if (databaseContext == attach) {
           databaseContext.doRead();
         } else {
-          ((ServerContext) key.attachment()).doWrite();
+          ((ServerFrameVisitor) key.attachment()).getContext().doWrite();
         }
       }
 
@@ -110,7 +107,7 @@ public class ServerChatHack {
         if (databaseContext == attach) {
           databaseContext.doRead();
         } else {
-          ((ServerContext) key.attachment()).doRead();
+          ((ServerFrameVisitor) key.attachment()).getContext().doRead();
         }
       }
     } catch (IOException e) {
@@ -125,8 +122,7 @@ public class ServerChatHack {
       return; // the selector gave a bad hint
     sc.configureBlocking(false);
     SelectionKey clientKey = sc.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
-    // clientKey.attach(new ServerContext(this, clientKey));
-    clientKey.attach(new ServerFrameVisitor(new ServerContext(clientKey), this));
+    clientKey.attach(new ServerFrameVisitor(new ServerContext(clientKey, this), this));
   }
 
   private void silentlyClose(SelectionKey key) {
@@ -222,7 +218,4 @@ public class ServerChatHack {
       list.add("WRITE");
     return String.join(" and ", list);
   }
-
-
-
 }

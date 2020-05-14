@@ -2,7 +2,7 @@ package chathack.utils;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import chathack.common.trame.Request.OpCode;
+import chathack.common.model.Request.OpCode;
 
 /**
  * Class use to store constants, shared values
@@ -19,6 +19,8 @@ public class Helper {
         return OpCode.ANONYMOUS_CLIENT_CONNECTION;
       case 1:
         return OpCode.AUTHENTICATED_CLIENT_CONNECTION;
+      case 2:
+        return OpCode.BROADCAST_MESSAGE;
       default:
         throw new IllegalArgumentException("Unexpected value: " + b);
     }
@@ -31,6 +33,8 @@ public class Helper {
         return 0;
       case AUTHENTICATED_CLIENT_CONNECTION:
         return 1;
+      case BROADCAST_MESSAGE:
+        return 2;
       default:
         throw new IllegalArgumentException("Unexpected value: " + opCode);
     }

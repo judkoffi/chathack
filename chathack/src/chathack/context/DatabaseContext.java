@@ -2,9 +2,9 @@ package chathack.context;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
+import chathack.common.model.Message;
 import chathack.common.reader.IReader;
 import chathack.common.reader.MessageReader;
-import chathack.common.trame.Message;
 
 public class DatabaseContext extends BaseContext {
   private final MessageReader messageReader = new MessageReader();

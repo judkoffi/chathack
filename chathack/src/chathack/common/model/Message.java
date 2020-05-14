@@ -1,40 +1,41 @@
-package chathack.common.trame;
+package chathack.common.model;
 
 import static chathack.utils.Helper.DEFAULT_CHARSET;
 import java.nio.ByteBuffer;
 import chathack.utils.Helper;
 
 public class Message {
-  final String login;
-  final String value;
+  final String from;
+  final String content;
   final ByteBuffer bb;
 
   public Message(String login, String value) {
-    this.login = login;
-    this.value = value;
+    this.from = login;
+    this.content = value;
     this.bb = ByteBuffer.allocate(Helper.BUFFER_SIZE);
     fillBuffer();
   }
 
   private void fillBuffer() {
-    ByteBuffer loginBuffer = DEFAULT_CHARSET.encode(login);
-    ByteBuffer messageBuffer = DEFAULT_CHARSET.encode(value);
+    ByteBuffer loginBuffer = DEFAULT_CHARSET.encode(from);
+    ByteBuffer messageBuffer = DEFAULT_CHARSET.encode(content);
     bb.putInt(loginBuffer.limit());
     bb.put(loginBuffer);
     bb.putInt(messageBuffer.limit());
     bb.put(messageBuffer);
+    bb.flip();
   }
 
   public ByteBuffer toBuffer() {
-    return bb.duplicate().flip();
+    return bb.duplicate();
   }
 
   public String getLogin() {
-    return login;
+    return from;
   }
 
   public String getValue() {
-    return value;
+    return content;
   }
 
   public int getTotalSize() {
@@ -43,7 +44,7 @@ public class Message {
 
   @Override
   public String toString() {
-    return "[" + login + "] >> " + value + " ----> size: " + getTotalSize();
+    return "[" + from + "] >> " + content + " ----> size: " + getTotalSize();
   }
 
 }

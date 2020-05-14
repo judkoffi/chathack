@@ -1,7 +1,7 @@
 package chathack.builder;
 
 import java.nio.ByteBuffer;
-import chathack.common.trame.Message;
+import chathack.common.model.Message;
 
 public class MessageBuilder implements IBuilder<Message> {
   private final StringBuilder writer = new StringBuilder();

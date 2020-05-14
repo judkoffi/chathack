@@ -12,8 +12,21 @@ public class ServerFrameVisitor implements IFrameVisitor {
     this.server = server;
   }
 
+
+
+  public ServerContext getContext() {
+    return context;
+  }
+
   @Override
   public void visit(BroadcastMessage message) {
     server.broadcast(message.toBuffer());
   }
+
+  @Override
+  public void visit(DirectMessage directMessage) {
+    // TODO Auto-generated method stub
+
+  }
+
 }

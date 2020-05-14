@@ -15,9 +15,15 @@ public class Main {
 
     var bb = ByteBuffer.allocate(1024);
 
-    bb.put((byte) 0);
+    bb.put((byte) 2);
+    var login = StandardCharsets.UTF_8.encode("peach");
+    var msg = StandardCharsets.UTF_8.encode("hello");
 
-    var msg = StandardCharsets.UTF_8.encode("peach");
+
+    bb.putInt(login.limit());
+    bb.put(login);
+
+
     bb.putInt(msg.limit());
     bb.put(msg);
 

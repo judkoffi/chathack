@@ -2,7 +2,7 @@
 package chathack.common.reader;
 
 import java.nio.ByteBuffer;
-import chathack.common.trame.Message;
+import chathack.common.model.Message;
 
 public class MessageReader implements IReader<Message> {
   private Message message;

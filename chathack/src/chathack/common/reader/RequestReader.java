@@ -1,7 +1,7 @@
 package chathack.common.reader;
 
 import java.nio.ByteBuffer;
-import chathack.common.trame.Request;
+import chathack.common.model.Request;
 
 public class RequestReader implements IReader<Request> {
 
