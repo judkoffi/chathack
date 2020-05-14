@@ -3,6 +3,7 @@ package chathack;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.Channel;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
@@ -16,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import chathack.context.DatabaseContext;
 import chathack.context.ServerContext;
+import chathack.frame.ServerFrameVisitor;
 
 public class ServerChatHack {
   private static final Logger logger = Logger.getLogger(ServerChatHack.class.getName());
@@ -46,6 +48,12 @@ public class ServerChatHack {
 
   private boolean isAvailableLogin(String login) {
     return map.containsKey(login);
+  }
+
+
+  public void broadcast(ByteBuffer bb) {
+    // TODO Auto-generated method stub
+
   }
 
   public void launch() throws IOException {
@@ -117,7 +125,8 @@ public class ServerChatHack {
       return; // the selector gave a bad hint
     sc.configureBlocking(false);
     SelectionKey clientKey = sc.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
-    clientKey.attach(new ServerContext(this, clientKey));
+    // clientKey.attach(new ServerContext(this, clientKey));
+    clientKey.attach(new ServerFrameVisitor(new ServerContext(clientKey), this));
   }
 
   private void silentlyClose(SelectionKey key) {
@@ -213,5 +222,7 @@ public class ServerChatHack {
       list.add("WRITE");
     return String.join(" and ", list);
   }
+
+
 
 }
