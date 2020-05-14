@@ -229,7 +229,7 @@ public class ClientChatDone {
     for (;;) {
       synchronized (commandQueue) {
         var line = this.commandQueue.poll();
-        if (line == null) {
+        if (line == null) { 
           return;
         }
 
