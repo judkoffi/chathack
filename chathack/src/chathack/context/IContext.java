@@ -1,11 +1,14 @@
 package chathack.context;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public interface IContext {
   public void processIn();
 
   public void processOut();
+
+  public void queueMessage(ByteBuffer bb);
 
   public void updateInterestOps();
 

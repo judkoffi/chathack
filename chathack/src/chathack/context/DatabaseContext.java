@@ -30,7 +30,6 @@ public class DatabaseContext extends BaseContext {
           return;
       }
     }
-
   }
 
   @Override

@@ -6,8 +6,8 @@ import chathack.common.model.Message;
 public class BroadcastMessage implements IFrame {
   private final Message message;
 
-  public BroadcastMessage(String from, String content) {
-    this.message = new Message(from, content);
+  public BroadcastMessage(Message message) {
+    this.message = message;
   }
 
   @Override

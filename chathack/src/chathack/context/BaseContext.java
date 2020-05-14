@@ -22,6 +22,10 @@ public abstract class BaseContext implements IContext {
     this.sc = (SocketChannel) key.channel();
   }
 
+  public SelectionKey getKey() {
+    return key;
+  }
+
   @Override
   public void updateInterestOps() {
     if (!key.isValid())
@@ -79,6 +83,12 @@ public abstract class BaseContext implements IContext {
     updateInterestOps();
   }
 
+  @Override
+  public void queueMessage(ByteBuffer bb) {
+    queue.add(bb);
+    processOut();
+    updateInterestOps();
+  }
 
   @Override
   public void silentlyClose() {

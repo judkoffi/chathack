@@ -12,8 +12,6 @@ public class ServerFrameVisitor implements IFrameVisitor {
     this.server = server;
   }
 
-
-
   public ServerContext getContext() {
     return context;
   }
@@ -27,6 +25,13 @@ public class ServerFrameVisitor implements IFrameVisitor {
   public void visit(DirectMessage directMessage) {
     // TODO Auto-generated method stub
 
+  }
+
+
+
+  @Override
+  public void visit(AnonymousConnection message) {
+    server.registerClient(message.getLogin());
   }
 
 }

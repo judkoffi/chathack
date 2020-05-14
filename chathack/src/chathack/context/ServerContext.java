@@ -41,8 +41,13 @@ public class ServerContext extends BaseContext {
 
   @Override
   public void processOut() {
-    // TODO Auto-generated method stub
-
+    while (!queue.isEmpty()) {
+      var bb = queue.peek();
+      if (bbout.remaining() < bb.remaining())
+        return;
+      queue.remove();
+      bbout.put(bb);
+    }
   }
 
   @Override

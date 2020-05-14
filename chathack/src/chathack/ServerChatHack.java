@@ -38,9 +38,12 @@ public class ServerChatHack {
 
 
   public boolean registerClient(String login) {
+    System.out.println("login: " + login);
+    
     if (!isAvailableLogin(login))
       return false;
-    // map.put(login, );
+
+
     return true;
   }
 
@@ -49,8 +52,16 @@ public class ServerChatHack {
   }
 
   public void broadcast(ByteBuffer bb) {
-    // TODO Auto-generated method stub
-
+    selector//
+      .keys()
+      .stream()
+      .filter(k -> k.attachment() != null)
+      .filter(k -> !k.equals(databaseContext.getKey()))
+      .forEach(k ->
+      {
+        var ctx = ((ServerFrameVisitor) k.attachment()).getContext();
+        ctx.queueMessage(bb);
+      });
   }
 
   public void launch() throws IOException {
