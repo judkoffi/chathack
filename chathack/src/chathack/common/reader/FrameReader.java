@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.function.Function;
 import chathack.common.model.OpCode;
 import chathack.frame.AnonymousConnection;
+import chathack.frame.AuthentificatedConnection;
 import chathack.frame.BroadcastMessage;
 import chathack.frame.IFrame;
 import chathack.utils.Helper;
@@ -50,10 +51,17 @@ public class FrameReader implements IReader<IFrame> {
             value = new AnonymousConnection(stringReader.get());
             state = State.DONE;
             return ProcessStatus.DONE;
+
           case AUTHENTICATED_CLIENT_CONNECTION:
-            break;
-
-
+            contentProcess = contentProcess(bb, messageReader::process);
+            if (contentProcess != ProcessStatus.DONE) {
+              System.out.println("status: " + contentProcess);
+              return contentProcess;
+            }
+            System.out.println("knkn");
+            value = new AuthentificatedConnection(messageReader.get());
+            state = State.DONE;
+            return ProcessStatus.DONE;
 
           case BROADCAST_MESSAGE:
             contentProcess = contentProcess(bb, messageReader::process);

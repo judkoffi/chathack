@@ -19,8 +19,9 @@ public class DatabaseRequestBuilder {
 
 
   public static ByteBuffer buildCheckRequest(ByteBuffer bb) {
-    var requestBuffer = ByteBuffer.allocate(Byte.BYTES + bb.limit());
+    var requestBuffer = ByteBuffer.allocate(Byte.BYTES + Long.BYTES + bb.limit());
     requestBuffer.put(requestEnumToByte(DatabaseRequestEnum.ASK_CREDENTIAL));
+    requestBuffer.putLong(1);
     requestBuffer.put(bb);
     return requestBuffer.flip();
   }

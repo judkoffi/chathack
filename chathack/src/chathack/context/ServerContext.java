@@ -11,9 +11,6 @@ import chathack.frame.DirectMessage;
 import chathack.frame.IFrame;
 import chathack.frame.IFrameVisitor;
 
-/**
- * ServerContext implement IFrameVisitor ==> pas besoin du this du context du coup
- */
 public class ServerContext extends BaseContext implements IFrameVisitor {
   private final FrameReader reader = new FrameReader();
   private final ServerChatHack server;

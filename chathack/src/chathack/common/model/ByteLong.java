@@ -22,4 +22,9 @@ public class ByteLong {
   public ByteBuffer toBuffer() {
     return bb.duplicate().flip();
   }
+
+  @Override
+  public String toString() {
+    return "op: " + opcode + " value: " + value;
+  }
 }

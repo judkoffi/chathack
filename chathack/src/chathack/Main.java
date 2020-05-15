@@ -46,12 +46,33 @@ public class Main {
     }
   }
 
+  private static void sendAuthenticatedConnection(SocketChannel sc, String login, String pass)
+      throws IOException {
+    var bb = ByteBuffer.allocate(4096);
+    var loginbb = StandardCharsets.UTF_8.encode(login);
+    var passbb = StandardCharsets.UTF_8.encode(pass);
+    bb.put((byte) 1);
+    bb.putInt(loginbb.limit());
+    bb.put(loginbb);
+    bb.putInt(passbb.limit());
+    bb.put(passbb);
+    bb.flip();
+    sc.write(bb);
+
+    System.out.println("readdd");
+    bb.clear();
+
+    sc.read(bb);
+    System.out.println(bb);
+  }
+
 
   public static void main(String[] args) throws IOException {
     var addr = new InetSocketAddress("localhost", 7777);
     var sc = SocketChannel.open(addr);
 
-    sendAnonymousConnection(sc, "oeach");
-    // sendBroadcastMsg(sc, "hello", "peach");
+    // sendAuthenticatedConnection(sc, "oeach", "ljcqj");
+    // sendAnonymousConnection(sc, "oeach");
+    sendBroadcastMsg(sc, "hello", "peach");
   }
 }

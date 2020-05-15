@@ -10,9 +10,9 @@ public class ByteLongReader implements IReader<ByteLong> {
 
   private final ByteReader byteReader = new ByteReader();
   private final LongReader longReader = new LongReader();
-
   private ByteLong value;
-  private State state;
+  private byte opcode;
+  private State state = State.WAITING_OPCODE;
 
   @Override
   public ProcessStatus process(ByteBuffer bb) {
@@ -21,6 +21,7 @@ public class ByteLongReader implements IReader<ByteLong> {
         var opcodeStatus = byteReader.process(bb);
         if (opcodeStatus != ProcessStatus.DONE)
           return opcodeStatus;
+        opcode = byteReader.get();
         state = State.WAITING_LONG;
       }
       case WAITING_LONG: {
@@ -28,7 +29,7 @@ public class ByteLongReader implements IReader<ByteLong> {
         if (status != ProcessStatus.DONE)
           return status;
         state = State.DONE;
-        value = new ByteLong(byteReader.get(), longReader.get());
+        value = new ByteLong(opcode, longReader.get());
         return ProcessStatus.DONE;
       }
       default:
@@ -48,6 +49,7 @@ public class ByteLongReader implements IReader<ByteLong> {
   public void reset() {
     state = State.WAITING_OPCODE;
     value = null;
+    opcode = 0;
     byteReader.reset();
     longReader.reset();
   }

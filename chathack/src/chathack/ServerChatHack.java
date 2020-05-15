@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import chathack.builder.DatabaseRequestBuilder;
+import chathack.context.BaseContext;
 import chathack.context.DatabaseContext;
 import chathack.context.ServerContext;
 import chathack.frame.AuthentificatedConnection;
@@ -38,6 +39,7 @@ public class ServerChatHack {
     serverSocketChannel.bind(new InetSocketAddress(port));
     dbChannel = SocketChannel.open();
     databaseAddress = new InetSocketAddress(dbHostname, dbPort);
+    dbChannel.connect(databaseAddress);
     selector = Selector.open();
   }
 
@@ -53,7 +55,8 @@ public class ServerChatHack {
   }
 
   public void registerAuthenticatedClient(AuthentificatedConnection message) {
-    databaseContext.checkLogin(DatabaseRequestBuilder.buildCheckRequest(message.toBuffer()));
+    var bb = DatabaseRequestBuilder.buildCheckRequest(message.toBuffer());
+    databaseContext.checkLogin(bb);
   }
 
   public void broadcast(ByteBuffer bb) {
@@ -78,7 +81,7 @@ public class ServerChatHack {
 
     while (!Thread.interrupted()) {
       System.out.println("Starting select");
-      printKeys();
+      // printKeys();
       try {
         selector.select(this::treatKey);
       } catch (UncheckedIOException tunneled) {
@@ -90,43 +93,29 @@ public class ServerChatHack {
 
   private void dbConnection() throws IOException {
     dbChannel.configureBlocking(false);
-    var dbKey = dbChannel.register(selector, SelectionKey.OP_CONNECT);
+    var dbKey = dbChannel.register(selector, SelectionKey.OP_WRITE);
     databaseContext = new DatabaseContext(dbKey);
     dbKey.attach(databaseContext);
-    dbChannel.connect(databaseAddress);
+    // dbChannel.connect(databaseAddress);
   }
 
   private void treatKey(SelectionKey key) {
-    printSelectedKey(key);
+    // printSelectedKey(key);
     try {
       if (key.isValid() && key.isAcceptable()) {
         doAccept(key);
-      }
-
-      if (key.isValid() && key.isConnectable()) {
-        databaseContext.doConnect();
       }
     } catch (IOException ioe) {
       throw new UncheckedIOException(ioe);
     }
 
     try {
-      var attach = key.attachment();
-
       if (key.isValid() && key.isWritable()) {
-        if (databaseContext == attach) {
-          databaseContext.doRead();
-        } else {
-          ((ServerContext) key.attachment()).doWrite();
-        }
+        ((BaseContext) key.attachment()).doWrite();
       }
 
       if (key.isValid() && key.isReadable()) {
-        if (databaseContext == attach) {
-          databaseContext.doRead();
-        } else {
-          ((ServerContext) key.attachment()).doRead();
-        }
+        ((BaseContext) key.attachment()).doRead();
       }
     } catch (IOException e) {
       logger.log(Level.INFO, "Connection closed with client due to IOException", e);

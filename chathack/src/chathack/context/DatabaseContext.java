@@ -15,20 +15,23 @@ public class DatabaseContext extends BaseContext {
   }
 
   public void checkLogin(ByteBuffer bb) {
+    System.out.println(bb);
     queueMessage(bb);
   }
 
   @Override
   public void processIn() {
     for (;;) {
+      System.out.println("bb: "+bbin.hasRemaining());
       IReader.ProcessStatus status = reader.process(bbin);
       switch (status) {
         case DONE:
           ByteLong msg = reader.get();
-          reader.reset();
           System.out.println("message read : " + msg);
+          reader.reset();
           break;
         case REFILL:
+          System.out.println("klsncqlkn");
           return;
         case ERROR:
           silentlyClose();
@@ -39,7 +42,14 @@ public class DatabaseContext extends BaseContext {
 
   @Override
   public void processOut() {
+    while (!queue.isEmpty()) {
+      var bb = queue.peek();
+      if (bbout.remaining() < bb.remaining())
+        return;
 
+      queue.remove();
+      bbout.put(bb);
+    }
   }
 
   public void doConnect() throws IOException {
