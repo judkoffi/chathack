@@ -18,6 +18,9 @@ import java.util.logging.Logger;
 import chathack.context.DatabaseContext;
 import chathack.context.ServerContext;
 
+/*
+ * Champs isAuthentificated qui designe l'état du client pour definir les actions disponible
+ */
 public class ServerChatHack {
   private static final Logger logger = Logger.getLogger(ServerChatHack.class.getName());
   private final Selector selector;
@@ -27,6 +30,7 @@ public class ServerChatHack {
   private DatabaseContext databaseContext;
   private final InetSocketAddress databaseAddress;
 
+
   public ServerChatHack(int port, String dbHostname, int dbPort) throws IOException {
     serverSocketChannel = ServerSocketChannel.open();
     serverSocketChannel.bind(new InetSocketAddress(port));
@@ -34,7 +38,6 @@ public class ServerChatHack {
     databaseAddress = new InetSocketAddress(dbHostname, dbPort);
     selector = Selector.open();
   }
-
 
   public boolean registerClient(String login, SelectionKey clientKey) {
     System.out.println("login: " + login);
@@ -53,7 +56,7 @@ public class ServerChatHack {
     selector//
       .keys()
       .stream()
-      .filter(k -> k.isValid())
+      .filter(SelectionKey::isValid)
       .filter(k -> k.attachment() != null)
       .filter(k -> !k.equals(databaseContext.getKey()))
       .forEach(k ->

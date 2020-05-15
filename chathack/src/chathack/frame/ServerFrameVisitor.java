@@ -3,6 +3,9 @@ package chathack.frame;
 import chathack.ServerChatHack;
 import chathack.context.ServerContext;
 
+/**
+ * ServerContext implement IFrameVisitor ==> pas besoin du this du context du coup
+ */
 public class ServerFrameVisitor implements IFrameVisitor {
   private final ServerContext context;
   private final ServerChatHack server;
