@@ -2,15 +2,15 @@ package chathack.common.reader;
 
 import java.nio.ByteBuffer;
 
-public class IntReader implements IReader<Integer> {
+public class LongReader implements IReader<Long> {
 
   private enum State {
     DONE, WAITING, ERROR
   }
 
   private State state = State.WAITING;
-  private final ByteBuffer internalbb = ByteBuffer.allocate(Integer.BYTES); // write-mode
-  private int value;
+  private final ByteBuffer internalbb = ByteBuffer.allocate(Long.BYTES); // write-mode
+  private long value;
 
   @Override
   public ProcessStatus process(ByteBuffer bb) {
@@ -38,12 +38,12 @@ public class IntReader implements IReader<Integer> {
 
     state = State.DONE;
     internalbb.flip();
-    value = internalbb.getInt();
+    value = internalbb.getLong();
     return ProcessStatus.DONE;
   }
 
   @Override
-  public Integer get() {
+  public Long get() {
     if (state != State.DONE) {
       throw new IllegalStateException();
     }
@@ -57,4 +57,3 @@ public class IntReader implements IReader<Integer> {
     internalbb.clear();
   }
 }
-

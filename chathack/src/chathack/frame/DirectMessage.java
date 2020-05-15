@@ -14,7 +14,6 @@ public class DirectMessage implements IFrame {
 
   @Override
   public ByteBuffer toBuffer() {
-    // TODO Auto-generated method stub
     return null;
   }
 

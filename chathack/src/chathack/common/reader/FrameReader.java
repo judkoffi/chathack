@@ -1,6 +1,5 @@
 package chathack.common.reader;
 
-import static chathack.utils.Helper.BUFFER_SIZE;
 import java.nio.ByteBuffer;
 import java.util.function.Function;
 import chathack.common.model.OpCode;
@@ -22,7 +21,6 @@ public class FrameReader implements IReader<IFrame> {
   private State state = State.WAITING_OPCODE;
   private OpCode opCode;
   private IFrame value;
-  private final ByteBuffer internalbb = ByteBuffer.allocate(BUFFER_SIZE);
 
 
   private ProcessStatus contentProcess(ByteBuffer bb, Function<ByteBuffer, ProcessStatus> f) {
@@ -101,7 +99,6 @@ public class FrameReader implements IReader<IFrame> {
     state = State.WAITING_OPCODE;
     value = null;
     opCode = null;
-    internalbb.clear();
 
     byteReader.reset();
     messageReader.reset();

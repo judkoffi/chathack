@@ -229,14 +229,12 @@ public class ClientChatDone {
     for (;;) {
       synchronized (commandQueue) {
         var line = this.commandQueue.poll();
-        if (line == null) { 
+        if (line == null) {
           return;
         }
-
         this.uniqueContext.queueMessage(new Message(login, line).toBuffer());
       }
     }
-
   }
 
   public void launch() throws IOException {

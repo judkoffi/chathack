@@ -15,8 +15,10 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import chathack.builder.DatabaseRequestBuilder;
 import chathack.context.DatabaseContext;
 import chathack.context.ServerContext;
+import chathack.frame.AuthentificatedConnection;
 
 /*
  * Champs isAuthentificated qui designe l'état du client pour definir les actions disponible
@@ -39,17 +41,19 @@ public class ServerChatHack {
     selector = Selector.open();
   }
 
-  public boolean registerClient(String login, SelectionKey clientKey) {
-    System.out.println("login: " + login);
+  public boolean registerAnnonymousClient(String login, SelectionKey clientKey) {
     if (!isAvailableLogin(login))
       return false;
-
     map.put(login, clientKey);
     return true;
   }
 
   private boolean isAvailableLogin(String login) {
     return !map.containsKey(login);
+  }
+
+  public void registerAuthenticatedClient(AuthentificatedConnection message) {
+    databaseContext.checkLogin(DatabaseRequestBuilder.buildCheckRequest(message.toBuffer()));
   }
 
   public void broadcast(ByteBuffer bb) {
@@ -232,4 +236,5 @@ public class ServerChatHack {
       list.add("WRITE");
     return String.join(" and ", list);
   }
+
 }

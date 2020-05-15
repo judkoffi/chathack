@@ -1,26 +1,31 @@
 package chathack.context;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
-import chathack.common.model.Message;
+import chathack.common.model.ByteLong;
+import chathack.common.reader.ByteLongReader;
 import chathack.common.reader.IReader;
-import chathack.common.reader.MessageReader;
 
 public class DatabaseContext extends BaseContext {
-  private final MessageReader messageReader = new MessageReader();
+  private final ByteLongReader reader = new ByteLongReader();
 
   public DatabaseContext(SelectionKey key) {
     super(key);
   }
 
+  public void checkLogin(ByteBuffer bb) {
+    queueMessage(bb);
+  }
+
   @Override
   public void processIn() {
     for (;;) {
-      IReader.ProcessStatus status = messageReader.process(bbin);
+      IReader.ProcessStatus status = reader.process(bbin);
       switch (status) {
         case DONE:
-          Message msg = messageReader.get();
-          messageReader.reset();
+          ByteLong msg = reader.get();
+          reader.reset();
           System.out.println("message read : " + msg);
           break;
         case REFILL:

@@ -4,20 +4,27 @@ import java.nio.channels.SelectionKey;
 import chathack.ServerChatHack;
 import chathack.common.reader.FrameReader;
 import chathack.common.reader.IReader;
+import chathack.frame.AnonymousConnection;
+import chathack.frame.AuthentificatedConnection;
+import chathack.frame.BroadcastMessage;
+import chathack.frame.DirectMessage;
 import chathack.frame.IFrame;
-import chathack.frame.ServerFrameVisitor;
+import chathack.frame.IFrameVisitor;
 
-public class ServerContext extends BaseContext {
+/**
+ * ServerContext implement IFrameVisitor ==> pas besoin du this du context du coup
+ */
+public class ServerContext extends BaseContext implements IFrameVisitor {
   private final FrameReader reader = new FrameReader();
-  private final ServerFrameVisitor serverFrameVisitor;
+  private final ServerChatHack server;
 
   public ServerContext(SelectionKey key, ServerChatHack server) {
     super(key);
-    this.serverFrameVisitor = new ServerFrameVisitor(server, this);
+    this.server = server;
   }
 
   private void handler(IFrame frame) {
-    frame.accept(serverFrameVisitor);
+    frame.accept(this);
   }
 
   @Override
@@ -52,6 +59,35 @@ public class ServerContext extends BaseContext {
   }
 
   @Override
+  public void visit(BroadcastMessage message) {
+    server.broadcast(message.toBuffer());
+  }
+
+  @Override
+  public void visit(DirectMessage directMessage) {
+    // TODO Auto-generated method stub
+
+  }
+
+
+  @Override
+  public void visit(AnonymousConnection message) {
+    boolean availableLogin = server.registerAnnonymousClient(message.getLogin(), key);
+    if (!availableLogin) {
+      System.out.println("pas libre");
+      silentlyClose();
+      return;
+    }
+    System.out.println("libre");
+  }
+
+
+  @Override
+  public void visit(AuthentificatedConnection message) {
+    server.registerAuthenticatedClient(message);
+  }
+
+  @Override
   public boolean equals(Object obj) {
     return super.equals(obj);
   }
@@ -60,4 +96,5 @@ public class ServerContext extends BaseContext {
   public int hashCode() {
     return super.hashCode();
   }
+
 }
