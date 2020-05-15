@@ -12,10 +12,10 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
 import chathack.common.model.Message;
 import chathack.context.ClientContext;
+import static chathack.utils.Helper.BUFFER_SIZE;
 
 public class Client {
 
-  private static final int BUFFER_SIZE = 4096;
   private static final Logger logger = Logger.getLogger(Client.class.getName());
 
   private final SocketChannel sc;
@@ -94,7 +94,7 @@ public class Client {
   public void launch() throws IOException {
     sc.configureBlocking(false);
     var key = sc.register(selector, SelectionKey.OP_CONNECT);
-    uniqueContext = new ClientContext(key);
+    uniqueContext = new ClientContext(key,this);
     key.attach(uniqueContext);
     sc.connect(serverAddress);
 
