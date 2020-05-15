@@ -36,29 +36,29 @@ public class ServerChatHack {
   }
 
 
-  public boolean registerClient(String login) {
+  public boolean registerClient(String login, SelectionKey clientKey) {
     System.out.println("login: " + login);
-
     if (!isAvailableLogin(login))
       return false;
 
-
+    map.put(login, clientKey);
     return true;
   }
 
   private boolean isAvailableLogin(String login) {
-    return map.containsKey(login);
+    return !map.containsKey(login);
   }
 
   public void broadcast(ByteBuffer bb) {
     selector//
       .keys()
       .stream()
+      .filter(k -> k.isValid())
       .filter(k -> k.attachment() != null)
       .filter(k -> !k.equals(databaseContext.getKey()))
       .forEach(k ->
       {
-        System.out.println(bb);
+        // System.out.println(bb);
         var ctx = ((ServerContext) k.attachment());
         ctx.queueMessage(bb.duplicate());
       });

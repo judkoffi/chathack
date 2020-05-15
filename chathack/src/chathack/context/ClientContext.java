@@ -1,4 +1,4 @@
-package chathack;
+package chathack.context;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
@@ -6,7 +6,6 @@ import java.nio.channels.SelectionKey;
 import chathack.common.model.Message;
 import chathack.common.reader.IReader;
 import chathack.common.reader.MessageReader;
-import chathack.context.BaseContext;
 import chathack.frame.ClientFrameVisitor;
 
 public class ClientContext extends BaseContext{

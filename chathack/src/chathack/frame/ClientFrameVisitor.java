@@ -23,6 +23,12 @@ public class ClientFrameVisitor implements IFrameVisitor {
 		
 	}
 
+  @Override
+  public void visit(AuthentificatedConnection message) {
+    // TODO Auto-generated method stub
+    
+  }
+
 	
 
 }

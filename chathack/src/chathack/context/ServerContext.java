@@ -13,7 +13,7 @@ public class ServerContext extends BaseContext {
 
   public ServerContext(SelectionKey key, ServerChatHack server) {
     super(key);
-    this.serverFrameVisitor = new ServerFrameVisitor(server);
+    this.serverFrameVisitor = new ServerFrameVisitor(server, this);
   }
 
   private void handler(IFrame frame) {
@@ -46,7 +46,6 @@ public class ServerContext extends BaseContext {
       if (bbout.remaining() < bb.remaining())
         return;
 
-      // System.out.println(bb);
       queue.remove();
       bbout.put(bb);
     }

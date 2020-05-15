@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public class Main {
 
@@ -39,6 +40,10 @@ public class Main {
     bb.flip();
     System.out.println(bb);
     sc.write(bb);
+    var scan = new Scanner(System.in);
+    while (scan.hasNextLine()) {
+
+    }
   }
 
 
@@ -46,7 +51,7 @@ public class Main {
     var addr = new InetSocketAddress("localhost", 7777);
     var sc = SocketChannel.open(addr);
 
-    // sendAnonymousConnection(sc, "oeach");
-    sendBroadcastMsg(sc, "hello", "peach");
+    sendAnonymousConnection(sc, "oeach");
+    // sendBroadcastMsg(sc, "hello", "peach");
   }
 }
