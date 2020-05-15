@@ -10,7 +10,7 @@ import chathack.common.model.OpCode;
 public class Helper {
   private Helper() {}
 
-  public static final int BUFFER_SIZE = 10_000;
+  public static final int BUFFER_SIZE = 4096;
   public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
   public static OpCode byteToOpCode(byte b) {

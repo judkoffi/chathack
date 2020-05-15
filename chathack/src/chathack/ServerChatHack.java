@@ -17,7 +17,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import chathack.context.DatabaseContext;
 import chathack.context.ServerContext;
-import chathack.frame.ServerFrameVisitor;
 
 public class ServerChatHack {
   private static final Logger logger = Logger.getLogger(ServerChatHack.class.getName());
@@ -39,7 +38,7 @@ public class ServerChatHack {
 
   public boolean registerClient(String login) {
     System.out.println("login: " + login);
-    
+
     if (!isAvailableLogin(login))
       return false;
 
@@ -59,8 +58,9 @@ public class ServerChatHack {
       .filter(k -> !k.equals(databaseContext.getKey()))
       .forEach(k ->
       {
-        var ctx = ((ServerFrameVisitor) k.attachment()).getContext();
-        ctx.queueMessage(bb);
+        System.out.println(bb);
+        var ctx = ((ServerContext) k.attachment());
+        ctx.queueMessage(bb.duplicate());
       });
   }
 
@@ -110,7 +110,7 @@ public class ServerChatHack {
         if (databaseContext == attach) {
           databaseContext.doRead();
         } else {
-          ((ServerFrameVisitor) key.attachment()).getContext().doWrite();
+          ((ServerContext) key.attachment()).doWrite();
         }
       }
 
@@ -118,7 +118,7 @@ public class ServerChatHack {
         if (databaseContext == attach) {
           databaseContext.doRead();
         } else {
-          ((ServerFrameVisitor) key.attachment()).getContext().doRead();
+          ((ServerContext) key.attachment()).doRead();
         }
       }
     } catch (IOException e) {
@@ -133,7 +133,7 @@ public class ServerChatHack {
       return; // the selector gave a bad hint
     sc.configureBlocking(false);
     SelectionKey clientKey = sc.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
-    clientKey.attach(new ServerFrameVisitor(new ServerContext(clientKey, this), this));
+    clientKey.attach(new ServerContext(clientKey, this));
   }
 
   private void silentlyClose(SelectionKey key) {

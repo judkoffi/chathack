@@ -20,6 +20,14 @@ public class Main {
     bb.put(msgbb);
     bb.flip();
     sc.write(bb);
+
+    System.out.println("readdd");
+    bb.clear();
+    sc.read(bb);
+
+    bb.flip();
+    var size = bb.getInt();
+    System.out.println("login size: " + size);
   }
 
   private static void sendAnonymousConnection(SocketChannel sc, String login) throws IOException {

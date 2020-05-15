@@ -1,20 +1,14 @@
 package chathack.frame;
 
 import chathack.ServerChatHack;
-import chathack.context.ServerContext;
 
 public class ServerFrameVisitor implements IFrameVisitor {
-  private final ServerContext context;
   private final ServerChatHack server;
 
-  public ServerFrameVisitor(ServerContext context, ServerChatHack server) {
-    this.context = context;
+  public ServerFrameVisitor(ServerChatHack server) {
     this.server = server;
   }
 
-  public ServerContext getContext() {
-    return context;
-  }
 
   @Override
   public void visit(BroadcastMessage message) {

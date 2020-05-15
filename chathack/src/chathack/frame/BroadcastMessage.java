@@ -15,6 +15,7 @@ public class BroadcastMessage implements IFrame {
     return message.toBuffer();
   }
 
+
   @Override
   public void accept(IFrameVisitor frameVisitor) {
     frameVisitor.visit(this);
