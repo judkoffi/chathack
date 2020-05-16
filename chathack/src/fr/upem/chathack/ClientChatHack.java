@@ -1,10 +1,8 @@
 package fr.upem.chathack;
 
-import static fr.upem.chathack.utils.Helper.BUFFER_SIZE;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
-import java.nio.channels.Channel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -14,9 +12,9 @@ import java.util.logging.Logger;
 import fr.upem.chathack.common.model.Message;
 import fr.upem.chathack.context.ClientContext;
 
-public class Client {
+public class ClientChatHack {
 
-  private static final Logger logger = Logger.getLogger(Client.class.getName());
+  private static final Logger logger = Logger.getLogger(ClientChatHack.class.getName());
 
   private final SocketChannel sc;
   private final Selector selector;
@@ -27,28 +25,26 @@ public class Client {
   private String password;
   private Thread console = new Thread(this::consoleRun);
 
-  public Client(InetSocketAddress serverAddress, String path, String login) throws IOException {
+  public ClientChatHack(InetSocketAddress serverAddress, String path, String login)
+      throws IOException {
     this.serverAddress = serverAddress;
     this.login = login;
     this.sc = SocketChannel.open();
     this.selector = Selector.open();
   }
 
-  public Client(InetSocketAddress serverAddress, String path, String login, String password)
+  public ClientChatHack(InetSocketAddress serverAddress, String path, String login, String password)
       throws IOException {
     this(serverAddress, path, login); // call the other constructeur
     this.password = password;
-
   }
 
   private void consoleRun() {
-    try {
-      Scanner scan = new Scanner(System.in);
+    try (Scanner scan = new Scanner(System.in)) {
       while (scan.hasNextLine()) {
         var msg = scan.nextLine();
         sendCommand(msg);
       }
-
     } catch (InterruptedException e) {
       logger.info("Console thread has been interrupted");
     } finally {
@@ -65,7 +61,6 @@ public class Client {
 
   private void processCommands() {
     for (;;) {
-
       synchronized (commandQueue) {
         var line = this.commandQueue.poll();
         if (line == null) {
@@ -73,20 +68,20 @@ public class Client {
         }
 
         switch (line.charAt(0)) {
-          case '/':
+          case '/': {
             System.out.println("send files");
             break;
-
-          case '@':
+          }
+          case '@': {
             System.out.println("private message");
             break;
-
-          default:
+          }
+          default: {
             System.out.println("public message");
+            this.uniqueContext.queueMessage(new Message(login, line).toBuffer());
             return;
+          }
         }
-
-        this.uniqueContext.queueMessage(new Message(login, line).toBuffer());
       }
     }
   }
@@ -94,18 +89,20 @@ public class Client {
   public void launch() throws IOException {
     sc.configureBlocking(false);
     var key = sc.register(selector, SelectionKey.OP_CONNECT);
-    uniqueContext = new ClientContext(key,this);
+    uniqueContext = new ClientContext(key, this);
     key.attach(uniqueContext);
     sc.connect(serverAddress);
 
-    console.start();
+    /**
+     * When, client connected, send anonymous or authenticated request to connect client with server
+     */
+
+    console.start();// run stdin thread
 
     while (!Thread.interrupted()) {
       try {
         selector.select(this::treatKey);
-
         processCommands();
-
       } catch (UncheckedIOException tunneled) {
         throw tunneled.getCause();
       }
@@ -130,9 +127,8 @@ public class Client {
   }
 
   private void silentlyClose(SelectionKey key) {
-    Channel sc = (Channel) key.channel();
     try {
-      sc.close();
+      key.channel().close();
     } catch (IOException e) {
       // ignore exception
     }
@@ -143,22 +139,23 @@ public class Client {
   }
 
   public static void main(String[] args) throws NumberFormatException, IOException {
-    if (args.length == 4) {
-      // IP address server ,nb port, path, login
-
-      new Client(new InetSocketAddress(args[0], Integer.parseInt(args[1])), args[2], args[3])
-        .launch();
-
-    } else if (args.length == 5) {
-      // IP address server ,nb port, path, login, password
-      new Client(new InetSocketAddress(args[0], Integer.parseInt(args[1])), args[2], args[3],
-          args[4]).launch();
-
-    } else {
+    if (args.length < 4 || args.length > 5) {
       usage();
       return;
     }
 
+    var srvAddr = new InetSocketAddress(args[0], Integer.valueOf(args[1]));
+    ClientChatHack client = null;
+
+    // IP address server ,nb port, path, login
+    if (args.length == 4) {
+      client = new ClientChatHack(srvAddr, args[2], args[3]);
+    } else {
+      // IP address server ,nb port, path, login, password
+      client = new ClientChatHack(srvAddr, args[2], args[3], args[4]);
+    }
+
     System.out.println("connection to server");
+    client.launch();
   }
 }

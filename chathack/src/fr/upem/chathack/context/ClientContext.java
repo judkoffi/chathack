@@ -2,7 +2,7 @@ package fr.upem.chathack.context;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
-import fr.upem.chathack.Client;
+import fr.upem.chathack.ClientChatHack;
 import fr.upem.chathack.common.model.Message;
 import fr.upem.chathack.common.reader.FrameReader;
 import fr.upem.chathack.common.reader.IReader;
@@ -17,9 +17,9 @@ import fr.upem.chathack.frame.IFrameVisitor;
 public class ClientContext extends BaseContext implements IFrameVisitor {
   private final MessageReader messageReader = new MessageReader();
   private final FrameReader reader = new FrameReader();
-  private final Client client;
+  private final ClientChatHack client;
   
-  public ClientContext(SelectionKey key, Client client) {
+  public ClientContext(SelectionKey key, ClientChatHack client) {
     super(key);
     this.client = client;
   }
