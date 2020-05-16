@@ -9,7 +9,6 @@ import java.nio.channels.SocketChannel;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
-
 import fr.upem.chathack.common.model.LongSizedString;
 import fr.upem.chathack.common.model.Message;
 import fr.upem.chathack.context.ClientContext;
@@ -83,8 +82,8 @@ public class ClientChatHack {
           }
           default: {
             System.out.println("public message");
-            Message message = new Message(new LongSizedString(this.login), new LongSizedString(line));
-            this.uniqueContext.queueMessage(new BroadcastMessage(message).toBuffer());
+            Message msg = new Message(new LongSizedString(this.login), new LongSizedString(line));
+            this.uniqueContext.queueMessage(new BroadcastMessage(msg).toBuffer());
             return;
           }
         }
@@ -98,18 +97,23 @@ public class ClientChatHack {
     uniqueContext = new ClientContext(key, this);
     key.attach(uniqueContext);
     sc.connect(serverAddress);
-    
-    var request = this.password == null
-    		? new AnonymousConnection(new LongSizedString(login))
-    		:new AuthentificatedConnection(new LongSizedString(login), new LongSizedString(password));
-        		
-    this.uniqueContext.queueMessage(request.toBuffer());
+
 
     /**
      * When, client connected, send anonymous or authenticated request to connect client with server
      */
 
+    var request = this.password == null //
+        ? new AnonymousConnection(new LongSizedString(login))
+        : new AuthentificatedConnection(new LongSizedString(login), new LongSizedString(password));
+
+    var bb = request.toBuffer();
+    System.out.println("bb: " + bb);
+    this.uniqueContext.putInQueue(bb);
+
+
     console.start();// run stdin thread
+    // console.setDaemon(true);
 
     while (!Thread.interrupted()) {
       try {

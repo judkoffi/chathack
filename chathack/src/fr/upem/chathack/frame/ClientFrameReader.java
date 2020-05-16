@@ -1,11 +1,10 @@
-package fr.upem.chathack.common.reader.trame;
+package fr.upem.chathack.frame;
 
 import java.nio.ByteBuffer;
 import fr.upem.chathack.common.model.OpCode;
 import fr.upem.chathack.common.reader.IReader;
-import fr.upem.chathack.frame.IFrame;
 
-public class FrameReader implements IReader<IFrame> {
+public class ClientFrameReader implements IReader<IFrame> {
 
   private enum State {
     WAITING_OPCODE, WAITING_CONTENT, DONE, ERROR
@@ -14,21 +13,16 @@ public class FrameReader implements IReader<IFrame> {
   /**
    * Readers
    */
-  private final BroadcastMessageReader broadcastMessageReader;
-  private final AnonymousConnectionReader anonymousReader;
-  private final AuthentificatedConnectionReader authenticatedReader;
+  private final ServerMessageReader serverMessageReader;
+
+  public ClientFrameReader() {
+    this.serverMessageReader = new ServerMessageReader();
+    this.state = State.WAITING_OPCODE;
+  }
 
   private State state;
   private IReader<? extends IFrame> currentFrameReader;
   private IFrame value;
-
-
-  public FrameReader() {
-    this.broadcastMessageReader = new BroadcastMessageReader();
-    this.anonymousReader = new AnonymousConnectionReader();
-    this.authenticatedReader = new AuthentificatedConnectionReader();
-    this.state = State.WAITING_OPCODE;
-  }
 
   @Override
   public ProcessStatus process(ByteBuffer bb) {
@@ -42,16 +36,9 @@ public class FrameReader implements IReader<IFrame> {
         var opcode = bb.get();
         bb.compact();
         switch (opcode) {
-          case OpCode.ANONYMOUS_CLIENT_CONNECTION:
-            currentFrameReader = anonymousReader;
+          case OpCode.SERVER_ERROR_MESSAGE:
+            currentFrameReader = serverMessageReader;
             break;
-          case OpCode.AUTHENTICATED_CLIENT_CONNECTION:
-            currentFrameReader = authenticatedReader;
-            break;
-          case OpCode.BROADCAST_MESSAGE:
-            currentFrameReader = broadcastMessageReader;
-            break;
-
           default:
             throw new IllegalArgumentException("unknow opcode " + opcode);
         }
@@ -71,7 +58,6 @@ public class FrameReader implements IReader<IFrame> {
     }
   }
 
-
   @Override
   public IFrame get() {
     if (state != State.DONE) {
@@ -84,8 +70,6 @@ public class FrameReader implements IReader<IFrame> {
   public void reset() {
     state = State.WAITING_OPCODE;
     value = null;
-    broadcastMessageReader.reset();
-    authenticatedReader.reset();
-    anonymousReader.reset();
+    serverMessageReader.reset();
   }
 }

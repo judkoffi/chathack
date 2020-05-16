@@ -20,7 +20,7 @@ public class AnonymousConnection implements IFrame {
     var bb = ByteBuffer.allocate(Byte.BYTES + (int) sizedString.getSize() + Long.BYTES);
     bb.put(OpCode.ANONYMOUS_CLIENT_CONNECTION);
     bb.put(sizedString.toBuffer());
-    return bb;
+    return bb.flip();
   }
 
   @Override

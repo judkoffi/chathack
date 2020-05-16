@@ -15,7 +15,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
 import fr.upem.chathack.common.model.LongSizedString;
 import fr.upem.chathack.common.reader.IReader;
-import fr.upem.chathack.common.reader.trame.FrameReader;
+import fr.upem.chathack.common.reader.trame.ServerFrameReader;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
 
@@ -28,7 +28,7 @@ public class ClientChatDone {
     final private ByteBuffer bbin = ByteBuffer.allocate(BUFFER_SIZE);
     final private ByteBuffer bbout = ByteBuffer.allocate(BUFFER_SIZE);
     final private Queue<ByteBuffer> queue = new LinkedList<>(); // buffers read-mode
-    final private FrameReader messageReader = new FrameReader();
+    final private ServerFrameReader messageReader = new ServerFrameReader();
     private boolean closed = false;
 
 

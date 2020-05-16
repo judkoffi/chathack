@@ -5,16 +5,17 @@ import java.nio.channels.SelectionKey;
 import fr.upem.chathack.ServerChatHack;
 import fr.upem.chathack.builder.ServerResponseBuilder;
 import fr.upem.chathack.common.reader.IReader;
-import fr.upem.chathack.common.reader.trame.FrameReader;
+import fr.upem.chathack.common.reader.trame.ServerFrameReader;
 import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
 import fr.upem.chathack.frame.DirectMessage;
 import fr.upem.chathack.frame.IFrame;
 import fr.upem.chathack.frame.IFrameVisitor;
+import fr.upem.chathack.frame.ServerMessage;
 
 public class ServerContext extends BaseContext implements IFrameVisitor {
-  private final FrameReader reader = new FrameReader();
+  private final ServerFrameReader reader = new ServerFrameReader();
   private final ServerChatHack server;
 
   public ServerContext(SelectionKey key, ServerChatHack server) {
@@ -107,6 +108,11 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
     } catch (IOException e) {
       //
     }
+  }
+
+  @Override
+  public void visit(ServerMessage serverMessage) {
+
   }
 
 }
