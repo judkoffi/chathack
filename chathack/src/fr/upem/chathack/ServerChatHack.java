@@ -25,7 +25,7 @@ import fr.upem.chathack.frame.AuthentificatedConnection;
 
 public class ServerChatHack {
   /**
-   * CLasse ise to maintain some information about connected client
+   * Class use to keep some information about connected client
    */
   private static class ClientInfo {
     private boolean isAuthenticated;
@@ -133,15 +133,19 @@ public class ServerChatHack {
       .filter(e -> e != null)
       .ifPresent(c ->
       {
-        System.out.println("send auth response");
-        // good login / password
-        if (msg.getByte() == (byte) 1) {
-          System.out.println("good crendentiel");
-          map.get(entry.getKey()).isAuthenticated = true;
-        } else {
-          System.out.println("wrong crendentiel");
-          map.remove(entry.getKey());
-          silentlyClose(entry.getValue().key);
+        var op = DatabaseRequestBuilder.byteToResponseDBOpcode(msg.getByte());
+        switch (op) {
+          case BAD_CREDENTIAL:
+            System.out.println("wrong credential");
+            map.remove(entry.getKey());
+            silentlyClose(entry.getValue().key);
+            break;
+          case GOOD_CREDENTIAL:
+            System.out.println("good credential");
+            map.get(entry.getKey()).isAuthenticated = true;
+            break;
+          default:
+            break;
         }
       });
   }
@@ -152,15 +156,15 @@ public class ServerChatHack {
     dbConnection();
 
     while (!Thread.interrupted()) {
-      System.out.println("Starting select");
-      // printKeys();
+      // System.out.println("Starting select");
+      printKeys();
       try {
         selector.select(this::treatKey);
         System.out.println(map);
       } catch (UncheckedIOException tunneled) {
         throw tunneled.getCause();
       }
-      System.out.println("Select finished");
+      // System.out.println("Select finished");
     }
   }
 
@@ -169,7 +173,6 @@ public class ServerChatHack {
     var dbKey = dbChannel.register(selector, SelectionKey.OP_WRITE);
     databaseContext = new DatabaseContext(dbKey, this);
     dbKey.attach(databaseContext);
-    // dbChannel.connect(databaseAddress);
   }
 
   private void treatKey(SelectionKey key) {
