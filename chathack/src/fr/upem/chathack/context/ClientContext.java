@@ -15,7 +15,6 @@ import fr.upem.chathack.frame.IFrame;
 import fr.upem.chathack.frame.IFrameVisitor;
 
 public class ClientContext extends BaseContext implements IFrameVisitor {
-  private final IntMessageReader messageReader = new IntMessageReader();
   private final FrameReader reader = new FrameReader();
   private final ClientChatHack client;
   
@@ -25,17 +24,18 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
   }
 
   private void handler(IFrame frame) {
-	 frame.accept(this); //pas sur
+	 frame.accept(this); 
   }
   
   @Override
   public void processIn() {
     for (;;) {
-      IReader.ProcessStatus status = messageReader.process(bbin);
+      IReader.ProcessStatus status = reader.process(bbin);
       switch (status) {
         case DONE:
-          Message msg = messageReader.get();
-          messageReader.reset();
+          var msg = reader.get();
+          handler(msg);
+          reader.reset();
           System.out.println("message read : " + msg);
           break;
         case REFILL:
