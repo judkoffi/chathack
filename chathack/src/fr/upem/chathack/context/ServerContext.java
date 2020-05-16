@@ -73,12 +73,7 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
     if (!server.isAvailableLogin(message.getLogin())) {
       var msg = ServerResponseBuilder.errorResponse("Login not available");
       server.sendMessageToClient(msg, key);
-      try {
-        sc.shutdownInput();
-      } catch (IOException e) {
-        //
-      }
-      // silentlyClose();
+      silenceInuputClose();
       return;
     }
     server.registerAnnonymousClient(message.getLogin(), key);
@@ -90,7 +85,7 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
     if (!server.isAvailableLogin(message.getLogin().getValue())) {
       var msg = ServerResponseBuilder.errorResponse("Login not available");
       server.sendMessageToClient(msg, key);
-      // silentlyClose();
+      silenceInuputClose();
       return;
     }
     server.registerAuthenticatedClient(message, key);
@@ -104,6 +99,14 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
   @Override
   public int hashCode() {
     return super.hashCode();
+  }
+
+  private void silenceInuputClose() {
+    try {
+      sc.shutdownInput();
+    } catch (IOException e) {
+      //
+    }
   }
 
 }
