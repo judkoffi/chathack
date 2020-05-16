@@ -1,18 +1,23 @@
 package fr.upem.chathack.frame;
 
 import java.nio.ByteBuffer;
-import fr.upem.chathack.common.model.Message;
+import fr.upem.chathack.common.model.BiString;
+import fr.upem.chathack.common.model.OpCode;
 
 public class AuthentificatedConnection implements IFrame {
-  private final Message message;
+  private final BiString message;
 
-  public AuthentificatedConnection(Message message) {
+  public AuthentificatedConnection(BiString message) {
     this.message = message;
   }
 
   @Override
   public ByteBuffer toBuffer() {
-    return message.toBuffer();
+    var messageBb = message.toBuffer();
+    var bb = ByteBuffer.allocate(Byte.BYTES + messageBb.limit());
+    bb.put(OpCode.AUTHENTICATED_CLIENT_CONNECTION);
+    bb.put(messageBb);
+    return bb.duplicate().flip();
   }
 
   @Override
@@ -22,5 +27,14 @@ public class AuthentificatedConnection implements IFrame {
 
   public String getLogin() {
     return message.getLogin();
+  }
+
+  @Override
+  public String toString() {
+    return "2 | " + message.toString();
+  }
+
+  public ByteBuffer getContentBuffer() {
+    return message.toBuffer();
   }
 }

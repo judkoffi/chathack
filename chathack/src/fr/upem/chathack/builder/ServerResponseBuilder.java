@@ -11,7 +11,11 @@ public class ServerResponseBuilder {
   public static ByteBuffer errorResponse(String msg) {
     var encodedMsg = Helper.DEFAULT_CHARSET.encode(msg);
     var bb = ByteBuffer.allocate(Byte.BYTES + Long.BYTES + encodedMsg.limit());
-    bb.put(OpCode.ERROR_MESSAGE);
+    System.out.println("err op code " + OpCode.SERVER_ERROR_MESSAGE);
+    bb.put(OpCode.SERVER_ERROR_MESSAGE);
+    bb.putInt(encodedMsg.limit());
+    bb.put(encodedMsg);
+    bb.flip();
     return bb;
   }
 

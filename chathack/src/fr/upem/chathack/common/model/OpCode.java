@@ -25,7 +25,7 @@ public class OpCode {
   /********************************
    * ServerResponse Opcode
    *******************************/
-  public static final byte ERROR_MESSAGE = (byte) -1;
+  public static final byte SERVER_ERROR_MESSAGE = (byte) -1;
 
 
   /********************************

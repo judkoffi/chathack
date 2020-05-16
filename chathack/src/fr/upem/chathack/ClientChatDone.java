@@ -13,9 +13,11 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
-import fr.upem.chathack.common.model.Message;
+import fr.upem.chathack.common.model.BiString;
+import fr.upem.chathack.common.reader.FrameReader;
 import fr.upem.chathack.common.reader.IReader;
-import fr.upem.chathack.common.reader.MessageReader;
+import fr.upem.chathack.common.reader.BiStringReader;
+import fr.upem.chathack.frame.AuthentificatedConnection;
 
 public class ClientChatDone {
 
@@ -26,7 +28,7 @@ public class ClientChatDone {
     final private ByteBuffer bbin = ByteBuffer.allocate(BUFFER_SIZE);
     final private ByteBuffer bbout = ByteBuffer.allocate(BUFFER_SIZE);
     final private Queue<ByteBuffer> queue = new LinkedList<>(); // buffers read-mode
-    final private MessageReader messageReader = new MessageReader();
+    final private FrameReader messageReader = new FrameReader();
     private boolean closed = false;
 
 
@@ -47,7 +49,7 @@ public class ClientChatDone {
         IReader.ProcessStatus status = messageReader.process(bbin);
         switch (status) {
           case DONE:
-            Message msg = messageReader.get();
+            var msg = messageReader.get();
             messageReader.reset();
             System.out.println("message read : " + msg);
             break;
@@ -232,7 +234,9 @@ public class ClientChatDone {
         if (line == null) {
           return;
         }
-        this.uniqueContext.queueMessage(new Message(login, line).toBuffer());
+        System.out.println("line: " + line);
+        this.uniqueContext
+          .queueMessage(new AuthentificatedConnection(new BiString(login, line)).toBuffer());
       }
     }
   }

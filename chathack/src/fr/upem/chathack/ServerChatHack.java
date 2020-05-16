@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import fr.upem.chathack.builder.DatabaseRequestBuilder;
+import fr.upem.chathack.builder.ServerResponseBuilder;
 import fr.upem.chathack.common.model.ByteLong;
 import fr.upem.chathack.common.model.OpCode;
 import fr.upem.chathack.context.BaseContext;
@@ -113,7 +114,7 @@ public class ServerChatHack {
   public void registerAuthenticatedClient(AuthentificatedConnection message, SelectionKey key) {
     var login = message.getLogin();
     map.put(login, new ClientInfo(key, getMapId()));
-    var bb = DatabaseRequestBuilder.buildCheckRequest(map.get(login).id, message.toBuffer());
+    var bb = DatabaseRequestBuilder.checkRequest(map.get(login).id, message.getContentBuffer());
     databaseContext.checkLogin(bb);
   }
 
@@ -137,12 +138,14 @@ public class ServerChatHack {
         byte b = msg.getByte();
         switch (b) {
           case OpCode.BAD_CREDENTIAL:
-            System.out.println("wrong credential");
+            System.out.println("wrong credential id " + entry.getValue().id);
             map.remove(entry.getKey());
-            silentlyClose(entry.getValue().key);
+            c.queueMessage(ServerResponseBuilder.errorResponse("Wrong credentials").duplicate());
+            c.processOut();
+            //silentlyClose(entry.getValue().key);
             break;
           case OpCode.GOOD_CREDENTIAL:
-            System.out.println("good credential");
+            System.out.println("good credential id " + entry.getValue().id);
             map.get(entry.getKey()).isAuthenticated = true;
             break;
           default:

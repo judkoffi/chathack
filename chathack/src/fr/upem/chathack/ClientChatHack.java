@@ -9,7 +9,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
-import fr.upem.chathack.common.model.Message;
+import fr.upem.chathack.common.model.BiString;
 import fr.upem.chathack.context.ClientContext;
 
 public class ClientChatHack {
@@ -78,7 +78,7 @@ public class ClientChatHack {
           }
           default: {
             System.out.println("public message");
-            this.uniqueContext.queueMessage(new Message(login, line).toBuffer());
+            this.uniqueContext.queueMessage(new BiString(login, line).toBuffer());
             return;
           }
         }

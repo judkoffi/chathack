@@ -15,7 +15,7 @@ public class FrameReader implements IReader<IFrame> {
   }
 
   private final ByteReader byteReader = new ByteReader();
-  private final MessageReader messageReader = new MessageReader();
+  private final BiStringReader messageReader = new BiStringReader();
   private final StringReader stringReader = new StringReader();
 
   private State state = State.WAITING_OPCODE;
@@ -37,6 +37,7 @@ public class FrameReader implements IReader<IFrame> {
 
         // TODO: add opcode check
         opCode = byteReader.get();
+        System.out.println("FrameReader opcode read value " + opCode);
         state = State.WAITING_CONTENT;
       }
 
@@ -80,6 +81,14 @@ public class FrameReader implements IReader<IFrame> {
             break;
           case OpCode.SUCCEDED_PRIVATE_CLIENT_CONNECTION:
             break;
+
+
+
+          case OpCode.SERVER_ERROR_MESSAGE:
+            System.out.println("error message server");
+            break;
+
+
           default:
             break;
         }

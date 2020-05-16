@@ -2,10 +2,10 @@
 package fr.upem.chathack.common.reader;
 
 import java.nio.ByteBuffer;
-import fr.upem.chathack.common.model.Message;
+import fr.upem.chathack.common.model.BiString;
 
-public class MessageReader implements IReader<Message> {
-  private Message message;
+public class BiStringReader implements IReader<BiString> {
+  private BiString message;
 
   private enum State {
     WAITING_LOGIN, WAITING_MESSAGE, DONE, ERROR
@@ -51,7 +51,7 @@ public class MessageReader implements IReader<Message> {
 
         state = State.DONE;
         var msg = stringReader.get();
-        message = new Message(login, msg);
+        message = new BiString(login, msg);
         return ProcessStatus.DONE;
       }
       default:
@@ -60,7 +60,7 @@ public class MessageReader implements IReader<Message> {
   }
 
   @Override
-  public Message get() {
+  public BiString get() {
     if (state != State.DONE) {
       throw new IllegalStateException();
     }

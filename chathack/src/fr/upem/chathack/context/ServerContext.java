@@ -88,6 +88,7 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
       return;
     }
     System.out.println("AuthentificatedConnection login available ");
+    System.out.println("auth message: " + message);
     server.registerAuthenticatedClient(message, key);
   }
 

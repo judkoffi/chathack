@@ -5,7 +5,9 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
+import fr.upem.chathack.common.reader.FrameReader;
+import fr.upem.chathack.common.reader.IReader;
+import fr.upem.chathack.frame.IFrame;
 
 public class Main {
 
@@ -40,6 +42,7 @@ public class Main {
     bb.flip();
     System.out.println(bb);
     sc.write(bb);
+
   }
 
   private static void sendAuthenticatedConnection(SocketChannel sc, String login, String pass)
@@ -53,13 +56,20 @@ public class Main {
     bb.putInt(passbb.limit());
     bb.put(passbb);
     bb.flip();
+    System.out.println(bb);
     sc.write(bb);
 
     System.out.println("readdd");
     bb.clear();
 
-    sc.read(bb);
     System.out.println(bb);
+
+    sc.read(bb);
+    byte b = bb.get();
+    System.out.println("op :" + b);
+    long s = bb.getLong();
+    System.out.println("length :" + s);
+    System.out.println(StandardCharsets.UTF_8.decode(bb));
   }
 
 
@@ -74,8 +84,8 @@ public class Main {
 
     var login = args[0];
 
-    // sendAuthenticatedConnection(sc, login, "test");
+    sendAuthenticatedConnection(sc, login, "test");
     // sendAnonymousConnection(sc, login);
-    sendBroadcastMsg(sc, login, "hello");
+    // sendBroadcastMsg(sc, login, "hello");
   }
 }
