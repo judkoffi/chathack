@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class Main {
 
-  private static void sendBroadcastMsg(SocketChannel sc, String message, String login)
+  private static void sendBroadcastMsg(SocketChannel sc, String login, String message)
       throws IOException {
     var bb = ByteBuffer.allocate(1024);
     bb.put((byte) 2);
@@ -68,11 +68,18 @@ public class Main {
 
 
   public static void main(String[] args) throws IOException {
+    if (args.length != 1) {
+      System.err.println("Usage Main login");
+      return;
+    }
+
     var addr = new InetSocketAddress("localhost", 7777);
     var sc = SocketChannel.open(addr);
 
-    // sendAuthenticatedConnection(sc, "oeach", "ljcqj");
-    // sendAnonymousConnection(sc, "oeach");
-    sendBroadcastMsg(sc, "hello", "peach");
+    var login = args[0];
+
+    sendAuthenticatedConnection(sc, login, "test");
+    // sendAnonymousConnection(sc, login);
+    // sendBroadcastMsg(sc, login, "hello");
   }
 }

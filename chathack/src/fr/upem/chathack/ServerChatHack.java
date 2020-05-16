@@ -16,20 +16,43 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import fr.upem.chathack.builder.DatabaseRequestBuilder;
+import fr.upem.chathack.common.model.ByteLong;
 import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.context.DatabaseContext;
 import fr.upem.chathack.context.ServerContext;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 
-/*
- * Champs isAuthentificated qui designe l'état du client pour definir les actions disponible
- */
+
 public class ServerChatHack {
+  /**
+   * CLasse ise to maintain some information about connected client
+   */
+  private static class ClientInfo {
+    private boolean isAuthenticated;
+    private SelectionKey key;
+    private long id;
+
+    private ClientInfo(boolean isAuthenticated, SelectionKey key, long id) {
+      this.isAuthenticated = isAuthenticated;
+      this.key = key;
+      this.id = id;
+    }
+
+    private ClientInfo(SelectionKey key, long id) {
+      this(false, key, id);
+    }
+
+    @Override
+    public String toString() {
+      return "id: " + id;
+    }
+  }
+
   private static final Logger logger = Logger.getLogger(ServerChatHack.class.getName());
   private final Selector selector;
   private final ServerSocketChannel serverSocketChannel;
   private final SocketChannel dbChannel;
-  private final HashMap<String, SelectionKey> map = new HashMap<>();
+  private final HashMap<String, ClientInfo> map = new HashMap<>();
   private DatabaseContext databaseContext;
   private final InetSocketAddress databaseAddress;
 
@@ -43,24 +66,29 @@ public class ServerChatHack {
     selector = Selector.open();
   }
 
+  private long getMapId() {
+    return map
+      .entrySet()
+      .stream()
+      .max((e1, e2) -> e1.getValue().id > e2.getValue().id ? 1 : -1)
+      .map(p -> p.getValue().id + 1)
+      .orElse((long) 1); // map empty
+  }
+
   public boolean registerAnnonymousClient(String login, SelectionKey clientKey) {
     if (!isAvailableLogin(login))
       return false;
-    map.put(login, clientKey);
+
+    /*
+     * Find the highest id in map and increment with 1 to have new id
+     */
+    map.put(login, new ClientInfo(true, clientKey, getMapId()));
     return true;
   }
 
-  private boolean isAvailableLogin(String login) {
-    return !map.containsKey(login);
-  }
-
-  public void registerAuthenticatedClient(AuthentificatedConnection message) {
-    var bb = DatabaseRequestBuilder.buildCheckRequest(message.toBuffer());
-    databaseContext.checkLogin(bb);
-  }
 
   public void broadcast(ByteBuffer bb) {
-    selector//
+    selector
       .keys()
       .stream()
       .filter(SelectionKey::isValid)
@@ -68,9 +96,53 @@ public class ServerChatHack {
       .filter(k -> !k.equals(databaseContext.getKey()))
       .forEach(k ->
       {
-        // System.out.println(bb);
         var ctx = ((ServerContext) k.attachment());
         ctx.queueMessage(bb.duplicate());
+      });
+  }
+
+
+  public boolean isAvailableLogin(String login) {
+    return !map.containsKey(login);
+  }
+
+  /*****************************
+   * Database methods
+   ******************************/
+  public void registerAuthenticatedClient(AuthentificatedConnection message, SelectionKey key) {
+    var login = message.getLogin();
+    map.put(login, new ClientInfo(key, getMapId()));
+    var bb = DatabaseRequestBuilder.buildCheckRequest(map.get(login).id, message.toBuffer());
+    databaseContext.checkLogin(bb);
+  }
+
+
+  public void responseCheckLogin(ByteLong msg) {
+    var clt = map.entrySet().stream().filter(p -> p.getValue().id == msg.getLong()).findFirst();
+    if (clt.isEmpty())
+      return;
+
+    var entry = clt.get();
+
+    selector
+      .keys()
+      .stream()
+      .filter(key -> key.equals(entry.getValue().key))
+      .map(m -> (ServerContext) m.attachment())
+      .findFirst()
+      .filter(e -> e != null)
+      .ifPresent(c ->
+      {
+        System.out.println("send auth response");
+        // good login / password
+        if (msg.getByte() == (byte) 1) {
+          System.out.println("good crendentiel");
+          map.get(entry.getKey()).isAuthenticated = true;
+        } else {
+          System.out.println("wrong crendentiel");
+          map.remove(entry.getKey());
+          silentlyClose(entry.getValue().key);
+        }
       });
   }
 
@@ -84,6 +156,7 @@ public class ServerChatHack {
       // printKeys();
       try {
         selector.select(this::treatKey);
+        System.out.println(map);
       } catch (UncheckedIOException tunneled) {
         throw tunneled.getCause();
       }
@@ -94,7 +167,7 @@ public class ServerChatHack {
   private void dbConnection() throws IOException {
     dbChannel.configureBlocking(false);
     var dbKey = dbChannel.register(selector, SelectionKey.OP_WRITE);
-    databaseContext = new DatabaseContext(dbKey);
+    databaseContext = new DatabaseContext(dbKey, this);
     dbKey.attach(databaseContext);
     // dbChannel.connect(databaseAddress);
   }
@@ -140,6 +213,7 @@ public class ServerChatHack {
       // ignore exception
     }
   }
+
 
   public static void main(String[] args) throws NumberFormatException, IOException {
     if (args.length != 3) {

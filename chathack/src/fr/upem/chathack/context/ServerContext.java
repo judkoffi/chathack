@@ -71,17 +71,24 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
   public void visit(AnonymousConnection message) {
     boolean availableLogin = server.registerAnnonymousClient(message.getLogin(), key);
     if (!availableLogin) {
-      System.out.println("pas libre");
+      System.out.println("AnonymousConnection login not available");
       silentlyClose();
       return;
     }
-    System.out.println("libre");
+    System.out.println("AnonymousConnection login available");
   }
 
 
   @Override
   public void visit(AuthentificatedConnection message) {
-    server.registerAuthenticatedClient(message);
+    if (!server.isAvailableLogin(message.getLogin())) {
+      // Not available login
+      System.out.println("AuthentificatedConnection login not available ");
+      silentlyClose();
+      return;
+    }
+    System.out.println("AuthentificatedConnection login available ");
+    server.registerAuthenticatedClient(message, key);
   }
 
   @Override

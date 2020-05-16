@@ -18,11 +18,12 @@ public class DatabaseRequestBuilder {
   }
 
 
-  public static ByteBuffer buildCheckRequest(ByteBuffer bb) {
+  public static ByteBuffer buildCheckRequest(long id, ByteBuffer bb) {
     var requestBuffer = ByteBuffer.allocate(Byte.BYTES + Long.BYTES + bb.limit());
     requestBuffer.put(requestEnumToByte(DatabaseRequestEnum.ASK_CREDENTIAL));
-    requestBuffer.putLong(1);
+    requestBuffer.putLong(id);
     requestBuffer.put(bb);
     return requestBuffer.flip();
   }
+
 }

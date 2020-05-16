@@ -23,6 +23,15 @@ public class ByteLong {
     return bb.duplicate().flip();
   }
 
+
+  public byte getByte() {
+    return opcode;
+  }
+
+  public long getLong() {
+    return value;
+  }
+
   @Override
   public String toString() {
     return "op: " + opcode + " value: " + value;

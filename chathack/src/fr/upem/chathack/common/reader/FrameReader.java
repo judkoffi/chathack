@@ -55,10 +55,8 @@ public class FrameReader implements IReader<IFrame> {
           case AUTHENTICATED_CLIENT_CONNECTION:
             contentProcess = contentProcess(bb, messageReader::process);
             if (contentProcess != ProcessStatus.DONE) {
-              System.out.println("status: " + contentProcess);
               return contentProcess;
             }
-            System.out.println("knkn");
             value = new AuthentificatedConnection(messageReader.get());
             state = State.DONE;
             return ProcessStatus.DONE;

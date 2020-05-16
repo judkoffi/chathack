@@ -19,4 +19,8 @@ public class AuthentificatedConnection implements IFrame {
   public void accept(IFrameVisitor frameVisitor) {
     frameVisitor.visit(this);
   }
+
+  public String getLogin() {
+    return message.getLogin();
+  }
 }
