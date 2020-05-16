@@ -46,7 +46,7 @@ public class ClientFrameReader implements IReader<IFrame> {
         	  currentFrameReader = broadcastMessageReader;
         	break;
           default:
-            throw new IllegalArgumentException("unknow opcode " + opcode);
+            throw new IllegalArgumentException("unknown opcode " + opcode);
         }
         state = State.WAITING_CONTENT;
       }
