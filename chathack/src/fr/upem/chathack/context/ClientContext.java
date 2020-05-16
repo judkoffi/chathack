@@ -75,7 +75,7 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(BroadcastMessage message) {
-    System.out.println("visit broadcast msg : " + message);
+    System.out.println(message);
 
   }
 
@@ -84,6 +84,7 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(ServerMessage serverMessage) {
+	  this.client.interruptConsole();
     System.out.println(serverMessage);
   }
 

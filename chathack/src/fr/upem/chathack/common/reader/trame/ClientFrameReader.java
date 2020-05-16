@@ -15,9 +15,11 @@ public class ClientFrameReader implements IReader<IFrame> {
    * Readers
    */
   private final ServerMessageReader serverMessageReader;
+  private final BroadcastMessageReader broadcastMessageReader;
 
   public ClientFrameReader() {
     this.serverMessageReader = new ServerMessageReader();
+    this.broadcastMessageReader = new BroadcastMessageReader();
     this.state = State.WAITING_OPCODE;
   }
 
@@ -40,6 +42,9 @@ public class ClientFrameReader implements IReader<IFrame> {
           case OpCode.SERVER_ERROR_MESSAGE:
             currentFrameReader = serverMessageReader;
             break;
+          case OpCode.BROADCAST_MESSAGE:
+        	  currentFrameReader = broadcastMessageReader;
+        	break;
           default:
             throw new IllegalArgumentException("unknow opcode " + opcode);
         }
@@ -72,5 +77,6 @@ public class ClientFrameReader implements IReader<IFrame> {
     state = State.WAITING_OPCODE;
     value = null;
     serverMessageReader.reset();
+    broadcastMessageReader.reset();
   }
 }

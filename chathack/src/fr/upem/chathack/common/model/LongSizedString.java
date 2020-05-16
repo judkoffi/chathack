@@ -41,6 +41,6 @@ public class LongSizedString {
 
   @Override
   public String toString() {
-    return content + "[" + size + "]";
+    return content;
   }
 }

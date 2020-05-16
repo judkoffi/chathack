@@ -81,7 +81,6 @@ public class ClientChatHack {
             break;
           }
           default: {
-            System.out.println("public message");
             Message msg = new Message(new LongSizedString(this.login), new LongSizedString(line));
             this.uniqueContext.queueMessage(new BroadcastMessage(msg).toBuffer());
             return;
@@ -108,12 +107,11 @@ public class ClientChatHack {
         : new AuthentificatedConnection(new LongSizedString(login), new LongSizedString(password));
 
     var bb = request.toBuffer();
-    System.out.println("bb: " + bb);
     this.uniqueContext.putInQueue(bb);
 
-
+    //console.setDaemon(true);
     console.start();// run stdin thread
-    // console.setDaemon(true);
+   
 
     while (!Thread.interrupted()) {
       try {
@@ -123,6 +121,7 @@ public class ClientChatHack {
         throw tunneled.getCause();
       }
     }
+    System.out.println("ngzoon");
   }
 
   private void treatKey(SelectionKey key) {
@@ -148,6 +147,10 @@ public class ClientChatHack {
     } catch (IOException e) {
       // ignore exception
     }
+  }
+  
+  public void interruptConsole() {
+	  this.console.interrupt();
   }
 
   private static void usage() {

@@ -47,6 +47,7 @@ public class BroadcastMessageReader implements IReader<BroadcastMessage> {
         return ProcessStatus.DONE;
       }
       default:
+    	  System.out.println(state);
         throw new IllegalStateException();
     }
   }
