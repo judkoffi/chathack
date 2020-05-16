@@ -49,6 +49,10 @@ public class Main {
 
     bb.clear();
     sc.read(bb);
+    bb.flip();
+    bb.get();
+    bb.getLong();
+    System.out.println(StandardCharsets.UTF_8.decode(bb));
   }
 
   private static void sendAuthenticatedConnection(SocketChannel sc, String login, String pass)
@@ -89,8 +93,8 @@ public class Main {
     var login = args[0];
 
     // sendAuthenticatedConnection(sc, login, "test");
-    // sendAnonymousConnection(sc, login);
-    sendBroadcastMsg(sc, login, "hello");
+    sendAnonymousConnection(sc, login);
+    // sendBroadcastMsg(sc, login, "hello");
 
     // readBroadcastMsg(sc);
   }

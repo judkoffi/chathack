@@ -4,9 +4,9 @@ import static fr.upem.chathack.utils.Helper.DEFAULT_CHARSET;
 import java.nio.ByteBuffer;
 
 public class LongSizedString {
-  final long size;
-  final String content;
-  final ByteBuffer contentBuffer;
+  private final long size;
+  private final String content;
+  private final ByteBuffer contentBuffer;
 
   public LongSizedString(String content) {
     this.content = content;

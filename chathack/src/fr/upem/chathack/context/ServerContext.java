@@ -1,7 +1,9 @@
 package fr.upem.chathack.context;
 
+import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import fr.upem.chathack.ServerChatHack;
+import fr.upem.chathack.builder.ServerResponseBuilder;
 import fr.upem.chathack.common.reader.IReader;
 import fr.upem.chathack.common.reader.trame.FrameReader;
 import fr.upem.chathack.frame.AnonymousConnection;
@@ -68,26 +70,29 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(AnonymousConnection message) {
-    boolean availableLogin = server.registerAnnonymousClient(message.getLogin(), key);
-    if (!availableLogin) {
-      System.out.println("AnonymousConnection login not available");
-      silentlyClose();
+    if (!server.isAvailableLogin(message.getLogin())) {
+      var msg = ServerResponseBuilder.errorResponse("Login not available");
+      server.sendMessageToClient(msg, key);
+      try {
+        sc.shutdownInput();
+      } catch (IOException e) {
+        //
+      }
+      // silentlyClose();
       return;
     }
-    System.out.println("AnonymousConnection login available");
+    server.registerAnnonymousClient(message.getLogin(), key);
   }
 
 
   @Override
   public void visit(AuthentificatedConnection message) {
     if (!server.isAvailableLogin(message.getLogin().getValue())) {
-      // Not available login
-      System.out.println("AuthentificatedConnection login not available ");
-      silentlyClose();
+      var msg = ServerResponseBuilder.errorResponse("Login not available");
+      server.sendMessageToClient(msg, key);
+      // silentlyClose();
       return;
     }
-    System.out.println("AuthentificatedConnection login available ");
-    System.out.println("auth message: " + message);
     server.registerAuthenticatedClient(message, key);
   }
 

@@ -3,8 +3,8 @@ package fr.upem.chathack.common.model;
 import java.nio.ByteBuffer;
 
 public class Message {
-  final LongSizedString from;
-  final LongSizedString content;
+  private final LongSizedString from;
+  private final LongSizedString content;
 
   public Message(LongSizedString login, LongSizedString value) {
     this.from = login;

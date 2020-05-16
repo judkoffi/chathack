@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import fr.upem.chathack.common.model.Message;
 
 public class DirectMessage implements IFrame {
+  /*
   private final Message message;
   private final String to;
 
@@ -11,7 +12,7 @@ public class DirectMessage implements IFrame {
     this.message = new Message(from, content);
     this.to = to;
   }
-
+*/
   @Override
   public ByteBuffer toBuffer() {
     return null;

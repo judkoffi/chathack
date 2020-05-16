@@ -12,6 +12,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,6 +69,9 @@ public class ServerChatHack {
     selector = Selector.open();
   }
 
+  /*
+   * Find the highest id in map and increment with 1 to have new id
+   */
   private long getMapId() {
     return map
       .entrySet()
@@ -77,17 +81,17 @@ public class ServerChatHack {
       .orElse((long) 1); // map empty
   }
 
-  public boolean registerAnnonymousClient(String login, SelectionKey clientKey) {
-    if (!isAvailableLogin(login))
-      return false;
-
-    /*
-     * Find the highest id in map and increment with 1 to have new id
-     */
+  public void registerAnnonymousClient(String login, SelectionKey clientKey) {
     map.put(login, new ClientInfo(true, clientKey, getMapId()));
-    return true;
   }
 
+  public void sendMessageToClient(ByteBuffer msg, SelectionKey key) {
+    findContextByKey(key).ifPresent(c ->
+    {
+      System.out.println(":knklqn "+msg);
+      c.queueMessage(msg);
+    });
+  }
 
   public void broadcast(ByteBuffer bb) {
     selector
@@ -106,6 +110,18 @@ public class ServerChatHack {
 
   public boolean isAvailableLogin(String login) {
     return !map.containsKey(login);
+  }
+
+  private Optional<ServerContext> findContextByKey(SelectionKey key) {
+    return selector
+      .keys()
+      .stream()
+      .filter(SelectionKey::isValid)
+      .filter(k -> k.attachment() != null)
+      .filter(k -> !k.equals(databaseContext.getKey()))
+      .filter(k -> k.equals(key))
+      .map(m -> (ServerContext) m.attachment())
+      .findFirst();
   }
 
   /*****************************
