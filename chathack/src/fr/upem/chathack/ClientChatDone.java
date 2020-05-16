@@ -13,10 +13,10 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
-import fr.upem.chathack.common.model.BiString;
+import fr.upem.chathack.common.model.Message;
 import fr.upem.chathack.common.reader.FrameReader;
 import fr.upem.chathack.common.reader.IReader;
-import fr.upem.chathack.common.reader.BiStringReader;
+import fr.upem.chathack.common.reader.IntMessageReader;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 
 public class ClientChatDone {
@@ -236,7 +236,7 @@ public class ClientChatDone {
         }
         System.out.println("line: " + line);
         this.uniqueContext
-          .queueMessage(new AuthentificatedConnection(new BiString(login, line)).toBuffer());
+          .queueMessage(new AuthentificatedConnection(new Message(login, line)).toBuffer());
       }
     }
   }

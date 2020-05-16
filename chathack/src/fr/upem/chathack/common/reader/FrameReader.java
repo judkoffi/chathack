@@ -15,7 +15,7 @@ public class FrameReader implements IReader<IFrame> {
   }
 
   private final ByteReader byteReader = new ByteReader();
-  private final BiStringReader messageReader = new BiStringReader();
+  private final IntMessageReader messageReader = new IntMessageReader();
   private final StringReader stringReader = new StringReader();
 
   private State state = State.WAITING_OPCODE;

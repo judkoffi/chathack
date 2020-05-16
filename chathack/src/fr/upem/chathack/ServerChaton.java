@@ -13,8 +13,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import fr.upem.chathack.common.model.BiString;
-import fr.upem.chathack.common.reader.BiStringReader;
+import fr.upem.chathack.common.model.Message;
+import fr.upem.chathack.common.reader.IntMessageReader;
 
 
 
@@ -27,7 +27,7 @@ public class ServerChaton {
     final private ByteBuffer bbin = ByteBuffer.allocate(BUFFER_SIZE);
     final private ByteBuffer bbout = ByteBuffer.allocate(BUFFER_SIZE);
     final private Queue<ByteBuffer> queue = new LinkedList<>();
-    private BiStringReader messageReader = new BiStringReader();
+    private IntMessageReader messageReader = new IntMessageReader();
     final private ServerChaton server;
     private boolean closed = false;
 
@@ -232,7 +232,7 @@ public class ServerChaton {
    *
    * @param msg
    */
-  private void broadcast(BiString msg) {
+  private void broadcast(Message msg) {
     for (SelectionKey key : selector.keys()) {
       var cntxt = (Context) key.attachment();
       if (cntxt == null) {

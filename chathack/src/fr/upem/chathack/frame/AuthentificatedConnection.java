@@ -1,13 +1,13 @@
 package fr.upem.chathack.frame;
 
 import java.nio.ByteBuffer;
-import fr.upem.chathack.common.model.BiString;
+import fr.upem.chathack.common.model.Message;
 import fr.upem.chathack.common.model.OpCode;
 
 public class AuthentificatedConnection implements IFrame {
-  private final BiString message;
+  private final Message message;
 
-  public AuthentificatedConnection(BiString message) {
+  public AuthentificatedConnection(Message message) {
     this.message = message;
   }
 

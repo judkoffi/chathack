@@ -3,10 +3,10 @@ package fr.upem.chathack.context;
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import fr.upem.chathack.ClientChatHack;
-import fr.upem.chathack.common.model.BiString;
+import fr.upem.chathack.common.model.Message;
 import fr.upem.chathack.common.reader.FrameReader;
 import fr.upem.chathack.common.reader.IReader;
-import fr.upem.chathack.common.reader.BiStringReader;
+import fr.upem.chathack.common.reader.IntMessageReader;
 import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
@@ -15,7 +15,7 @@ import fr.upem.chathack.frame.IFrame;
 import fr.upem.chathack.frame.IFrameVisitor;
 
 public class ClientContext extends BaseContext implements IFrameVisitor {
-  private final BiStringReader messageReader = new BiStringReader();
+  private final IntMessageReader messageReader = new IntMessageReader();
   private final FrameReader reader = new FrameReader();
   private final ClientChatHack client;
   
@@ -34,7 +34,7 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
       IReader.ProcessStatus status = messageReader.process(bbin);
       switch (status) {
         case DONE:
-          BiString msg = messageReader.get();
+          Message msg = messageReader.get();
           messageReader.reset();
           System.out.println("message read : " + msg);
           break;

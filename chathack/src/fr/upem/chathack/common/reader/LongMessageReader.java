@@ -1,22 +1,20 @@
-
 package fr.upem.chathack.common.reader;
 
 import java.nio.ByteBuffer;
-import fr.upem.chathack.common.model.BiString;
+import fr.upem.chathack.common.model.Message;
 
-public class BiStringReader implements IReader<BiString> {
-  private BiString message;
-
+public class LongMessageReader implements IReader<Message> {
   private enum State {
     WAITING_LOGIN, WAITING_MESSAGE, DONE, ERROR
   }
 
+  private Message message;
   private State state = State.WAITING_LOGIN;
-  private final StringReader stringReader = new StringReader();
+  private final StringLongReader stringLongReader = new StringLongReader();
   private String login;
 
   private ProcessStatus processPart(ByteBuffer bb) {
-    var sizeStatus = stringReader.process(bb);
+    var sizeStatus = stringLongReader.process(bb);
     switch (sizeStatus) {
       case ERROR:
         state = State.ERROR;
@@ -30,7 +28,6 @@ public class BiStringReader implements IReader<BiString> {
     }
   }
 
-
   @Override
   public ProcessStatus process(ByteBuffer bb) {
     switch (state) {
@@ -38,10 +35,9 @@ public class BiStringReader implements IReader<BiString> {
         var status = processPart(bb);
         if (status != ProcessStatus.DONE)
           return status;
-
-        login = stringReader.get();
+        login = stringLongReader.get();
         state = State.WAITING_MESSAGE;
-        stringReader.reset();
+        stringLongReader.reset();
       }
 
       case WAITING_MESSAGE: {
@@ -50,8 +46,8 @@ public class BiStringReader implements IReader<BiString> {
           return status;
 
         state = State.DONE;
-        var msg = stringReader.get();
-        message = new BiString(login, msg);
+        var msg = stringLongReader.get();
+        message = new Message(login, msg);
         return ProcessStatus.DONE;
       }
       default:
@@ -60,7 +56,7 @@ public class BiStringReader implements IReader<BiString> {
   }
 
   @Override
-  public BiString get() {
+  public Message get() {
     if (state != State.DONE) {
       throw new IllegalStateException();
     }
@@ -70,8 +66,7 @@ public class BiStringReader implements IReader<BiString> {
   @Override
   public void reset() {
     state = State.WAITING_LOGIN;
-    stringReader.reset();
+    stringLongReader.reset();
     message = null;
   }
-
 }

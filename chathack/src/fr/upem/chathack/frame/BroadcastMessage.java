@@ -1,12 +1,12 @@
 package fr.upem.chathack.frame;
 
 import java.nio.ByteBuffer;
-import fr.upem.chathack.common.model.BiString;
+import fr.upem.chathack.common.model.Message;
 
 public class BroadcastMessage implements IFrame {
-  private final BiString message;
+  private final Message message;
 
-  public BroadcastMessage(BiString message) {
+  public BroadcastMessage(Message message) {
     this.message = message;
   }
 

@@ -4,12 +4,12 @@ import static fr.upem.chathack.utils.Helper.DEFAULT_CHARSET;
 import java.nio.ByteBuffer;
 import fr.upem.chathack.utils.Helper;
 
-public class BiString {
+public class Message {
   final String from;
   final String content;
   final ByteBuffer bb;
 
-  public BiString(String login, String value) {
+  public Message(String login, String value) {
     this.from = login;
     this.content = value;
     this.bb = ByteBuffer.allocate(Helper.BUFFER_SIZE);
