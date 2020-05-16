@@ -1,42 +1,24 @@
 package fr.upem.chathack.common.model;
 
-import static fr.upem.chathack.utils.Helper.DEFAULT_CHARSET;
 import java.nio.ByteBuffer;
-import fr.upem.chathack.utils.Helper;
 
 public class Message {
-  final String from;
-  final String content;
-  final ByteBuffer bb;
+  final LongSizedString from;
+  final LongSizedString content;
 
-  public Message(String login, String value) {
+  public Message(LongSizedString login, LongSizedString value) {
     this.from = login;
     this.content = value;
-    this.bb = ByteBuffer.allocate(Helper.BUFFER_SIZE);
-    fillBuffer();
-  }
-
-  private void fillBuffer() {
-    ByteBuffer loginBuffer = DEFAULT_CHARSET.encode(from);
-    ByteBuffer messageBuffer = DEFAULT_CHARSET.encode(content);
-    bb.putInt(loginBuffer.limit());
-    bb.put(loginBuffer);
-    bb.putInt(messageBuffer.limit());
-    bb.put(messageBuffer);
   }
 
   public ByteBuffer toBuffer() {
-    return bb.duplicate().flip();
+    var size = Byte.BYTES + 2 * Long.BYTES + (int) from.getSize() + (int) content.getSize();
+    var bb = ByteBuffer.allocate(size);
+    bb.put(OpCode.BROADCAST_MESSAGE);
+    bb.put(from.toBuffer());
+    bb.put(content.toBuffer());
+    return bb.flip();
   }
-
-  public String getLogin() {
-    return from;
-  }
-
-  public String getValue() {
-    return content;
-  }
-
 
   @Override
   public String toString() {

@@ -63,7 +63,6 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
   @Override
   public void visit(DirectMessage directMessage) {
     // TODO Auto-generated method stub
-
   }
 
 

@@ -20,15 +20,22 @@ public class Main {
     bb.put(msgbb);
     bb.flip();
     sc.write(bb);
+  }
+
+
+  private static void readBroadcastMsg(SocketChannel sc) throws IOException {
+    var bb = ByteBuffer.allocate(1024);
 
     System.out.println("readdd");
     bb.clear();
     sc.read(bb);
 
     bb.flip();
+    bb.get();
     var size = bb.getInt();
-    System.out.println("login size: " + size);
+    System.out.println(StandardCharsets.UTF_8.decode(bb));
   }
+
 
   private static void sendAnonymousConnection(SocketChannel sc, String login) throws IOException {
     var bb = ByteBuffer.allocate(1024);
@@ -42,7 +49,6 @@ public class Main {
 
     bb.clear();
     sc.read(bb);
-
   }
 
   private static void sendAuthenticatedConnection(SocketChannel sc, String login, String pass)
@@ -82,8 +88,10 @@ public class Main {
 
     var login = args[0];
 
-    sendAuthenticatedConnection(sc, login, "test");
+    // sendAuthenticatedConnection(sc, login, "test");
     // sendAnonymousConnection(sc, login);
-    // sendBroadcastMsg(sc, login, "hello");
+    sendBroadcastMsg(sc, login, "hello");
+
+    // readBroadcastMsg(sc);
   }
 }

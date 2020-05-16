@@ -17,7 +17,7 @@ public class LongSizedString {
   public ByteBuffer toBuffer() {
     var bb = ByteBuffer.allocate(Long.BYTES + (int) size);
     bb.putLong(size);
-    bb.put(contentBuffer);
+    bb.put(contentBuffer.duplicate());
     return bb.flip();
   }
 

@@ -99,7 +99,7 @@ public class ServerChatHack {
       .forEach(k ->
       {
         var ctx = ((ServerContext) k.attachment());
-        ctx.queueMessage(bb);
+        ctx.queueMessage(bb.duplicate());
       });
   }
 

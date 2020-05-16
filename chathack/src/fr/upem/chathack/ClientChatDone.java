@@ -17,6 +17,7 @@ import fr.upem.chathack.common.model.LongSizedString;
 import fr.upem.chathack.common.reader.IReader;
 import fr.upem.chathack.common.reader.trame.FrameReader;
 import fr.upem.chathack.frame.AuthentificatedConnection;
+import fr.upem.chathack.frame.BroadcastMessage;
 
 public class ClientChatDone {
 
@@ -47,7 +48,7 @@ public class ClientChatDone {
         IReader.ProcessStatus status = messageReader.process(bbin);
         switch (status) {
           case DONE:
-            var msg = messageReader.get();
+            BroadcastMessage msg = (BroadcastMessage)messageReader.get();
             messageReader.reset();
             System.out.println("message read : " + msg);
             break;
