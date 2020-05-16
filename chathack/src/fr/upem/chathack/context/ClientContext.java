@@ -34,7 +34,6 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
           var msg = reader.get();
           handler(msg);
           reader.reset();
-          System.out.println("message read : " + msg);
           break;
         case REFILL:
           return;
@@ -82,7 +81,7 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(BroadcastMessage message) {
-    
+	  System.out.println("visit broadcast msg : " + message);
 
   }
 

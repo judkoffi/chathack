@@ -19,5 +19,11 @@ public class BroadcastMessage implements IFrame {
   public void accept(IFrameVisitor frameVisitor) {
     frameVisitor.visit(this);
   }
+  
+  @Override
+	public String toString() {
+		
+		return message.toString();
+	}
 
 }

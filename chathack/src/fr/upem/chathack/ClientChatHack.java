@@ -9,7 +9,11 @@ import java.nio.channels.SocketChannel;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
+
+import fr.upem.chathack.common.model.LongSizedString;
+import fr.upem.chathack.common.model.Message;
 import fr.upem.chathack.context.ClientContext;
+import fr.upem.chathack.frame.BroadcastMessage;
 
 public class ClientChatHack {
 
@@ -77,6 +81,8 @@ public class ClientChatHack {
           }
           default: {
             System.out.println("public message");
+            Message message = new Message(new LongSizedString(this.login), new LongSizedString(line));
+            this.uniqueContext.queueMessage(new BroadcastMessage(message).toBuffer());
             return;
           }
         }
