@@ -13,6 +13,8 @@ import java.util.logging.Logger;
 import fr.upem.chathack.common.model.LongSizedString;
 import fr.upem.chathack.common.model.Message;
 import fr.upem.chathack.context.ClientContext;
+import fr.upem.chathack.frame.AnonymousConnection;
+import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
 
 public class ClientChatHack {
@@ -96,6 +98,12 @@ public class ClientChatHack {
     uniqueContext = new ClientContext(key, this);
     key.attach(uniqueContext);
     sc.connect(serverAddress);
+    
+    var request = this.password == null
+    		? new AnonymousConnection(new LongSizedString(login))
+    		:new AuthentificatedConnection(new LongSizedString(login), new LongSizedString(password));
+        		
+    this.uniqueContext.queueMessage(request.toBuffer());
 
     /**
      * When, client connected, send anonymous or authenticated request to connect client with server

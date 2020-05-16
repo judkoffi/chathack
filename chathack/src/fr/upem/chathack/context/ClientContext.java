@@ -69,7 +69,7 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(AnonymousConnection message) {
-    // TODO Auto-generated method stub
+    System.out.println("toto");
 
   }
 
