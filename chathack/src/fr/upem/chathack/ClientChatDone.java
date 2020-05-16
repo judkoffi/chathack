@@ -13,10 +13,9 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
-import fr.upem.chathack.common.model.Message;
-import fr.upem.chathack.common.reader.FrameReader;
+import fr.upem.chathack.common.model.LongSizedString;
 import fr.upem.chathack.common.reader.IReader;
-import fr.upem.chathack.common.reader.IntMessageReader;
+import fr.upem.chathack.common.reader.trame.FrameReader;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 
 public class ClientChatDone {
@@ -35,7 +34,6 @@ public class ClientChatDone {
     private Context(SelectionKey key) {
       this.key = key;
       this.sc = (SocketChannel) key.channel();
-
     }
 
     /**
@@ -236,7 +234,9 @@ public class ClientChatDone {
         }
         System.out.println("line: " + line);
         this.uniqueContext
-          .queueMessage(new AuthentificatedConnection(new Message(login, line)).toBuffer());
+          .queueMessage(
+              new AuthentificatedConnection(new LongSizedString(login), new LongSizedString(line))
+                .toBuffer());
       }
     }
   }

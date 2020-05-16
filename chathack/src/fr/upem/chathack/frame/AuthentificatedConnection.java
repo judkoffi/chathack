@@ -1,23 +1,26 @@
 package fr.upem.chathack.frame;
 
 import java.nio.ByteBuffer;
-import fr.upem.chathack.common.model.Message;
+import fr.upem.chathack.common.model.LongSizedString;
 import fr.upem.chathack.common.model.OpCode;
 
 public class AuthentificatedConnection implements IFrame {
-  private final Message message;
+  private final LongSizedString login;
+  private final LongSizedString password;
 
-  public AuthentificatedConnection(Message message) {
-    this.message = message;
+  public AuthentificatedConnection(LongSizedString login, LongSizedString password) {
+    this.login = login;
+    this.password = password;
   }
 
   @Override
   public ByteBuffer toBuffer() {
-    var messageBb = message.toBuffer();
-    var bb = ByteBuffer.allocate(Byte.BYTES + messageBb.limit());
+    var size = Byte.BYTES + (int) login.getSize() + (int) password.getSize();
+    var bb = ByteBuffer.allocate(size);
     bb.put(OpCode.AUTHENTICATED_CLIENT_CONNECTION);
-    bb.put(messageBb);
-    return bb.duplicate().flip();
+    bb.put(login.toBuffer());
+    bb.put(password.toBuffer());
+    return bb.flip();
   }
 
   @Override
@@ -25,16 +28,16 @@ public class AuthentificatedConnection implements IFrame {
     frameVisitor.visit(this);
   }
 
-  public String getLogin() {
-    return message.getLogin();
+  public LongSizedString getLogin() {
+    return login;
+  }
+
+  public LongSizedString getPassword() {
+    return password;
   }
 
   @Override
   public String toString() {
-    return "2 | " + message.toString();
-  }
-
-  public ByteBuffer getContentBuffer() {
-    return message.toBuffer();
+    return "2 | " + login + " : " + password;
   }
 }

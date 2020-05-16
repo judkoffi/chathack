@@ -2,6 +2,7 @@ package fr.upem.chathack.builder;
 
 import java.nio.ByteBuffer;
 import fr.upem.chathack.common.model.OpCode;
+import fr.upem.chathack.frame.AuthentificatedConnection;
 
 public class DatabaseRequestBuilder {
   private DatabaseRequestBuilder() {}
@@ -41,11 +42,13 @@ public class DatabaseRequestBuilder {
    * 
    */
 
-  public static ByteBuffer checkRequest(long id, ByteBuffer bb) {
-    var requestBuffer = ByteBuffer.allocate(Byte.BYTES + Long.BYTES + bb.limit());
+  public static ByteBuffer checkRequest(long id, AuthentificatedConnection message) {
+    var s = message.getLogin().getSize() + message.getPassword().getSize() + (Integer.BYTES * 2);
+    var requestBuffer = ByteBuffer.allocate((int) (Byte.BYTES + Long.BYTES + s));
     requestBuffer.put(OpCode.ASK_CREDENTIAL);
     requestBuffer.putLong(id);
-    requestBuffer.put(bb);
+    requestBuffer.put(message.getLogin().toIntBuffer());
+    requestBuffer.put(message.getPassword().toIntBuffer());
     return requestBuffer.flip();
   }
 }

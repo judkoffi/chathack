@@ -5,9 +5,6 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
-import fr.upem.chathack.common.reader.FrameReader;
-import fr.upem.chathack.common.reader.IReader;
-import fr.upem.chathack.frame.IFrame;
 
 public class Main {
 
@@ -17,9 +14,9 @@ public class Main {
     bb.put((byte) 2);
     var loginbb = StandardCharsets.UTF_8.encode(login);
     var msgbb = StandardCharsets.UTF_8.encode(message);
-    bb.putInt(loginbb.limit());
+    bb.putLong(loginbb.limit());
     bb.put(loginbb);
-    bb.putInt(msgbb.limit());
+    bb.putLong(msgbb.limit());
     bb.put(msgbb);
     bb.flip();
     sc.write(bb);
@@ -37,11 +34,14 @@ public class Main {
     var bb = ByteBuffer.allocate(1024);
     bb.put((byte) 0);
     var loginbb = StandardCharsets.UTF_8.encode(login);
-    bb.putInt(loginbb.limit());
+    bb.putLong(loginbb.limit());
     bb.put(loginbb);
     bb.flip();
     System.out.println(bb);
     sc.write(bb);
+
+    bb.clear();
+    sc.read(bb);
 
   }
 
@@ -51,9 +51,9 @@ public class Main {
     var loginbb = StandardCharsets.UTF_8.encode(login);
     var passbb = StandardCharsets.UTF_8.encode(pass);
     bb.put((byte) 1);
-    bb.putInt(loginbb.limit());
+    bb.putLong(loginbb.limit());
     bb.put(loginbb);
-    bb.putInt(passbb.limit());
+    bb.putLong(passbb.limit());
     bb.put(passbb);
     bb.flip();
     System.out.println(bb);
@@ -65,6 +65,7 @@ public class Main {
     System.out.println(bb);
 
     sc.read(bb);
+    bb.flip();
     byte b = bb.get();
     System.out.println("op :" + b);
     long s = bb.getLong();

@@ -2,8 +2,8 @@ package fr.upem.chathack.context;
 
 import java.nio.channels.SelectionKey;
 import fr.upem.chathack.ServerChatHack;
-import fr.upem.chathack.common.reader.FrameReader;
 import fr.upem.chathack.common.reader.IReader;
+import fr.upem.chathack.common.reader.trame.FrameReader;
 import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
@@ -81,7 +81,7 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(AuthentificatedConnection message) {
-    if (!server.isAvailableLogin(message.getLogin())) {
+    if (!server.isAvailableLogin(message.getLogin().getValue())) {
       // Not available login
       System.out.println("AuthentificatedConnection login not available ");
       silentlyClose();

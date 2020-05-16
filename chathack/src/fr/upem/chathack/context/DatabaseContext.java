@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import fr.upem.chathack.ServerChatHack;
-import fr.upem.chathack.common.model.ByteLong;
-import fr.upem.chathack.common.reader.ByteLongReader;
 import fr.upem.chathack.common.reader.IReader;
+import fr.upem.chathack.common.reader.trame.DatabaseReader;
+import fr.upem.chathack.frame.DatabaseTrame;
 
 public class DatabaseContext extends BaseContext {
-  private final ByteLongReader reader = new ByteLongReader();
+  private final DatabaseReader reader = new DatabaseReader();
   private final ServerChatHack server;
 
   public DatabaseContext(SelectionKey key, ServerChatHack server) {
@@ -27,7 +27,8 @@ public class DatabaseContext extends BaseContext {
       IReader.ProcessStatus status = reader.process(bbin);
       switch (status) {
         case DONE:
-          ByteLong msg = reader.get();
+          DatabaseTrame msg = reader.get();
+          System.out.println(msg);
           server.responseCheckLogin(msg);
           reader.reset();
           break;

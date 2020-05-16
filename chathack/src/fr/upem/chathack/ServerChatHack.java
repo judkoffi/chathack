@@ -17,12 +17,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import fr.upem.chathack.builder.DatabaseRequestBuilder;
 import fr.upem.chathack.builder.ServerResponseBuilder;
-import fr.upem.chathack.common.model.ByteLong;
 import fr.upem.chathack.common.model.OpCode;
 import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.context.DatabaseContext;
 import fr.upem.chathack.context.ServerContext;
 import fr.upem.chathack.frame.AuthentificatedConnection;
+import fr.upem.chathack.frame.DatabaseTrame;
 
 
 public class ServerChatHack {
@@ -99,7 +99,7 @@ public class ServerChatHack {
       .forEach(k ->
       {
         var ctx = ((ServerContext) k.attachment());
-        ctx.queueMessage(bb.duplicate());
+        ctx.queueMessage(bb);
       });
   }
 
@@ -112,15 +112,15 @@ public class ServerChatHack {
    * Database methods
    ******************************/
   public void registerAuthenticatedClient(AuthentificatedConnection message, SelectionKey key) {
-    var login = message.getLogin();
+    var login = message.getLogin().getValue();
     map.put(login, new ClientInfo(key, getMapId()));
-    var bb = DatabaseRequestBuilder.checkRequest(map.get(login).id, message.getContentBuffer());
+    var bb = DatabaseRequestBuilder.checkRequest(map.get(login).id, message);
     databaseContext.checkLogin(bb);
   }
 
 
-  public void responseCheckLogin(ByteLong msg) {
-    var clt = map.entrySet().stream().filter(p -> p.getValue().id == msg.getLong()).findFirst();
+  public void responseCheckLogin(DatabaseTrame trame) {
+    var clt = map.entrySet().stream().filter(p -> p.getValue().id == trame.getResult()).findFirst();
     if (clt.isEmpty())
       return;
 
@@ -135,14 +135,14 @@ public class ServerChatHack {
       .filter(e -> e != null)
       .ifPresent(c ->
       {
-        byte b = msg.getByte();
+        byte b = trame.getOpCode();
         switch (b) {
           case OpCode.BAD_CREDENTIAL:
             System.out.println("wrong credential id " + entry.getValue().id);
             map.remove(entry.getKey());
             c.queueMessage(ServerResponseBuilder.errorResponse("Wrong credentials").duplicate());
             c.processOut();
-            //silentlyClose(entry.getValue().key);
+            silentlyClose(entry.getValue().key);
             break;
           case OpCode.GOOD_CREDENTIAL:
             System.out.println("good credential id " + entry.getValue().id);

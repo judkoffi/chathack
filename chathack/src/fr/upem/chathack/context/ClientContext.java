@@ -3,10 +3,8 @@ package fr.upem.chathack.context;
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import fr.upem.chathack.ClientChatHack;
-import fr.upem.chathack.common.model.Message;
-import fr.upem.chathack.common.reader.FrameReader;
 import fr.upem.chathack.common.reader.IReader;
-import fr.upem.chathack.common.reader.IntMessageReader;
+import fr.upem.chathack.common.reader.trame.FrameReader;
 import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
@@ -24,7 +22,7 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
   }
 
   private void handler(IFrame frame) {
-	 frame.accept(this); 
+     frame.accept(this); 
   }
   
   @Override
