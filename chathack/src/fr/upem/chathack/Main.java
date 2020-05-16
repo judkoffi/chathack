@@ -40,10 +40,6 @@ public class Main {
     bb.flip();
     System.out.println(bb);
     sc.write(bb);
-    var scan = new Scanner(System.in);
-    while (scan.hasNextLine()) {
-
-    }
   }
 
   private static void sendAuthenticatedConnection(SocketChannel sc, String login, String pass)
@@ -78,8 +74,8 @@ public class Main {
 
     var login = args[0];
 
-    sendAuthenticatedConnection(sc, login, "test");
+    // sendAuthenticatedConnection(sc, login, "test");
     // sendAnonymousConnection(sc, login);
-    // sendBroadcastMsg(sc, login, "hello");
+    sendBroadcastMsg(sc, login, "hello");
   }
 }

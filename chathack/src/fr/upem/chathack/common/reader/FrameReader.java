@@ -7,7 +7,6 @@ import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
 import fr.upem.chathack.frame.IFrame;
-import fr.upem.chathack.utils.Helper;
 
 public class FrameReader implements IReader<IFrame> {
 
@@ -20,7 +19,7 @@ public class FrameReader implements IReader<IFrame> {
   private final StringReader stringReader = new StringReader();
 
   private State state = State.WAITING_OPCODE;
-  private OpCode opCode;
+  private byte opCode;
   private IFrame value;
 
 
@@ -37,13 +36,13 @@ public class FrameReader implements IReader<IFrame> {
           return opcodeStatus;
 
         // TODO: add opcode check
-        opCode = Helper.byteToOpCode(byteReader.get());
+        opCode = byteReader.get();
         state = State.WAITING_CONTENT;
       }
 
       case WAITING_CONTENT: {
         switch (opCode) {
-          case ANONYMOUS_CLIENT_CONNECTION:
+          case OpCode.ANONYMOUS_CLIENT_CONNECTION:
             var contentProcess = contentProcess(bb, stringReader::process);
             if (contentProcess != ProcessStatus.DONE)
               return contentProcess;
@@ -52,7 +51,7 @@ public class FrameReader implements IReader<IFrame> {
             state = State.DONE;
             return ProcessStatus.DONE;
 
-          case AUTHENTICATED_CLIENT_CONNECTION:
+          case OpCode.AUTHENTICATED_CLIENT_CONNECTION:
             contentProcess = contentProcess(bb, messageReader::process);
             if (contentProcess != ProcessStatus.DONE) {
               return contentProcess;
@@ -61,7 +60,7 @@ public class FrameReader implements IReader<IFrame> {
             state = State.DONE;
             return ProcessStatus.DONE;
 
-          case BROADCAST_MESSAGE:
+          case OpCode.BROADCAST_MESSAGE:
             contentProcess = contentProcess(bb, messageReader::process);
             if (contentProcess != ProcessStatus.DONE)
               return contentProcess;
@@ -71,15 +70,15 @@ public class FrameReader implements IReader<IFrame> {
             return ProcessStatus.DONE;
 
 
-          case CLIENT_FAILED_PRIVATE_CLIENT_CONNECTION:
+          case OpCode.CLIENT_FAILED_PRIVATE_CLIENT_CONNECTION:
             break;
-          case PRIVATE_MESSAGE:
+          case OpCode.PRIVATE_MESSAGE:
             break;
-          case REQUEST_PRIVATE_CLIENT_CONNECTION:
+          case OpCode.REQUEST_PRIVATE_CLIENT_CONNECTION:
             break;
-          case SERVER_NOTIFY_PRIVATE_CLIENT_CONNECTION:
+          case OpCode.SERVER_NOTIFY_PRIVATE_CLIENT_CONNECTION:
             break;
-          case SUCCEDED_PRIVATE_CLIENT_CONNECTION:
+          case OpCode.SUCCEDED_PRIVATE_CLIENT_CONNECTION:
             break;
           default:
             break;
@@ -104,8 +103,7 @@ public class FrameReader implements IReader<IFrame> {
   public void reset() {
     state = State.WAITING_OPCODE;
     value = null;
-    opCode = null;
-
+    opCode = -1;
     byteReader.reset();
     messageReader.reset();
     stringReader.reset();

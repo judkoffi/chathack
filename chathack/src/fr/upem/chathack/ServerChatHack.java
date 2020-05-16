@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import fr.upem.chathack.builder.DatabaseRequestBuilder;
 import fr.upem.chathack.common.model.ByteLong;
+import fr.upem.chathack.common.model.OpCode;
 import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.context.DatabaseContext;
 import fr.upem.chathack.context.ServerContext;
@@ -133,19 +134,19 @@ public class ServerChatHack {
       .filter(e -> e != null)
       .ifPresent(c ->
       {
-        var op = DatabaseRequestBuilder.byteToResponseDBOpcode(msg.getByte());
-        switch (op) {
-          case BAD_CREDENTIAL:
+        byte b = msg.getByte();
+        switch (b) {
+          case OpCode.BAD_CREDENTIAL:
             System.out.println("wrong credential");
             map.remove(entry.getKey());
             silentlyClose(entry.getValue().key);
             break;
-          case GOOD_CREDENTIAL:
+          case OpCode.GOOD_CREDENTIAL:
             System.out.println("good credential");
             map.get(entry.getKey()).isAuthenticated = true;
             break;
           default:
-            break;
+            throw new IllegalArgumentException("unknow db response byte" + b);
         }
       });
   }
