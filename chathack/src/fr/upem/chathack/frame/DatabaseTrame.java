@@ -33,6 +33,6 @@ public class DatabaseTrame {
 
   @Override
   public String toString() {
-    return "op: " + opcode + " ==> result " + result;
+    return "DBTrame op: " + opcode + " ==> result " + result;
   }
 }

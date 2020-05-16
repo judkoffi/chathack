@@ -138,11 +138,10 @@ public class ServerChatHack {
         byte b = trame.getOpCode();
         switch (b) {
           case OpCode.BAD_CREDENTIAL:
-            System.out.println("wrong credential id " + entry.getValue().id);
+            var msg = ServerResponseBuilder.errorResponse("Wrong credentials");
+            System.out.println("msg: " + msg);
+            c.queueMessage(msg);
             map.remove(entry.getKey());
-            c.queueMessage(ServerResponseBuilder.errorResponse("Wrong credentials").duplicate());
-            c.processOut();
-            silentlyClose(entry.getValue().key);
             break;
           case OpCode.GOOD_CREDENTIAL:
             System.out.println("good credential id " + entry.getValue().id);

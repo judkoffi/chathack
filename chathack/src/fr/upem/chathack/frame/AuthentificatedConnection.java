@@ -15,7 +15,7 @@ public class AuthentificatedConnection implements IFrame {
 
   @Override
   public ByteBuffer toBuffer() {
-    var size = Byte.BYTES + (int) login.getSize() + (int) password.getSize();
+    var size = Byte.BYTES + 2 * Long.BYTES + (int) login.getSize() + (int) password.getSize();
     var bb = ByteBuffer.allocate(size);
     bb.put(OpCode.AUTHENTICATED_CLIENT_CONNECTION);
     bb.put(login.toBuffer());

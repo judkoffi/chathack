@@ -56,20 +56,17 @@ public class Main {
     bb.putLong(passbb.limit());
     bb.put(passbb);
     bb.flip();
-    System.out.println(bb);
     sc.write(bb);
-
-    System.out.println("readdd");
     bb.clear();
 
+    System.out.println("readdd");
+    sc.read(bb);
+    System.out.println(bb);
+    bb.flip();
     System.out.println(bb);
 
-    sc.read(bb);
-    bb.flip();
     byte b = bb.get();
-    System.out.println("op :" + b);
     long s = bb.getLong();
-    System.out.println("length :" + s);
     System.out.println(StandardCharsets.UTF_8.decode(bb));
   }
 

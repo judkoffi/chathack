@@ -18,6 +18,7 @@ public class DatabaseContext extends BaseContext {
   }
 
   public void checkLogin(ByteBuffer bb) {
+    System.out.println("check login bb: " + bb);
     queueMessage(bb);
   }
 
@@ -28,7 +29,7 @@ public class DatabaseContext extends BaseContext {
       switch (status) {
         case DONE:
           DatabaseTrame msg = reader.get();
-          System.out.println(msg);
+          System.out.println("res db: " + msg);
           server.responseCheckLogin(msg);
           reader.reset();
           break;
