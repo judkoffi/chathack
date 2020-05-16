@@ -20,6 +20,10 @@ public class Message {
     return bb.flip();
   }
 
+  public LongSizedString getFrom() {
+	return from;
+  }
+  
   @Override
   public String toString() {
     return "[" + from + "] >> " + content;

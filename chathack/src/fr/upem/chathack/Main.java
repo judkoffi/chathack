@@ -20,6 +20,17 @@ public class Main {
     bb.put(msgbb);
     bb.flip();
     sc.write(bb);
+    
+    System.out.println("readdd");
+    bb.clear();
+    sc.read(bb);
+    System.out.println(bb);
+    bb.flip();
+    System.out.println(bb);
+
+    byte b = bb.get();
+    long s = bb.getLong();
+    System.out.println(StandardCharsets.UTF_8.decode(bb));
   }
 
 
@@ -93,8 +104,8 @@ public class Main {
     var login = args[0];
 
     // sendAuthenticatedConnection(sc, login, "test");
-    sendAnonymousConnection(sc, login);
-    // sendBroadcastMsg(sc, login, "hello");
+    //sendAnonymousConnection(sc, login);
+    sendBroadcastMsg(sc, login, "hello");
 
     // readBroadcastMsg(sc);
   }

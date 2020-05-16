@@ -43,7 +43,6 @@ public class ServerFrameReader implements IReader<IFrame> {
         bb.compact();
         switch (opcode) {
           case OpCode.ANONYMOUS_CLIENT_CONNECTION:
-            System.out.println("anonymousReader");
             currentFrameReader = anonymousReader;
             break;
           case OpCode.AUTHENTICATED_CLIENT_CONNECTION:
@@ -54,7 +53,7 @@ public class ServerFrameReader implements IReader<IFrame> {
             break;
 
           default:
-            throw new IllegalArgumentException("unknow opcode " + opcode);
+            throw new IllegalArgumentException("unknown opcode " + opcode);
         }
         state = State.WAITING_CONTENT;
       }

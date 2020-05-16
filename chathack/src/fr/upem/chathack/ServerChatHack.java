@@ -28,7 +28,7 @@ import fr.upem.chathack.frame.DatabaseTrame;
 
 public class ServerChatHack {
   /**
-   * Class use to keep some information about connected client
+   * Class used to keep some information about connected client
    */
   private static class ClientInfo {
     private boolean isAuthenticated;
@@ -72,7 +72,7 @@ public class ServerChatHack {
   /*
    * Find the highest id in map and increment with 1 to have new id
    */
-  private long getMapId() {
+  private long getNextMapId() {
     return map
       .entrySet()
       .stream()
@@ -81,16 +81,12 @@ public class ServerChatHack {
       .orElse((long) 1); // map empty
   }
 
-  public void registerAnnonymousClient(String login, SelectionKey clientKey) {
-    map.put(login, new ClientInfo(true, clientKey, getMapId()));
+  public void registerAnonymousClient(String login, SelectionKey clientKey) {
+    map.put(login, new ClientInfo(true, clientKey, getNextMapId()));
   }
 
   public void sendMessageToClient(ByteBuffer msg, SelectionKey key) {
-    findContextByKey(key).ifPresent(c ->
-    {
-      System.out.println(":knklqn " + msg);
-      c.queueMessage(msg);
-    });
+    findContextByKey(key).ifPresent(c ->c.queueMessage(msg));
   }
 
   public void broadcast(ByteBuffer bb) {
@@ -109,8 +105,14 @@ public class ServerChatHack {
 
 
   public boolean isAvailableLogin(String login) {
+	  //TODO check login presence in DB
     return !map.containsKey(login);
   }
+  
+  public boolean isConnected(String fromLogin) {
+		return map.get(fromLogin) != null && map.get(fromLogin).isAuthenticated;
+  }
+
 
   private Optional<ServerContext> findContextByKey(SelectionKey key) {
     return selector
@@ -129,7 +131,7 @@ public class ServerChatHack {
    ******************************/
   public void registerAuthenticatedClient(AuthentificatedConnection message, SelectionKey key) {
     var login = message.getLogin().getValue();
-    map.put(login, new ClientInfo(key, getMapId()));
+    map.put(login, new ClientInfo(key, getNextMapId()));
     var bb = DatabaseRequestBuilder.checkRequest(map.get(login).id, message);
     databaseContext.checkLogin(bb);
   }
@@ -156,7 +158,7 @@ public class ServerChatHack {
           map.get(entry.getKey()).isAuthenticated = true;
           break;
         default:
-          throw new IllegalArgumentException("unknow db response byte" + b);
+          throw new IllegalArgumentException("unknown db response byte" + b);
       }
     });
   }
@@ -313,5 +315,4 @@ public class ServerChatHack {
       list.add("WRITE");
     return String.join(" and ", list);
   }
-
 }

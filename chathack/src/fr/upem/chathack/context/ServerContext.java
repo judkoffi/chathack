@@ -60,7 +60,13 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(BroadcastMessage message) {
-    server.broadcast(message.toBuffer());
+    if(server.isConnected(message.getFromLogin())) {
+    	server.broadcast(message.toBuffer());
+    }else {
+    	var msg = ServerResponseBuilder.errorResponse("Not connected");
+        queueMessage(msg);
+        silenceInuputClose();
+    }
   }
 
   @Override
@@ -73,11 +79,11 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
   public void visit(AnonymousConnection message) {
     if (!server.isAvailableLogin(message.getLogin())) {
       var msg = ServerResponseBuilder.errorResponse("Login not available");
-      server.sendMessageToClient(msg, key);
+      queueMessage(msg);
       silenceInuputClose();
       return;
     }
-    server.registerAnnonymousClient(message.getLogin(), key);
+    server.registerAnonymousClient(message.getLogin(), key);
   }
 
 
@@ -85,7 +91,7 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
   public void visit(AuthentificatedConnection message) {
     if (!server.isAvailableLogin(message.getLogin().getValue())) {
       var msg = ServerResponseBuilder.errorResponse("Login not available");
-      server.sendMessageToClient(msg, key);
+      queueMessage(msg);
       silenceInuputClose();
       return;
     }
