@@ -24,4 +24,8 @@ public class ServerMessage implements IFrame {
     frameVisitor.visit(this);
   }
 
+  @Override
+  public String toString() {
+    return "ERROR: " + value.getValue();
+  }
 }

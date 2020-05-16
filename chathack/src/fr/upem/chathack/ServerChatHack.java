@@ -88,7 +88,7 @@ public class ServerChatHack {
   public void sendMessageToClient(ByteBuffer msg, SelectionKey key) {
     findContextByKey(key).ifPresent(c ->
     {
-      System.out.println(":knklqn "+msg);
+      System.out.println(":knklqn " + msg);
       c.queueMessage(msg);
     });
   }
@@ -141,32 +141,24 @@ public class ServerChatHack {
       return;
 
     var entry = clt.get();
-
-    selector
-      .keys()
-      .stream()
-      .filter(key -> key.equals(entry.getValue().key))
-      .map(m -> (ServerContext) m.attachment())
-      .findFirst()
-      .filter(e -> e != null)
-      .ifPresent(c ->
-      {
-        byte b = trame.getOpCode();
-        switch (b) {
-          case OpCode.BAD_CREDENTIAL:
-            var msg = ServerResponseBuilder.errorResponse("Wrong credentials");
-            System.out.println("msg: " + msg);
-            c.queueMessage(msg);
-            map.remove(entry.getKey());
-            break;
-          case OpCode.GOOD_CREDENTIAL:
-            System.out.println("good credential id " + entry.getValue().id);
-            map.get(entry.getKey()).isAuthenticated = true;
-            break;
-          default:
-            throw new IllegalArgumentException("unknow db response byte" + b);
-        }
-      });
+    findContextByKey(entry.getValue().key).ifPresent(c ->
+    {
+      byte b = trame.getOpCode();
+      switch (b) {
+        case OpCode.BAD_CREDENTIAL:
+          var msg = ServerResponseBuilder.errorResponse("Wrong credentials");
+          System.out.println("msg: " + msg);
+          c.queueMessage(msg);
+          map.remove(entry.getKey());
+          break;
+        case OpCode.GOOD_CREDENTIAL:
+          System.out.println("good credential id " + entry.getValue().id);
+          map.get(entry.getKey()).isAuthenticated = true;
+          break;
+        default:
+          throw new IllegalArgumentException("unknow db response byte" + b);
+      }
+    });
   }
 
   public void launch() throws IOException {

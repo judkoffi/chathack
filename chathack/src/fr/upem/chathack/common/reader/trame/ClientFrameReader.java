@@ -1,11 +1,12 @@
-package fr.upem.chathack.frame;
+package fr.upem.chathack.common.reader.trame;
 
 import java.nio.ByteBuffer;
 import fr.upem.chathack.common.model.OpCode;
 import fr.upem.chathack.common.reader.IReader;
+import fr.upem.chathack.frame.IFrame;
+import fr.upem.chathack.frame.ServerMessageReader;
 
 public class ClientFrameReader implements IReader<IFrame> {
-
   private enum State {
     WAITING_OPCODE, WAITING_CONTENT, DONE, ERROR
   }
