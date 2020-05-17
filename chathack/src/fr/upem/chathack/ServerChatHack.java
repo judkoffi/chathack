@@ -200,7 +200,7 @@ public class ServerChatHack {
         }
 
         var m = map.get(entry.getKey()).isAuthenticated
-            ? new ServerResponseMessage("Welcome !!!!", false)
+            ? new ServerResponseMessage(Helper.WELCOME_MESSAGE, false)
             : new ServerResponseMessage("Wrong credentials", true);
         c.queueMessage(m.toBuffer());
 
@@ -217,7 +217,7 @@ public class ServerChatHack {
         }
 
         var msg = map.get(entry.getKey()).isAuthenticated
-            ? new ServerResponseMessage("Welcome !!!!", false)
+            ? new ServerResponseMessage(Helper.WELCOME_MESSAGE, false)
             : new ServerResponseMessage("Not available login", true);
         c.queueMessage(msg.toBuffer());
 
