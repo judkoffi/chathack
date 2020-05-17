@@ -17,9 +17,8 @@ public class Message {
   }
 
   public ByteBuffer toBuffer() {
-    var size = Byte.BYTES + from.getTrameSize() + content.getTrameSize();
+    var size = from.getTrameSize() + content.getTrameSize();
     var bb = ByteBuffer.allocate((int) size);
-    bb.put(OpCode.BROADCAST_MESSAGE);
     bb.put(from.toBuffer());
     bb.put(content.toBuffer());
     return bb.flip();
@@ -37,5 +36,4 @@ public class Message {
   public String toString() {
     return "[" + from + "] >> " + content;
   }
-
 }
