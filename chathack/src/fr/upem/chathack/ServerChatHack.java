@@ -12,6 +12,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
@@ -103,7 +104,6 @@ public class ServerChatHack {
 
 
   public boolean isAvailableLogin(String login) {
-    // TODO check login presence in DB
     return !map.containsKey(login);
   }
 
@@ -128,7 +128,6 @@ public class ServerChatHack {
    * Authentication methods
    ******************************/
 
-
   public void registerAnonymousClient(String login, SelectionKey clientKey) {
     map.put(login, new ClientInfo(true, clientKey, getNextMapId()));
     var bb = DatabaseRequestBuilder.checkLoginRequest(map.get(login).id, login);
@@ -149,51 +148,8 @@ public class ServerChatHack {
       return;
 
     var entry = clt.get();
-    findContextByKey(entry.getValue().key).ifPresent(c ->
-    {
-      byte b = trame.getOpCode();
-      switch (b) {
-        /**
-         * DB respose trame opcde:<br>
-         * 1 -> valid response <br>
-         * 0 -> invalid response
-         */
-        case OpCode.DB_INVALID_RESPONSE:
-          // Login free in db
-          if (map.get(entry.getKey()).anonymous) {
-            map.get(entry.getKey()).isAuthenticated = true;
-          }
-
-          var m = map.get(entry.getKey()).isAuthenticated
-              ? new ServerResponseMessage("Welcome !!!!", false)
-              : new ServerResponseMessage("Wrong credentials", true);
-          c.queueMessage(m.toBuffer());
-
-          if (!map.get(entry.getKey()).isAuthenticated) {
-            map.remove(entry.getKey());
-          }
-
-          break;
-        case OpCode.DB_VALID_RESPONSE:
-          // good credentials
-          if (!map.get(entry.getKey()).anonymous) {
-            map.get(entry.getKey()).isAuthenticated = true;
-          }
-
-          var msg = map.get(entry.getKey()).isAuthenticated
-              ? new ServerResponseMessage("Welcome !!!!", false)
-              : new ServerResponseMessage("Not available login", true);
-          c.queueMessage(msg.toBuffer());
-
-          if (!map.get(entry.getKey()).isAuthenticated) {
-            map.remove(entry.getKey());
-          }
-
-          break;
-        default:
-          throw new IllegalArgumentException("unknown db response byte" + b);
-      }
-    });
+    var key = entry.getValue().key;
+    findContextByKey(key).ifPresent(c -> handlerDbResponse(c, trame.getOpCode(), entry));
   }
 
   public void launch() throws IOException {
@@ -219,6 +175,50 @@ public class ServerChatHack {
     var dbKey = dbChannel.register(selector, SelectionKey.OP_WRITE);
     databaseContext = new DatabaseContext(dbKey, this);
     dbKey.attach(databaseContext);
+  }
+
+  private void handlerDbResponse(ServerContext c, byte b, Entry<String, ClientInfo> entry) {
+    switch (b) {
+      /**
+       * DB respose trame opcde:<br>
+       * 1 -> valid response <br>
+       * 0 -> invalid response
+       */
+      case OpCode.DB_INVALID_RESPONSE:
+        // Login free in db
+        if (map.get(entry.getKey()).anonymous) {
+          map.get(entry.getKey()).isAuthenticated = true;
+        }
+
+        var m = map.get(entry.getKey()).isAuthenticated
+            ? new ServerResponseMessage("Welcome !!!!", false)
+            : new ServerResponseMessage("Wrong credentials", true);
+        c.queueMessage(m.toBuffer());
+
+        if (!map.get(entry.getKey()).isAuthenticated) {
+          map.remove(entry.getKey());
+        }
+
+        break;
+      case OpCode.DB_VALID_RESPONSE:
+        // good credentials
+        if (!map.get(entry.getKey()).anonymous) {
+          map.get(entry.getKey()).isAuthenticated = true;
+        }
+
+        var msg = map.get(entry.getKey()).isAuthenticated
+            ? new ServerResponseMessage("Welcome !!!!", false)
+            : new ServerResponseMessage("Not available login", true);
+        c.queueMessage(msg.toBuffer());
+
+        if (!map.get(entry.getKey()).isAuthenticated) {
+          map.remove(entry.getKey());
+        }
+
+        break;
+      default:
+        throw new IllegalArgumentException("unknown db response byte" + b);
+    }
   }
 
   private void treatKey(SelectionKey key) {
