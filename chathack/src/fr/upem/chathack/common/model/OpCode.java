@@ -25,7 +25,11 @@ public class OpCode {
   /********************************
    * ServerResponse Opcode
    *******************************/
-  public static final byte SERVER_ERROR_MESSAGE = (byte) -1;
+  public static final byte SERVER_ERROR_RESPONSE_TYPE = (byte) -1;
+  public static final byte SERVER_NOT_ERROR_RESPONSE_TYPE = (byte) 1;
+
+
+  public static final byte SERVER_RESPONSE_MESSAGE = (byte) 15;
 
 
   /********************************
@@ -38,6 +42,6 @@ public class OpCode {
   /********************************
    * DBResponse Opcode
    *******************************/
-  public static final byte GOOD_CREDENTIAL = ((byte) 1);
-  public static final byte BAD_CREDENTIAL = ((byte) 0);
+  public static final byte DB_VALID_RESPONSE = ((byte) 1);
+  public static final byte DB_INVALID_RESPONSE = ((byte) 0);
 }

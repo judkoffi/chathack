@@ -16,14 +16,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import fr.upem.chathack.builder.DatabaseRequestBuilder;
-import fr.upem.chathack.builder.ServerResponseBuilder;
 import fr.upem.chathack.common.model.OpCode;
 import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.context.DatabaseContext;
 import fr.upem.chathack.context.ServerContext;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.DatabaseTrame;
+import fr.upem.chathack.frame.ServerResponseMessage;
+import fr.upem.chathack.utils.DatabaseRequestBuilder;
 
 
 public class ServerChatHack {
@@ -32,17 +32,19 @@ public class ServerChatHack {
    */
   private static class ClientInfo {
     private boolean isAuthenticated;
+    private boolean anonymous; // type of connection (anonymous or with credentials)
     private SelectionKey key;
     private long id;
 
-    private ClientInfo(boolean isAuthenticated, SelectionKey key, long id) {
+    private ClientInfo(boolean anonymous, boolean isAuthenticated, SelectionKey key, long id) {
+      this.anonymous = anonymous;
       this.isAuthenticated = isAuthenticated;
       this.key = key;
       this.id = id;
     }
 
-    private ClientInfo(SelectionKey key, long id) {
-      this(false, key, id);
+    private ClientInfo(boolean anonymous, SelectionKey key, long id) {
+      this(anonymous, false, key, id);
     }
 
     @Override
@@ -81,12 +83,8 @@ public class ServerChatHack {
       .orElse((long) 1); // map empty
   }
 
-  public void registerAnonymousClient(String login, SelectionKey clientKey) {
-    map.put(login, new ClientInfo(true, clientKey, getNextMapId()));
-  }
-
   public void sendMessageToClient(ByteBuffer msg, SelectionKey key) {
-    findContextByKey(key).ifPresent(c ->c.queueMessage(msg));
+    findContextByKey(key).ifPresent(c -> c.queueMessage(msg));
   }
 
   public void broadcast(ByteBuffer bb) {
@@ -105,12 +103,12 @@ public class ServerChatHack {
 
 
   public boolean isAvailableLogin(String login) {
-	  //TODO check login presence in DB
+    // TODO check login presence in DB
     return !map.containsKey(login);
   }
-  
+
   public boolean isConnected(String fromLogin) {
-		return map.get(fromLogin) != null && map.get(fromLogin).isAuthenticated;
+    return map.get(fromLogin) != null && map.get(fromLogin).isAuthenticated;
   }
 
 
@@ -127,12 +125,20 @@ public class ServerChatHack {
   }
 
   /*****************************
-   * Database methods
+   * Authentication methods
    ******************************/
+
+
+  public void registerAnonymousClient(String login, SelectionKey clientKey) {
+    map.put(login, new ClientInfo(true, clientKey, getNextMapId()));
+    var bb = DatabaseRequestBuilder.checkLoginRequest(map.get(login).id, login);
+    databaseContext.checkLogin(bb);
+  }
+
   public void registerAuthenticatedClient(AuthentificatedConnection message, SelectionKey key) {
     var login = message.getLogin().getValue();
-    map.put(login, new ClientInfo(key, getNextMapId()));
-    var bb = DatabaseRequestBuilder.checkRequest(map.get(login).id, message);
+    map.put(login, new ClientInfo(false, key, getNextMapId()));
+    var bb = DatabaseRequestBuilder.checkCredentialsRequest(map.get(login).id, message);
     databaseContext.checkLogin(bb);
   }
 
@@ -147,15 +153,42 @@ public class ServerChatHack {
     {
       byte b = trame.getOpCode();
       switch (b) {
-        case OpCode.BAD_CREDENTIAL:
-          var msg = ServerResponseBuilder.errorResponse("Wrong credentials");
-          System.out.println("msg: " + msg);
-          c.queueMessage(msg);
-          map.remove(entry.getKey());
+        /**
+         * DB respose trame opcde:<br>
+         * 1 -> valid response <br>
+         * 0 -> invalid response
+         */
+        case OpCode.DB_INVALID_RESPONSE:
+          // Login free in db
+          if (map.get(entry.getKey()).anonymous) {
+            map.get(entry.getKey()).isAuthenticated = true;
+          }
+
+          var m = map.get(entry.getKey()).isAuthenticated
+              ? new ServerResponseMessage("Welcome !!!!", false)
+              : new ServerResponseMessage("Wrong credentials", true);
+          c.queueMessage(m.toBuffer());
+
+          if (!map.get(entry.getKey()).isAuthenticated) {
+            map.remove(entry.getKey());
+          }
+
           break;
-        case OpCode.GOOD_CREDENTIAL:
-          System.out.println("good credential id " + entry.getValue().id);
-          map.get(entry.getKey()).isAuthenticated = true;
+        case OpCode.DB_VALID_RESPONSE:
+          // good credentials
+          if (!map.get(entry.getKey()).anonymous) {
+            map.get(entry.getKey()).isAuthenticated = true;
+          }
+
+          var msg = map.get(entry.getKey()).isAuthenticated
+              ? new ServerResponseMessage("Welcome !!!!", false)
+              : new ServerResponseMessage("Not available login", true);
+          c.queueMessage(msg.toBuffer());
+
+          if (!map.get(entry.getKey()).isAuthenticated) {
+            map.remove(entry.getKey());
+          }
+
           break;
         default:
           throw new IllegalArgumentException("unknown db response byte" + b);

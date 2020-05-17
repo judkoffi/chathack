@@ -1,6 +1,7 @@
-package fr.upem.chathack.builder;
+package fr.upem.chathack.utils;
 
 import java.nio.ByteBuffer;
+import fr.upem.chathack.common.model.LongSizedString;
 import fr.upem.chathack.common.model.OpCode;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 
@@ -24,10 +25,10 @@ public class DatabaseRequestBuilder {
    * 0 (BYTE) id (LONG)<br>
    * ---------------------<br>
    * 
-   * Pour demander, si un login est dans la base de donnée, le client envoie:
-   * 
-   * 2 (BYTE) id (LONG) login (STRING)
-   * 
+   * Pour demander, si un login est dans la base de donnée, le client envoie:<br>
+   * ---------------------------------------------------------<br>
+   * 2 (BYTE) | id (LONG) | login size (INT) | login (STRING) |<br>
+   * ---------------------------------------------------------<br>
    * avec
    * 
    * id est un LONG en BigEndian qui identifie la requête.
@@ -42,7 +43,7 @@ public class DatabaseRequestBuilder {
    * 
    */
 
-  public static ByteBuffer checkRequest(long id, AuthentificatedConnection message) {
+  public static ByteBuffer checkCredentialsRequest(long id, AuthentificatedConnection message) {
     var s = message.getLogin().getSize() + message.getPassword().getSize() + (Integer.BYTES * 2);
     var requestBuffer = ByteBuffer.allocate((int) (Byte.BYTES + Long.BYTES + s));
     requestBuffer.put(OpCode.ASK_CREDENTIAL);
@@ -50,5 +51,14 @@ public class DatabaseRequestBuilder {
     requestBuffer.put(message.getLogin().toIntBuffer());
     requestBuffer.put(message.getPassword().toIntBuffer());
     return requestBuffer.flip();
+  }
+
+  public static ByteBuffer checkLoginRequest(long id, String login) {
+    var s = new LongSizedString(login);
+    var bb = ByteBuffer.allocate(Byte.BYTES + Long.BYTES + Long.BYTES + (int) s.getSize());
+    bb.put(OpCode.ASK_LOGIN_PRESENT);
+    bb.putLong(id);
+    bb.put(s.toIntBuffer());
+    return bb.flip();
   }
 }

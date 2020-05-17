@@ -13,7 +13,7 @@ import fr.upem.chathack.frame.DirectMessage;
 import fr.upem.chathack.frame.IFrame;
 import fr.upem.chathack.frame.IFrameVisitor;
 import fr.upem.chathack.frame.RequestPrivateConnection;
-import fr.upem.chathack.frame.ServerMessage;
+import fr.upem.chathack.frame.ServerResponseMessage;
 
 public class ClientContext extends BaseContext implements IFrameVisitor {
   private final ClientFrameReader reader = new ClientFrameReader();
@@ -84,9 +84,12 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
   public void visit(DirectMessage directMessage) {}
 
   @Override
-  public void visit(ServerMessage serverMessage) {
-	  this.client.interruptConsole();
+  public void visit(ServerResponseMessage serverMessage) {
     System.out.println(serverMessage);
+    if (serverMessage.isErrorMessage()) {
+      this.client.interruptConsole();
+      // TODO: close client
+    }
   }
 
   /*
@@ -96,9 +99,9 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
     queue.add(bb);
   }
 
-@Override
-public void visit(RequestPrivateConnection requestMessage) {
-	// TODO Auto-generated method stub
-	
-}
+  @Override
+  public void visit(RequestPrivateConnection requestMessage) {
+    // TODO Auto-generated method stub
+
+  }
 }

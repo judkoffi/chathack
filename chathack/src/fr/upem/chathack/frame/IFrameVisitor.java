@@ -10,7 +10,7 @@ public interface IFrameVisitor {
 
   public void visit(DirectMessage directMessage);
 
-  public void visit(ServerMessage serverMessage);
+  public void visit(ServerResponseMessage serverMessage);
   
   public void visit(RequestPrivateConnection requestMessage);
 }

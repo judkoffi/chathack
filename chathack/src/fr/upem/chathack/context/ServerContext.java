@@ -3,7 +3,6 @@ package fr.upem.chathack.context;
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import fr.upem.chathack.ServerChatHack;
-import fr.upem.chathack.builder.ServerResponseBuilder;
 import fr.upem.chathack.common.reader.IReader;
 import fr.upem.chathack.common.reader.trame.ServerFrameReader;
 import fr.upem.chathack.frame.AnonymousConnection;
@@ -13,7 +12,7 @@ import fr.upem.chathack.frame.DirectMessage;
 import fr.upem.chathack.frame.IFrame;
 import fr.upem.chathack.frame.IFrameVisitor;
 import fr.upem.chathack.frame.RequestPrivateConnection;
-import fr.upem.chathack.frame.ServerMessage;
+import fr.upem.chathack.frame.ServerResponseMessage;
 
 public class ServerContext extends BaseContext implements IFrameVisitor {
   private final ServerFrameReader reader = new ServerFrameReader();
@@ -61,12 +60,12 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(BroadcastMessage message) {
-    if(server.isConnected(message.getFromLogin())) {
-    	server.broadcast(message.toBuffer());
-    }else {
-    	var msg = ServerResponseBuilder.errorResponse("Not connected");
-        queueMessage(msg);
-        silenceInuputClose();
+    if (server.isConnected(message.getFromLogin())) {
+      server.broadcast(message.toBuffer());
+    } else {
+      var msg = new ServerResponseMessage("Not connected", true).toBuffer();
+      queueMessage(msg);
+      silenceInuputClose();
     }
   }
 
@@ -79,7 +78,7 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
   @Override
   public void visit(AnonymousConnection message) {
     if (!server.isAvailableLogin(message.getLogin())) {
-      var msg = ServerResponseBuilder.errorResponse("Login not available");
+      var msg = new ServerResponseMessage("Login not available", true).toBuffer();
       queueMessage(msg);
       silenceInuputClose();
       return;
@@ -91,7 +90,7 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
   @Override
   public void visit(AuthentificatedConnection message) {
     if (!server.isAvailableLogin(message.getLogin().getValue())) {
-      var msg = ServerResponseBuilder.errorResponse("Login not available");
+      var msg = new ServerResponseMessage("Login not available", true).toBuffer();
       queueMessage(msg);
       silenceInuputClose();
       return;
@@ -118,14 +117,14 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
   }
 
   @Override
-  public void visit(ServerMessage serverMessage) {
+  public void visit(ServerResponseMessage serverMessage) {
 
   }
 
-@Override
-public void visit(RequestPrivateConnection requestMessage) {
-	//TODO
-	
-}
+  @Override
+  public void visit(RequestPrivateConnection requestMessage) {
+    // TODO
+
+  }
 
 }

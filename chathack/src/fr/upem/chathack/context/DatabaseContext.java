@@ -18,7 +18,6 @@ public class DatabaseContext extends BaseContext {
   }
 
   public void checkLogin(ByteBuffer bb) {
-    System.out.println("check login bb: " + bb);
     queueMessage(bb);
   }
 

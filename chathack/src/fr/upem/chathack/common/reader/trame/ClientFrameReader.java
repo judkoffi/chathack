@@ -39,12 +39,12 @@ public class ClientFrameReader implements IReader<IFrame> {
         var opcode = bb.get();
         bb.compact();
         switch (opcode) {
-          case OpCode.SERVER_ERROR_MESSAGE:
+          case OpCode.SERVER_RESPONSE_MESSAGE:
             currentFrameReader = serverMessageReader;
             break;
           case OpCode.BROADCAST_MESSAGE:
-        	  currentFrameReader = broadcastMessageReader;
-        	break;
+            currentFrameReader = broadcastMessageReader;
+            break;
           default:
             throw new IllegalArgumentException("unknown opcode " + opcode);
         }
