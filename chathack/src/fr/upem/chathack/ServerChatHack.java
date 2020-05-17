@@ -23,8 +23,10 @@ import fr.upem.chathack.context.DatabaseContext;
 import fr.upem.chathack.context.ServerContext;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.DatabaseTrame;
+import fr.upem.chathack.frame.RequestPrivateConnection;
 import fr.upem.chathack.frame.ServerResponseMessage;
 import fr.upem.chathack.utils.DatabaseRequestBuilder;
+import fr.upem.chathack.utils.Helper;
 
 
 public class ServerChatHack {
@@ -36,12 +38,16 @@ public class ServerChatHack {
     private boolean anonymous; // type of connection (anonymous or with credentials)
     private SelectionKey key;
     private long id;
+    private ServerContext context;
+    // list of already private connected clients
+    private final ArrayList<String> privateConnections;
 
     private ClientInfo(boolean anonymous, boolean isAuthenticated, SelectionKey key, long id) {
       this.anonymous = anonymous;
       this.isAuthenticated = isAuthenticated;
       this.key = key;
       this.id = id;
+      this.privateConnections = new ArrayList<>();
     }
 
     private ClientInfo(boolean anonymous, SelectionKey key, long id) {
@@ -61,7 +67,6 @@ public class ServerChatHack {
   private final HashMap<String, ClientInfo> map = new HashMap<>();
   private DatabaseContext databaseContext;
   private final InetSocketAddress databaseAddress;
-
 
   public ServerChatHack(int port, String dbHostname, int dbPort) throws IOException {
     serverSocketChannel = ServerSocketChannel.open();
@@ -98,19 +103,23 @@ public class ServerChatHack {
       .forEach(k ->
       {
         var ctx = ((ServerContext) k.attachment());
-        ctx.queueMessage(bb.duplicate());
+        ctx.queueMessage(Helper.cloneByteBuffer(bb));
       });
   }
 
 
-  public boolean isAvailableLogin(String login) {
-    return !map.containsKey(login);
+  public boolean isExistLogin(String login) {
+    return map.containsKey(login);
   }
 
-  public boolean isConnected(String fromLogin) {
-    return map.get(fromLogin) != null && map.get(fromLogin).isAuthenticated;
+  public boolean isConnected(String login) {
+    return map.get(login) != null && map.get(login).isAuthenticated;
   }
 
+  public void sendPrivateConnectionRequest(RequestPrivateConnection request) {
+    var target = request.getTargetLogin().getValue();
+    map.get(target).context.queueMessage(request.toBuffer());
+  }
 
   private Optional<ServerContext> findContextByKey(SelectionKey key) {
     return selector
@@ -140,7 +149,6 @@ public class ServerChatHack {
     var bb = DatabaseRequestBuilder.checkCredentialsRequest(map.get(login).id, message);
     databaseContext.checkLogin(bb);
   }
-
 
   public void responseCheckLogin(DatabaseTrame trame) {
     var clt = map.entrySet().stream().filter(p -> p.getValue().id == trame.getResult()).findFirst();
@@ -188,6 +196,7 @@ public class ServerChatHack {
         // Login free in db
         if (map.get(entry.getKey()).anonymous) {
           map.get(entry.getKey()).isAuthenticated = true;
+          map.get(entry.getKey()).context = c;
         }
 
         var m = map.get(entry.getKey()).isAuthenticated
@@ -204,6 +213,7 @@ public class ServerChatHack {
         // good credentials
         if (!map.get(entry.getKey()).anonymous) {
           map.get(entry.getKey()).isAuthenticated = true;
+          map.get(entry.getKey()).context = c;
         }
 
         var msg = map.get(entry.getKey()).isAuthenticated
@@ -222,7 +232,7 @@ public class ServerChatHack {
   }
 
   private void treatKey(SelectionKey key) {
-    // printSelectedKey(key);
+    printSelectedKey(key);
     try {
       if (key.isValid() && key.isAcceptable()) {
         doAccept(key);
@@ -235,7 +245,6 @@ public class ServerChatHack {
       if (key.isValid() && key.isWritable()) {
         ((BaseContext) key.attachment()).doWrite();
       }
-
       if (key.isValid() && key.isReadable()) {
         ((BaseContext) key.attachment()).doRead();
       }
@@ -348,4 +357,5 @@ public class ServerChatHack {
       list.add("WRITE");
     return String.join(" and ", list);
   }
+
 }

@@ -7,6 +7,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
@@ -15,7 +17,7 @@ import fr.upem.chathack.context.ClientContext;
 import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
-import fr.upem.chathack.frame.DirectMessage;
+import fr.upem.chathack.frame.RequestPrivateConnection;
 
 public class ClientChatHack {
 
@@ -40,6 +42,7 @@ public class ClientChatHack {
   private final String login;
   private String password;
   private final Thread console;
+  private final Queue<RequestPrivateConnection> privateConnectionRequest;
 
   public ClientChatHack(InetSocketAddress serverAddress, String path, String login)
       throws IOException {
@@ -48,6 +51,7 @@ public class ClientChatHack {
     this.sc = SocketChannel.open();
     this.selector = Selector.open();
     this.console = new Thread(this::consoleRun);
+    this.privateConnectionRequest = new LinkedList<>();
   }
 
   public ClientChatHack(InetSocketAddress serverAddress, String path, String login, String password)
@@ -87,8 +91,13 @@ public class ClientChatHack {
         if (line == null) {
           return;
         }
+        if (line.isBlank())
+          return;
 
         switch (line.charAt(0)) {
+          case '#': {
+
+          }
           case '/': {
             System.out.println("send files");
             break;
@@ -104,8 +113,12 @@ public class ClientChatHack {
 
             var targetLogin = splited[0];
             var message = splited[1];
-            var dm = new DirectMessage(login, targetLogin, message);
-            this.uniqueContext.queueMessage(dm.toBuffer());
+            if (havePrivateConnection(targetLogin)) {
+
+            } else {
+              var dmRequest = new RequestPrivateConnection(login, targetLogin);
+              this.uniqueContext.queueMessage(dmRequest.toBuffer());
+            }
             break;
           }
           default: {
@@ -116,6 +129,10 @@ public class ClientChatHack {
         }
       }
     }
+  }
+
+  public void addPrivateConnectionRequest(RequestPrivateConnection requestMessage) {
+    privateConnectionRequest.add(requestMessage);
   }
 
   public void launch() throws IOException {

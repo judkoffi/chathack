@@ -61,5 +61,6 @@ public class RequestPrivateConnectionReader implements IReader<RequestPrivateCon
     state = State.WAITING_TARGET_LOGIN;
     reader.reset();
     value = null;
+    targetLogin = null;
   }
 }

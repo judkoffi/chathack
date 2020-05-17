@@ -47,19 +47,6 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
     }
   }
 
-  @Override
-  public void processOut() {
-    while (!queue.isEmpty()) {
-      var bb = queue.peek();
-      if (bb.remaining() <= bbout.remaining()) {
-        queue.remove();
-        bbout.put(bb);
-      } else {
-        return;
-      }
-    }
-  }
-
   public void doConnect() throws IOException {
     if (!sc.finishConnect()) {
       return;
@@ -80,7 +67,7 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(DirectMessage directMessage) {
-	  System.out.println("TEST");
+    System.out.println("TEST");
     if (!client.havePrivateConnection(directMessage.getDestinator())) {
       System.out.println("do prive connection");
     } else {
@@ -105,5 +92,10 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
   }
 
   @Override
-  public void visit(RequestPrivateConnection requestMessage) {}
+  public void visit(RequestPrivateConnection requestMessage) {
+    // client.addPrivateConnectionRequest(requestMessage);
+    var from = requestMessage.getFromLogin().getValue();
+    System.out.println("Incoming private connection request from " + from);
+    System.out.println("y ==> yes or n ==> no");
+  }
 }

@@ -68,10 +68,9 @@ public class ServerMessageReader implements IReader<ServerResponseMessage> {
 
   @Override
   public void reset() {
-    state = State.WAITING_MSG;
+    state = State.WAITING_MSG_TYPE;
     reader.reset();
     value = null;
     errorMessage = false;
   }
-
 }

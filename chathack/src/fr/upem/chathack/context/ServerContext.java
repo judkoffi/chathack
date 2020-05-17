@@ -47,25 +47,13 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
   }
 
   @Override
-  public void processOut() {
-    while (!queue.isEmpty()) {
-      var bb = queue.peek();
-      if (bbout.remaining() < bb.remaining())
-        return;
-
-      queue.remove();
-      bbout.put(bb);
-    }
-  }
-
-  @Override
   public void visit(BroadcastMessage message) {
     if (server.isConnected(message.getFromLogin())) {
       server.broadcast(message.toBuffer());
     } else {
       var msg = new ServerResponseMessage("Not connected", true).toBuffer();
       queueMessage(msg);
-      silenceInuputClose();
+      silenceInputClose();
     }
   }
 
@@ -75,10 +63,10 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(AnonymousConnection message) {
-    if (!server.isAvailableLogin(message.getLogin())) {
+    if (server.isExistLogin(message.getLogin())) {
       var msg = new ServerResponseMessage("Login not available", true).toBuffer();
       queueMessage(msg);
-      silenceInuputClose();
+      silenceInputClose();
       return;
     }
     server.registerAnonymousClient(message.getLogin(), key);
@@ -87,10 +75,10 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(AuthentificatedConnection message) {
-    if (!server.isAvailableLogin(message.getLogin().getValue())) {
+    if (server.isExistLogin(message.getLogin().getValue())) {
       var msg = new ServerResponseMessage("Login not available", true).toBuffer();
       queueMessage(msg);
-      silenceInuputClose();
+      silenceInputClose();
       return;
     }
     server.registerAuthenticatedClient(message, key);
@@ -106,7 +94,7 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
     return super.hashCode();
   }
 
-  private void silenceInuputClose() {
+  private void silenceInputClose() {
     try {
       sc.shutdownInput();
     } catch (IOException e) {
@@ -115,9 +103,29 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
   }
 
   @Override
-  public void visit(ServerResponseMessage serverMessage) {}
+  public void visit(ServerResponseMessage serverMessage) {
+    System.out.println("qdsqsqsd");
+  }
 
   @Override
-  public void visit(RequestPrivateConnection requestMessage) {}
+  public void visit(RequestPrivateConnection requestMessage) {
+    if (!server.isConnected(requestMessage.getFromLogin().getValue())) {
+      var msg = new ServerResponseMessage("You must be authentificated", true).toBuffer();
+      queueMessage(msg);
+      silenceInputClose();
+      return;
+    }
 
+
+    var target = requestMessage.getTargetLogin().getValue();
+    if (!server.isExistLogin(target)) {
+      var msg = new ServerResponseMessage("Unknown login", true);
+      System.out.println(msg);
+      queueMessage(msg.toBuffer());
+      // silenceInuputClose();
+      return;
+    }
+
+    server.sendPrivateConnectionRequest(requestMessage);
+  }
 }

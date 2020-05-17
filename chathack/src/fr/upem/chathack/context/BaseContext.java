@@ -27,27 +27,37 @@ public abstract class BaseContext implements IContext {
   }
 
   @Override
+  public void processOut() {
+    while (!queue.isEmpty()) {
+      var bb = queue.peek();
+      if (bbout.remaining() < bb.remaining())
+        return;
+      queue.remove();
+      bbout.put(bb);
+    }
+  }
+
+  @Override
   public void updateInterestOps() {
+    if (!key.isValid())
+      return;
 
-		if (!key.isValid())
-			return;
+    int interestOps = 0;
 
-		int interestOps = 0;
+    if (!closed && bbin.hasRemaining()) {
+      interestOps |= SelectionKey.OP_READ;
+    }
 
-		if (!closed && bbin.hasRemaining()) {
-			interestOps |= SelectionKey.OP_READ;
-		}
+    if (bbout.position() != 0 || !queue.isEmpty()) {
+      interestOps |= SelectionKey.OP_WRITE;
+    }
 
-		if (bbout.position() != 0 || !queue.isEmpty()) {
-			interestOps |= SelectionKey.OP_WRITE;
-		}
+    if (interestOps == 0) {
+      silentlyClose();
+      return;
+    }
 
-		if (interestOps == 0) {
-			silentlyClose();
-			return;
-		}
-
-		key.interestOps(interestOps);
+    key.interestOps(interestOps);
   }
 
   /**
