@@ -17,8 +17,8 @@ public class Message {
   }
 
   public ByteBuffer toBuffer() {
-    var size = Byte.BYTES + 2 * Long.BYTES + (int) from.getSize() + (int) content.getSize();
-    var bb = ByteBuffer.allocate(size);
+    var size = Byte.BYTES + from.getTrameSize() + content.getTrameSize();
+    var bb = ByteBuffer.allocate((int) size);
     bb.put(OpCode.BROADCAST_MESSAGE);
     bb.put(from.toBuffer());
     bb.put(content.toBuffer());
@@ -27,6 +27,10 @@ public class Message {
 
   public LongSizedString getFrom() {
     return from;
+  }
+
+  public long getTrameSize() {
+    return (from.getTrameSize() + content.getTrameSize());
   }
 
   @Override

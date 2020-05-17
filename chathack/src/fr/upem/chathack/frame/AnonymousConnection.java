@@ -21,7 +21,8 @@ public class AnonymousConnection implements IFrame {
 
   @Override
   public ByteBuffer toBuffer() {
-    var bb = ByteBuffer.allocate(Byte.BYTES + (int) sizedString.getSize() + Long.BYTES);
+    var size = Byte.BYTES + sizedString.getTrameSize();
+    var bb = ByteBuffer.allocate((int) size);
     bb.put(OpCode.ANONYMOUS_CLIENT_CONNECTION);
     bb.put(sizedString.toBuffer());
     return bb.flip();
@@ -31,5 +32,4 @@ public class AnonymousConnection implements IFrame {
   public void accept(IFrameVisitor frameVisitor) {
     frameVisitor.visit(this);
   }
-
 }

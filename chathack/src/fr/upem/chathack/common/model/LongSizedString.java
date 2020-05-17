@@ -1,6 +1,7 @@
 package fr.upem.chathack.common.model;
 
 import static fr.upem.chathack.utils.Helper.DEFAULT_CHARSET;
+import static fr.upem.chathack.utils.Helper.cloneByteBuffer;
 import java.nio.ByteBuffer;
 
 public class LongSizedString {
@@ -17,7 +18,7 @@ public class LongSizedString {
   public ByteBuffer toBuffer() {
     var bb = ByteBuffer.allocate(Long.BYTES + (int) size);
     bb.putLong(size);
-    bb.put(contentBuffer.duplicate());
+    bb.put(cloneByteBuffer(contentBuffer));//
     return bb.flip();
   }
 
@@ -31,8 +32,17 @@ public class LongSizedString {
     return bb.flip();
   }
 
-  public long getSize() {
-    return size;
+  public long getContentSize() {
+    return contentBuffer.limit();
+  }
+
+  /**
+   * use to have sum of size of buffer and a long prefixed length
+   * 
+   * @return a long with represent sum of Long.BYTES and content buffer size
+   */
+  public long getTrameSize() {
+    return (Long.BYTES + size);
   }
 
   public String getValue() {

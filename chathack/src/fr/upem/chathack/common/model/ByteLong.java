@@ -1,5 +1,6 @@
 package fr.upem.chathack.common.model;
 
+import static fr.upem.chathack.utils.Helper.cloneByteBuffer;
 import java.nio.ByteBuffer;
 
 public class ByteLong {
@@ -20,7 +21,7 @@ public class ByteLong {
   }
 
   public ByteBuffer toBuffer() {
-    return bb.duplicate().flip();
+    return cloneByteBuffer(bb).flip();
   }
 
 

@@ -29,7 +29,8 @@ public class ServerResponseMessage implements IFrame {
         ? OpCode.SERVER_ERROR_RESPONSE_TYPE
         : OpCode.SERVER_NOT_ERROR_RESPONSE_TYPE;
 
-    var bb = ByteBuffer.allocate(Byte.BYTES + Byte.BYTES + (int) value.getSize() + Long.BYTES);
+    var size = Byte.BYTES + Byte.BYTES + value.getTrameSize();
+    var bb = ByteBuffer.allocate((int) size);
     bb.put(OpCode.SERVER_RESPONSE_MESSAGE);
     bb.put(typeOpcode);
     bb.put(value.toBuffer());

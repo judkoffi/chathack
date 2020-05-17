@@ -6,23 +6,36 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
-import fr.upem.chathack.common.model.LongSizedString;
 import fr.upem.chathack.common.model.Message;
 import fr.upem.chathack.context.ClientContext;
 import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
+import fr.upem.chathack.frame.DirectMessage;
 
 public class ClientChatHack {
+
+  private enum ConnectionStatus {
+    PENDING, ALLOWED, NOT_ALLOWED
+  }
+
+  private static class PrivateConnectionInfo {
+
+
+  }
+
   private static final Logger logger = Logger.getLogger(ClientChatHack.class.getName());
+  private final ArrayBlockingQueue<String> commandQueue = new ArrayBlockingQueue<>(10);
+  // map use to store private connection between a client and other clients
+  private final HashMap<String, PrivateConnectionInfo> map = new HashMap<>();
 
   private final SocketChannel sc;
   private final Selector selector;
   private final InetSocketAddress serverAddress;
-  private final ArrayBlockingQueue<String> commandQueue = new ArrayBlockingQueue<>(10);
   private ClientContext uniqueContext;
   private final String login;
   private String password;
@@ -63,6 +76,10 @@ public class ClientChatHack {
     }
   }
 
+  public boolean havePrivateConnection(String destinator) {
+    return map.containsKey(destinator);
+  }
+
   private void processCommands() {
     for (;;) {
       synchronized (commandQueue) {
@@ -77,13 +94,24 @@ public class ClientChatHack {
             break;
           }
           case '@': {
-            System.out.println("private message");
+            // @login msg -> login msg
+            var splited = line.substring(1).split(" ");
+
+            if (splited.length != 2) {
+              System.err.println("usage: @targetLogin msg");
+              return;
+            }
+
+            var targetLogin = splited[0];
+            var message = splited[1];
+            var dm = new DirectMessage(login, targetLogin, message);
+            this.uniqueContext.queueMessage(dm.toBuffer());
             break;
           }
           default: {
             Message msg = new Message(this.login, line);
             this.uniqueContext.queueMessage(new BroadcastMessage(msg).toBuffer());
-            return;
+            break;
           }
         }
       }

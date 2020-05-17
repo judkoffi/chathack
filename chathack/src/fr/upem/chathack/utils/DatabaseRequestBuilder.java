@@ -44,7 +44,8 @@ public class DatabaseRequestBuilder {
    */
 
   public static ByteBuffer checkCredentialsRequest(long id, AuthentificatedConnection message) {
-    var s = message.getLogin().getSize() + message.getPassword().getSize() + (Integer.BYTES * 2);
+    var s = message.getLogin().getContentSize() + message.getPassword().getContentSize()
+        + (Integer.BYTES * 2);
     var requestBuffer = ByteBuffer.allocate((int) (Byte.BYTES + Long.BYTES + s));
     requestBuffer.put(OpCode.ASK_CREDENTIAL);
     requestBuffer.putLong(id);
@@ -55,7 +56,7 @@ public class DatabaseRequestBuilder {
 
   public static ByteBuffer checkLoginRequest(long id, String login) {
     var s = new LongSizedString(login);
-    var bb = ByteBuffer.allocate(Byte.BYTES + Long.BYTES + Long.BYTES + (int) s.getSize());
+    var bb = ByteBuffer.allocate(Byte.BYTES + Long.BYTES + Long.BYTES + (int) s.getContentSize());
     bb.put(OpCode.ASK_LOGIN_PRESENT);
     bb.putLong(id);
     bb.put(s.toIntBuffer());

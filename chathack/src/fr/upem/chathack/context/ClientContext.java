@@ -79,7 +79,13 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
   }
 
   @Override
-  public void visit(DirectMessage directMessage) {}
+  public void visit(DirectMessage directMessage) {
+    if (!client.havePrivateConnection(directMessage.getDestinator())) {
+      System.out.println("do prive connection");
+    } else {
+      System.out.println("send message");
+    }
+  }
 
   @Override
   public void visit(ServerResponseMessage serverMessage) {

@@ -20,8 +20,8 @@ public class RequestPrivateConnection implements IFrame {
 
   @Override
   public ByteBuffer toBuffer() {
-    var s = Byte.BYTES + 2 * Long.BYTES + (int) fromLogin.getSize() + (int) targetLogin.getSize();
-    var bb = ByteBuffer.allocate(s);
+    var s = Byte.BYTES + fromLogin.getTrameSize() + targetLogin.getTrameSize();
+    var bb = ByteBuffer.allocate((int) s);
     bb.put(OpCode.REQUEST_PRIVATE_CLIENT_CONNECTION);
     bb.put(targetLogin.toBuffer());
     bb.put(fromLogin.toBuffer());
