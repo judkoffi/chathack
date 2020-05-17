@@ -11,6 +11,10 @@ public class AnonymousConnection implements IFrame {
     this.sizedString = sizedString;
   }
 
+  public AnonymousConnection(String login) {
+    this.sizedString = new LongSizedString(login);
+  }
+
   public String getLogin() {
     return sizedString.getValue();
   }

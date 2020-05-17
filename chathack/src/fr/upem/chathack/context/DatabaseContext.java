@@ -28,7 +28,6 @@ public class DatabaseContext extends BaseContext {
       switch (status) {
         case DONE:
           DatabaseTrame msg = reader.get();
-          System.out.println("res db: " + msg);
           server.responseCheckLogin(msg);
           reader.reset();
           break;
@@ -47,7 +46,6 @@ public class DatabaseContext extends BaseContext {
       var bb = queue.peek();
       if (bbout.remaining() < bb.remaining())
         return;
-
       queue.remove();
       bbout.put(bb);
     }

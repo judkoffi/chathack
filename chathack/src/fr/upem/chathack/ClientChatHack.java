@@ -17,7 +17,6 @@ import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
 
 public class ClientChatHack {
-
   private static final Logger logger = Logger.getLogger(ClientChatHack.class.getName());
 
   private final SocketChannel sc;
@@ -27,7 +26,7 @@ public class ClientChatHack {
   private ClientContext uniqueContext;
   private final String login;
   private String password;
-  private Thread console = new Thread(this::consoleRun);
+  private final Thread console;
 
   public ClientChatHack(InetSocketAddress serverAddress, String path, String login)
       throws IOException {
@@ -35,6 +34,7 @@ public class ClientChatHack {
     this.login = login;
     this.sc = SocketChannel.open();
     this.selector = Selector.open();
+    this.console = new Thread(this::consoleRun);
   }
 
   public ClientChatHack(InetSocketAddress serverAddress, String path, String login, String password)
@@ -97,21 +97,16 @@ public class ClientChatHack {
     key.attach(uniqueContext);
     sc.connect(serverAddress);
 
-
     /**
      * When, client connected, send anonymous or authenticated request to connect client with server
      */
 
     var request = this.password == null //
-        ? new AnonymousConnection(new LongSizedString(login))
-        : new AuthentificatedConnection(new LongSizedString(login), new LongSizedString(password));
+        ? new AnonymousConnection(login)
+        : new AuthentificatedConnection(login, password);
 
-    var bb = request.toBuffer();
-    this.uniqueContext.putInQueue(bb);
-
-    //console.setDaemon(true);
+    this.uniqueContext.putInQueue(request.toBuffer());
     console.start();// run stdin thread
-   
 
     while (!Thread.interrupted()) {
       try {
@@ -121,7 +116,6 @@ public class ClientChatHack {
         throw tunneled.getCause();
       }
     }
-    System.out.println("ngzoon");
   }
 
   private void treatKey(SelectionKey key) {
@@ -141,16 +135,8 @@ public class ClientChatHack {
     }
   }
 
-  private void silentlyClose(SelectionKey key) {
-    try {
-      key.channel().close();
-    } catch (IOException e) {
-      // ignore exception
-    }
-  }
-  
   public void interruptConsole() {
-	  this.console.interrupt();
+    this.console.interrupt();
   }
 
   private static void usage() {

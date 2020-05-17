@@ -1,7 +1,6 @@
 package fr.upem.chathack.frame;
 
 import java.nio.ByteBuffer;
-import fr.upem.chathack.common.model.Message;
 
 public class DirectMessage implements IFrame {
   /*

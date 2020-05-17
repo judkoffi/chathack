@@ -70,9 +70,7 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
   }
 
   @Override
-  public void visit(DirectMessage directMessage) {
-    // TODO Auto-generated method stub
-  }
+  public void visit(DirectMessage directMessage) {}
 
 
   @Override
@@ -117,14 +115,9 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
   }
 
   @Override
-  public void visit(ServerResponseMessage serverMessage) {
-
-  }
+  public void visit(ServerResponseMessage serverMessage) {}
 
   @Override
-  public void visit(RequestPrivateConnection requestMessage) {
-    // TODO
-
-  }
+  public void visit(RequestPrivateConnection requestMessage) {}
 
 }

@@ -58,7 +58,6 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
         return;
       }
     }
-
   }
 
   public void doConnect() throws IOException {
@@ -77,7 +76,6 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
   @Override
   public void visit(BroadcastMessage message) {
     System.out.println(message);
-
   }
 
   @Override
@@ -88,20 +86,17 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
     System.out.println(serverMessage);
     if (serverMessage.isErrorMessage()) {
       this.client.interruptConsole();
-      // TODO: close client
+      System.exit(-1);
     }
   }
 
   /*
-   * Put in a queue without procees
+   * Put in a queue without run processOut(), use to send authentication message at client launch
    */
   public void putInQueue(ByteBuffer bb) {
     queue.add(bb);
   }
 
   @Override
-  public void visit(RequestPrivateConnection requestMessage) {
-    // TODO Auto-generated method stub
-
-  }
+  public void visit(RequestPrivateConnection requestMessage) {}
 }

@@ -13,6 +13,11 @@ public class AuthentificatedConnection implements IFrame {
     this.password = password;
   }
 
+  public AuthentificatedConnection(String login, String password) {
+    this.login = new LongSizedString(login);
+    this.password = new LongSizedString(password);
+  }
+
   @Override
   public ByteBuffer toBuffer() {
     var size = Byte.BYTES + 2 * Long.BYTES + (int) login.getSize() + (int) password.getSize();
