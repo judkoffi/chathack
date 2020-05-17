@@ -97,7 +97,7 @@ public class ClientChatHack {
             // @login msg -> login msg
             var splited = line.substring(1).split(" ");
 
-            if (splited.length != 2) {
+            if (splited.length < 2) {
               System.err.println("usage: @targetLogin msg");
               return;
             }

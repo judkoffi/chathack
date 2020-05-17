@@ -5,44 +5,35 @@ import fr.upem.chathack.common.model.LongSizedString;
 import fr.upem.chathack.common.model.Message;
 import fr.upem.chathack.common.reader.IReader;
 import fr.upem.chathack.common.reader.LongSizedStringReader;
+import fr.upem.chathack.common.reader.MessageReader;
 import fr.upem.chathack.frame.BroadcastMessage;
 
 public class BroadcastMessageReader implements IReader<BroadcastMessage> {
 
   private enum State {
-    WAITING_LOGIN, WAITING_MESSAGE, DONE, ERROR
+   WAITING_MESSAGE, DONE, ERROR
   }
 
-  private final LongSizedStringReader reader;
+  private final MessageReader reader;
   private State state;
   private BroadcastMessage value;
-  private LongSizedString login;
 
   public BroadcastMessageReader() {
-    this.reader = new LongSizedStringReader();
-    this.state = State.WAITING_LOGIN;
+    this.reader = new MessageReader();
+    this.state = State.WAITING_MESSAGE;
   }
 
 
   @Override
   public ProcessStatus process(ByteBuffer bb) {
     switch (state) {
-      case WAITING_LOGIN: {
-        var status = reader.process(bb);
-        if (status != ProcessStatus.DONE) {
-          return status;
-        }
-        login = reader.get();
-        reader.reset();
-        state = State.WAITING_MESSAGE;
-      }
       case WAITING_MESSAGE: {
         var status = reader.process(bb);
         if (status != ProcessStatus.DONE) {
           return status;
         }
-        var password = reader.get();
-        value = new BroadcastMessage(new Message(login, password));
+        var message = reader.get();
+        value = new BroadcastMessage(message);
         state = State.DONE;
         return ProcessStatus.DONE;
       }
@@ -62,7 +53,7 @@ public class BroadcastMessageReader implements IReader<BroadcastMessage> {
 
   @Override
   public void reset() {
-    state = State.WAITING_LOGIN;
+    state = State.WAITING_MESSAGE;
     reader.reset();
     value = null;
   }

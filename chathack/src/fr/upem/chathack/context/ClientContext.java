@@ -80,6 +80,7 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(DirectMessage directMessage) {
+	  System.out.println("TEST");
     if (!client.havePrivateConnection(directMessage.getDestinator())) {
       System.out.println("do prive connection");
     } else {
