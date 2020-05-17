@@ -81,7 +81,7 @@ public class ClientChatHack {
             break;
           }
           default: {
-            Message msg = new Message(new LongSizedString(this.login), new LongSizedString(line));
+            Message msg = new Message(this.login, line);
             this.uniqueContext.queueMessage(new BroadcastMessage(msg).toBuffer());
             return;
           }

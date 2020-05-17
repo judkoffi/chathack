@@ -11,6 +11,11 @@ public class Message {
     this.content = value;
   }
 
+  public Message(String login, String value) {
+    this.from = new LongSizedString(login);
+    this.content = new LongSizedString(value);
+  }
+
   public ByteBuffer toBuffer() {
     var size = Byte.BYTES + 2 * Long.BYTES + (int) from.getSize() + (int) content.getSize();
     var bb = ByteBuffer.allocate(size);
@@ -21,9 +26,9 @@ public class Message {
   }
 
   public LongSizedString getFrom() {
-	return from;
+    return from;
   }
-  
+
   @Override
   public String toString() {
     return "[" + from + "] >> " + content;
