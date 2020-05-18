@@ -3,6 +3,7 @@ package fr.upem.chathack.common.model;
 import static fr.upem.chathack.utils.Helper.DEFAULT_CHARSET;
 import static fr.upem.chathack.utils.Helper.cloneByteBuffer;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 public class LongSizedString {
   private final long size;
@@ -47,6 +48,20 @@ public class LongSizedString {
 
   public String getValue() {
     return content;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof LongSizedString))
+      return false;
+
+    LongSizedString r = (LongSizedString) obj;
+    return r.size == size && r.content.equals(content);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(size, content);
   }
 
   @Override

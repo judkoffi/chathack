@@ -1,6 +1,7 @@
 package fr.upem.chathack.frame;
 
 import java.nio.ByteBuffer;
+import java.util.Objects;
 import fr.upem.chathack.common.model.LongSizedString;
 import fr.upem.chathack.common.model.OpCode;
 
@@ -42,7 +43,21 @@ public class RequestPrivateConnection implements IFrame {
   }
 
   @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof RequestPrivateConnection))
+      return false;
+
+    RequestPrivateConnection r = (RequestPrivateConnection) obj;
+    return r.fromLogin.equals(fromLogin) && r.targetLogin.equals(targetLogin);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(fromLogin, targetLogin);
+  }
+
+  @Override
   public String toString() {
-    return "4 | " + fromLogin + " : " + targetLogin;
+    return "Request from: [" + fromLogin + "]";
   }
 }

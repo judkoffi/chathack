@@ -93,9 +93,6 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(RequestPrivateConnection requestMessage) {
-    // client.addPrivateConnectionRequest(requestMessage);
-    var from = requestMessage.getFromLogin().getValue();
-    System.out.println("Incoming private connection request from " + from);
-    System.out.println("y ==> yes or n ==> no");
+    client.addPrivateConnectionRequest(requestMessage);
   }
 }
