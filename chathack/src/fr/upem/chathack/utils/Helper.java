@@ -16,11 +16,11 @@ public class Helper {
   public static final String WELCOME_MESSAGE = "Welcome to ChatHack !\n"
   		+ "To use this chat : \n"
   		+ "public message => no prefix\n"
-  		+ "@login => private message\n"
+  		+ "@login msg => private message\n"
   		+ "/requests => list private connection\n"
-  		+ "/accept => accept private connection\n"
-  		+ "/reject => reject private connection\n"
-  		+ "/file => send file\n";
+  		+ "/accept login => accept private connection\n"
+  		+ "/reject login => reject private connection\n"
+  		+ "/file login filename => send file\n";
 
   public static ByteBuffer cloneByteBuffer(ByteBuffer bb) {
     int capacity = bb.limit();
