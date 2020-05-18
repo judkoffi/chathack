@@ -12,6 +12,7 @@ import fr.upem.chathack.frame.DirectMessage;
 import fr.upem.chathack.frame.IFrame;
 import fr.upem.chathack.frame.IFrameVisitor;
 import fr.upem.chathack.frame.RequestPrivateConnection;
+import fr.upem.chathack.frame.ResponsePrivateConnection;
 import fr.upem.chathack.frame.ServerResponseMessage;
 
 public class ServerContext extends BaseContext implements IFrameVisitor {
@@ -127,5 +128,11 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
     }
 
     server.sendPrivateConnectionRequest(requestMessage);
+  }
+
+  @Override
+  public void visit(ResponsePrivateConnection responsePrivateConnection) {
+    // TODO Auto-generated method stub
+    
   }
 }

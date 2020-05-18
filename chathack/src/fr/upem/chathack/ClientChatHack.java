@@ -89,6 +89,8 @@ public class ClientChatHack {
     }
     if (line.startsWith("/accept")) {
       System.out.println("private connection accepted");
+      // var acceptMsg
+      // uniqueContext.queueMessage(bb);
     }
     if (line.startsWith("/reject")) {
       System.out.println(" private connection rejected");

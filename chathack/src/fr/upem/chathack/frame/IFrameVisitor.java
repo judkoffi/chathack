@@ -11,6 +11,8 @@ public interface IFrameVisitor {
   public void visit(DirectMessage directMessage);
 
   public void visit(ServerResponseMessage serverMessage);
-  
+
   public void visit(RequestPrivateConnection requestMessage);
+
+  public void visit(ResponsePrivateConnection responsePrivateConnection);
 }
