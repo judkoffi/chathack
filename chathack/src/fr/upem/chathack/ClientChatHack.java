@@ -5,6 +5,7 @@ import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,12 +45,14 @@ public class ClientChatHack {
   private String password;
   private final Thread console;
   private final ArrayList<RequestPrivateConnection> pendingPrivateRequests;
+  private ServerSocketChannel serverSocketChannel;
 
   public ClientChatHack(InetSocketAddress serverAddress, String path, String login)
       throws IOException {
     this.serverAddress = serverAddress;
     this.login = login;
     this.sc = SocketChannel.open();
+    this.serverSocketChannel = ServerSocketChannel.open();
     this.selector = Selector.open();
     this.console = new Thread(this::consoleRun);
     this.pendingPrivateRequests = new ArrayList<>();
@@ -199,6 +202,9 @@ public class ClientChatHack {
   }
 
   public void launch() throws IOException {
+    // binder un port random
+    serverSocketChannel.bind(new InetSocketAddress(0));
+
     sc.configureBlocking(false);
     var key = sc.register(selector, SelectionKey.OP_CONNECT);
     uniqueContext = new ClientContext(key, this);

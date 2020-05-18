@@ -12,6 +12,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -39,15 +40,12 @@ public class ServerChatHack {
     private SelectionKey key;
     private long id;
     private ServerContext context;
-    // list of already private connected clients
-    private final ArrayList<String> privateConnections;
 
     private ClientInfo(boolean anonymous, boolean isAuthenticated, SelectionKey key, long id) {
       this.anonymous = anonymous;
       this.isAuthenticated = isAuthenticated;
       this.key = key;
       this.id = id;
-      this.privateConnections = new ArrayList<>();
     }
 
     private ClientInfo(boolean anonymous, SelectionKey key, long id) {
@@ -131,6 +129,28 @@ public class ServerChatHack {
       .filter(k -> k.equals(key))
       .map(m -> (ServerContext) m.attachment())
       .findFirst();
+  }
+
+
+  public SelectionKey findKeyByLogin(String fromLogin) {
+    return this.map.get(fromLogin).key;
+  }
+
+  public void removeClientByKey(SelectionKey key) {
+    findLoginByKey(key).ifPresent(this::removeLoginInMap);
+  }
+
+  private Optional<String> findLoginByKey(SelectionKey key) {
+    return map
+      .entrySet()
+      .stream()
+      .filter(entry -> entry.getValue().key.equals(key))
+      .map(Map.Entry::getKey)
+      .findFirst();
+  }
+
+  private void removeLoginInMap(String login) {
+    map.remove(login);
   }
 
   /*****************************
@@ -357,10 +377,4 @@ public class ServerChatHack {
       list.add("WRITE");
     return String.join(" and ", list);
   }
-
-	public SelectionKey findKeyByLogin(String fromLogin) {
-		return this.map.get(fromLogin).key;
-		
-	}
-
 }
