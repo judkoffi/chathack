@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -44,7 +45,7 @@ public class ClientChatHack {
   private final String login;
   private String password;
   private final Thread console;
-  private final Queue<RequestPrivateConnection> privateConnectionRequest;
+  private final ArrayList<RequestPrivateConnection> privateConnectionRequest;
 
   public ClientChatHack(InetSocketAddress serverAddress, String path, String login)
       throws IOException {
@@ -53,7 +54,7 @@ public class ClientChatHack {
     this.sc = SocketChannel.open();
     this.selector = Selector.open();
     this.console = new Thread(this::consoleRun);
-    this.privateConnectionRequest = new LinkedList<>();
+    this.privateConnectionRequest = new ArrayList<>();
   }
 
   public ClientChatHack(InetSocketAddress serverAddress, String path, String login, String password)
@@ -99,6 +100,7 @@ public class ClientChatHack {
       }
       var fromLogin = splited[1];
       // TODO check if form is in pending connection
+      
       var addr = new InetSocketAddress(Helper.getCurrentIp(), 4500);
       var acceptMsg = new AcceptPrivateConnection(fromLogin, login, addr);
       uniqueContext.queueMessage(acceptMsg.toBuffer());
