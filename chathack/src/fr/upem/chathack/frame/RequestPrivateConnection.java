@@ -58,6 +58,6 @@ public class RequestPrivateConnection implements IFrame {
 
   @Override
   public String toString() {
-    return "Request from: [" + fromLogin + "]";
+    return "Request from: [" + fromLogin + "] to " + targetLogin;
   }
 }

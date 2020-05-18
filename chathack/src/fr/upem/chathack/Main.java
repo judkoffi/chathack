@@ -1,8 +1,10 @@
 package fr.upem.chathack;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 
@@ -91,6 +93,14 @@ public class Main {
     System.out.println(StandardCharsets.UTF_8.decode(bb));
   }
 
+  private static long ipToLong(InetSocketAddress addr) {
+    ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES).order(ByteOrder.BIG_ENDIAN);
+    buffer.put(new byte[] {0, 0, 0, 0});
+    buffer.put(addr.getAddress().getAddress());
+    buffer.position(0);
+    System.out.println(buffer);
+    return buffer.getLong();
+  }
 
   public static void main(String[] args) throws IOException {
     if (args.length != 1) {
@@ -100,9 +110,27 @@ public class Main {
 
     var addr = new InetSocketAddress("localhost", 7777);
     var sc = SocketChannel.open(addr);
-
+    
+    
+    System.out.println(ipToLong(addr));
+    
     var login = args[0];
 
+    String ip = "192.168.1.24";
+    InetAddress inetAddress = InetAddress.getByName(ip);
+    
+    var bytes= inetAddress.getAddress();
+    
+    for(int i = 0; i < bytes.length; i++) {
+      System.out.println(bytes[i]);
+    }
+
+    // ByteOrder.BIG_ENDIAN by default
+    ByteBuffer buffer = ByteBuffer.allocate(Long.SIZE);
+    buffer.put(inetAddress.getAddress());
+    buffer.position(0);
+    Long longValue = buffer.getLong();
+    System.out.println("dksqn: "+longValue);
     // sendAuthenticatedConnection(sc, login, "test");
     //sendAnonymousConnection(sc, login);
     sendBroadcastMsg(sc, login, "hello");

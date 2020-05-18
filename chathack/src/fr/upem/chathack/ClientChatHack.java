@@ -19,6 +19,7 @@ import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
 import fr.upem.chathack.frame.RequestPrivateConnection;
+import fr.upem.chathack.utils.Helper;
 
 public class ClientChatHack {
 
@@ -92,13 +93,15 @@ public class ClientChatHack {
       System.out.println("private connection accepted");
       var splited = line.split(" ");
       if (splited.length < 2) {
-          System.err.println("usage: /accept login");
-          return;
-        }
+        System.err.println("usage: /accept login");
+        return;
+      }
       var fromLogin = splited[1];
-      var addr = new InetSocketAddress("localhost", 4500);
+      // TODO check if form is in pending connection
+      var addr = new InetSocketAddress(Helper.getCurrentIp(), 4500);
       var acceptMsg = new AcceptPrivateConnection(fromLogin, login, addr);
       uniqueContext.queueMessage(acceptMsg.toBuffer());
+      // TODO remove in queue client accpeted
     }
     if (line.startsWith("/reject")) {
       System.out.println(" private connection rejected");

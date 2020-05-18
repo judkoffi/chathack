@@ -6,6 +6,7 @@ import java.nio.channels.SelectionKey;
 import fr.upem.chathack.ClientChatHack;
 import fr.upem.chathack.common.reader.IReader;
 import fr.upem.chathack.common.reader.trame.ClientFrameReader;
+import fr.upem.chathack.frame.AcceptPrivateConnection;
 import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
@@ -13,7 +14,6 @@ import fr.upem.chathack.frame.DirectMessage;
 import fr.upem.chathack.frame.IFrame;
 import fr.upem.chathack.frame.IFrameVisitor;
 import fr.upem.chathack.frame.RequestPrivateConnection;
-import fr.upem.chathack.frame.AcceptPrivateConnection;
 import fr.upem.chathack.frame.ServerResponseMessage;
 
 public class ClientContext extends BaseContext implements IFrameVisitor {
@@ -100,6 +100,6 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
   @Override
   public void visit(AcceptPrivateConnection responsePrivateConnection) {
     System.out.println("private connection is established !");
-    
+
   }
 }
