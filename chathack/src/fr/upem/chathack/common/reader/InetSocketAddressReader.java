@@ -39,6 +39,8 @@ public class InetSocketAddressReader implements IReader<InetSocketAddress> {
 				return status;
 			}
 			port = reader.get();
+			//System.out.println("port = " + port);
+			//System.out.println("longToIP : "+longToIp(address));
 			value = new InetSocketAddress(longToIp(address), (int) port);
 			state = State.DONE;
 			return ProcessStatus.DONE;

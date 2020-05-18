@@ -42,7 +42,7 @@ public class AcceptPrivateConnectionReader implements IReader<AcceptPrivateConne
 			state = State.WAITING_TARGET_ADDR;
 		}
 		case WAITING_TARGET_ADDR: {
-			var status = reader.process(bb);
+			var status = socketAddressReader.process(bb);
 			if (status != ProcessStatus.DONE) {
 				return status;
 			}

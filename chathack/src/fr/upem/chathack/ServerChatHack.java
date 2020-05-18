@@ -358,4 +358,9 @@ public class ServerChatHack {
     return String.join(" and ", list);
   }
 
+	public SelectionKey findKeyByLogin(String fromLogin) {
+		return this.map.get(fromLogin).key;
+		
+	}
+
 }

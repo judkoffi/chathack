@@ -96,7 +96,7 @@ public class ClientChatHack {
           return;
         }
       var fromLogin = splited[1];
-      var addr = new InetSocketAddress(0);
+      var addr = new InetSocketAddress("localhost", 4500);
       var acceptMsg = new AcceptPrivateConnection(fromLogin, login, addr);
       uniqueContext.queueMessage(acceptMsg.toBuffer());
     }

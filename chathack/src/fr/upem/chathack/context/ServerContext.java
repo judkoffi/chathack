@@ -132,7 +132,9 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(AcceptPrivateConnection responsePrivateConnection) {
-    // TODO Auto-generated method stub
+	  var targetKey = server.findKeyByLogin(responsePrivateConnection.getFromLogin()); 
+	  server.sendMessageToClient(responsePrivateConnection.toBuffer(), targetKey);
+	  
     
   }
 }

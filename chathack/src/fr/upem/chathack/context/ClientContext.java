@@ -99,7 +99,7 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(AcceptPrivateConnection responsePrivateConnection) {
-    // TODO Auto-generated method stub
+    System.out.println("private connection is established !");
     
   }
 }

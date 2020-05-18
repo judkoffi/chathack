@@ -18,6 +18,7 @@ public class ServerFrameReader implements IReader<IFrame> {
   private final AnonymousConnectionReader anonymousReader;
   private final AuthentificatedConnectionReader authenticatedReader;
   private final RequestPrivateConnectionReader requestConnectionReader;
+  private final AcceptPrivateConnectionReader acceptPrivateConnectionReader;
 
   private State state;
   private IReader<? extends IFrame> currentFrameReader;
@@ -29,6 +30,7 @@ public class ServerFrameReader implements IReader<IFrame> {
     this.anonymousReader = new AnonymousConnectionReader();
     this.authenticatedReader = new AuthentificatedConnectionReader();
     this.requestConnectionReader = new RequestPrivateConnectionReader();
+    this.acceptPrivateConnectionReader = new AcceptPrivateConnectionReader();
     this.state = State.WAITING_OPCODE;
   }
 
@@ -56,6 +58,9 @@ public class ServerFrameReader implements IReader<IFrame> {
           case OpCode.REQUEST_PRIVATE_CLIENT_CONNECTION:
             currentFrameReader = requestConnectionReader;
             break;
+          case OpCode.SUCCEDED_PRIVATE_CLIENT_CONNECTION:
+        	 currentFrameReader = acceptPrivateConnectionReader; 
+        	 break;
           default:
             throw new IllegalArgumentException("unknown opcode " + opcode);
         }
@@ -91,5 +96,6 @@ public class ServerFrameReader implements IReader<IFrame> {
     authenticatedReader.reset();
     anonymousReader.reset();
     requestConnectionReader.reset();
+    acceptPrivateConnectionReader.reset();
   }
 }

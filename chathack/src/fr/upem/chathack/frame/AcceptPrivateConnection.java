@@ -39,4 +39,8 @@ public class AcceptPrivateConnection implements IFrame {
 	public void accept(IFrameVisitor frameVisitor) {
 		frameVisitor.visit(this);
 	}
+
+	public String getFromLogin() {
+		return fromLogin.getValue();
+	}
 }
