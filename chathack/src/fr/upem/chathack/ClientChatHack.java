@@ -8,8 +8,6 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
@@ -45,7 +43,7 @@ public class ClientChatHack {
   private final String login;
   private String password;
   private final Thread console;
-  private final ArrayList<RequestPrivateConnection> privateConnectionRequest;
+  private final ArrayList<RequestPrivateConnection> pendingPrivateRequests;
 
   public ClientChatHack(InetSocketAddress serverAddress, String path, String login)
       throws IOException {
@@ -54,7 +52,7 @@ public class ClientChatHack {
     this.sc = SocketChannel.open();
     this.selector = Selector.open();
     this.console = new Thread(this::consoleRun);
-    this.privateConnectionRequest = new ArrayList<>();
+    this.pendingPrivateRequests = new ArrayList<>();
   }
 
   public ClientChatHack(InetSocketAddress serverAddress, String path, String login, String password)
@@ -90,42 +88,58 @@ public class ClientChatHack {
   private void processPrefixBySlash(String line) {
     if (line.startsWith("/file")) {
       System.out.println("send files");
+      return;
     }
-    if (line.startsWith("/accept")) {
-      System.out.println("private connection accepted");
-      var splited = line.split(" ");
-      if (splited.length < 2) {
-        System.err.println("usage: /accept login");
-        return;
-      }
-      var fromLogin = splited[1];
-      // TODO check if form is in pending connection
-      
-      var addr = new InetSocketAddress(Helper.getCurrentIp(), 4500);
-      var acceptMsg = new AcceptPrivateConnection(fromLogin, login, addr);
-      uniqueContext.queueMessage(acceptMsg.toBuffer());
-      // TODO remove in queue client accpeted
-    }
-    if (line.startsWith("/reject")) {
-      System.out.println("private connection rejected");
-      
-      var splited = line.split(" ");
-      if (splited.length < 2) {
-        System.err.println("usage: /reject login");
-        return;
-      }
-      var fromLogin = splited[1];
-      // TODO check if form is in pending connection
-      var rejectMsg = new RejectPrivateConnection(fromLogin, login);
-      uniqueContext.queueMessage(rejectMsg.toBuffer());
-    }
+
     if (line.startsWith("/requests")) {
-      if (privateConnectionRequest.isEmpty()) {
+      if (pendingPrivateRequests.isEmpty()) {
         System.out.println("No pending private request");
         return;
       }
-      System.out.println("Pending private request: ");
-      privateConnectionRequest.forEach(System.out::println);
+      pendingPrivateRequests.forEach(System.out::println);
+      return;
+    }
+
+    var isAcceptCommand = line.startsWith("/accept");
+    var isRejectCommand = line.startsWith("/reject");
+
+    var splited = line.split(" ");
+    if (splited.length < 2) {
+      if (isAcceptCommand)
+        System.err.println("usage: /accept login");
+
+      if (isRejectCommand)
+        System.err.println("usage: /reject login");
+      return;
+    }
+
+    var fromLogin = splited[1];
+    if (fromLogin.equals(login))
+      return;
+
+    boolean havePending = pendingPrivateRequests
+      .stream()
+      .anyMatch(p -> p.getFromLogin().getValue().equals(fromLogin));
+
+    if (!havePending)
+      return;
+
+    var targetRequest = pendingPrivateRequests
+      .stream()
+      .filter(p -> p.getFromLogin().getValue().equals(fromLogin))
+      .findFirst();
+
+    if (isAcceptCommand) {
+      var addr = new InetSocketAddress(Helper.getCurrentIp(), 4500);
+      var acceptMsg = new AcceptPrivateConnection(fromLogin, login, addr);
+      uniqueContext.queueMessage(acceptMsg.toBuffer());
+      targetRequest.ifPresent(pendingPrivateRequests::remove);
+    }
+
+    if (isRejectCommand) {
+      var rejectMsg = new RejectPrivateConnection(fromLogin, login);
+      uniqueContext.queueMessage(rejectMsg.toBuffer());
+      targetRequest.ifPresent(pendingPrivateRequests::remove);
     }
   }
 
@@ -144,6 +158,8 @@ public class ClientChatHack {
 
     } else {
       var dmRequest = new RequestPrivateConnection(login, targetLogin);
+      if (pendingPrivateRequests.contains(dmRequest) || targetLogin.equals(login))
+        return;
       this.uniqueContext.queueMessage(dmRequest.toBuffer());
     }
   }
@@ -178,8 +194,8 @@ public class ClientChatHack {
   }
 
   public void addPrivateConnectionRequest(RequestPrivateConnection requestMessage) {
-    if (!privateConnectionRequest.contains(requestMessage))
-      privateConnectionRequest.add(requestMessage);
+    if (!pendingPrivateRequests.contains(requestMessage))
+      pendingPrivateRequests.add(requestMessage);
   }
 
   public void launch() throws IOException {
