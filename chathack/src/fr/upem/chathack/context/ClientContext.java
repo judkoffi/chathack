@@ -13,6 +13,7 @@ import fr.upem.chathack.frame.BroadcastMessage;
 import fr.upem.chathack.frame.DirectMessage;
 import fr.upem.chathack.frame.IFrame;
 import fr.upem.chathack.frame.IFrameVisitor;
+import fr.upem.chathack.frame.RejectPrivateConnection;
 import fr.upem.chathack.frame.RequestPrivateConnection;
 import fr.upem.chathack.frame.ServerResponseMessage;
 
@@ -102,4 +103,10 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
     System.out.println("private connection is established !");
 
   }
+
+@Override
+public void visit(RejectPrivateConnection rejectPrivateConnection) {
+	System.out.println("private connection was rejected.");
+	
+}
 }

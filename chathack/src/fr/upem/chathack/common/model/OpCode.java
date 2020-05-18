@@ -12,6 +12,7 @@ public class OpCode {
   public static final byte SERVER_NOTIFY_PRIVATE_CLIENT_CONNECTION = (byte) 5;
   public static final byte CLIENT_FAILED_PRIVATE_CLIENT_CONNECTION = (byte) 6;
   public static final byte SUCCEDED_PRIVATE_CLIENT_CONNECTION = (byte) 7;
+  public static final byte REJECTED_PRIVATE_CLIENT_CONNECTION = (byte)-4;
   public static final byte PRIVATE_MESSAGE = (byte) 8;
 
 

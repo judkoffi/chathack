@@ -18,6 +18,7 @@ import fr.upem.chathack.frame.AcceptPrivateConnection;
 import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
+import fr.upem.chathack.frame.RejectPrivateConnection;
 import fr.upem.chathack.frame.RequestPrivateConnection;
 import fr.upem.chathack.utils.Helper;
 
@@ -104,7 +105,17 @@ public class ClientChatHack {
       // TODO remove in queue client accpeted
     }
     if (line.startsWith("/reject")) {
-      System.out.println(" private connection rejected");
+      System.out.println("private connection rejected");
+      
+      var splited = line.split(" ");
+      if (splited.length < 2) {
+        System.err.println("usage: /reject login");
+        return;
+      }
+      var fromLogin = splited[1];
+      // TODO check if form is in pending connection
+      var rejectMsg = new RejectPrivateConnection(fromLogin, login);
+      uniqueContext.queueMessage(rejectMsg.toBuffer());
     }
     if (line.startsWith("/requests")) {
       if (privateConnectionRequest.isEmpty()) {
