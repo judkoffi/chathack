@@ -8,7 +8,7 @@ import fr.upem.chathack.frame.RequestPrivateConnection;
 
 public class RequestPrivateConnectionReader implements IReader<RequestPrivateConnection> {
   private enum State {
-    WAITING_FROM_LOGIN, WAITING_TARGET_LOGIN, DONE, ERROR
+	  WAITING_TARGET_LOGIN,WAITING_FROM_LOGIN, DONE, ERROR
   }
 
   private final LongSizedStringReader reader;

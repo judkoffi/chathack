@@ -14,5 +14,5 @@ public interface IFrameVisitor {
 
   public void visit(RequestPrivateConnection requestMessage);
 
-  public void visit(ResponsePrivateConnection responsePrivateConnection);
+  public void visit(AcceptPrivateConnection responsePrivateConnection);
 }

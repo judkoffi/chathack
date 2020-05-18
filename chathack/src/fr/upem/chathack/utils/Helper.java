@@ -16,6 +16,7 @@ public class Helper {
   public static final String WELCOME_MESSAGE = "Welcome to ChatHack !\n"
   		+ "To use this chat : \n"
   		+ "public message => no prefix\n"
+  		+ "@login => private message\n"
   		+ "/requests => list private connection\n"
   		+ "/accept => accept private connection\n"
   		+ "/reject => reject private connection\n"

@@ -1,6 +1,6 @@
 package fr.upem.chathack.common.model;
 
-
+import java.nio.ByteBuffer;
 
 public class OpCode {
   private OpCode() {}

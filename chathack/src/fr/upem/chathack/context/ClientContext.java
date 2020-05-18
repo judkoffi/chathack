@@ -13,7 +13,7 @@ import fr.upem.chathack.frame.DirectMessage;
 import fr.upem.chathack.frame.IFrame;
 import fr.upem.chathack.frame.IFrameVisitor;
 import fr.upem.chathack.frame.RequestPrivateConnection;
-import fr.upem.chathack.frame.ResponsePrivateConnection;
+import fr.upem.chathack.frame.AcceptPrivateConnection;
 import fr.upem.chathack.frame.ServerResponseMessage;
 
 public class ClientContext extends BaseContext implements IFrameVisitor {
@@ -98,7 +98,7 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
   }
 
   @Override
-  public void visit(ResponsePrivateConnection responsePrivateConnection) {
+  public void visit(AcceptPrivateConnection responsePrivateConnection) {
     // TODO Auto-generated method stub
     
   }

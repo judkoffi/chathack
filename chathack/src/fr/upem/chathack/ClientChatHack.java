@@ -14,6 +14,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
 import fr.upem.chathack.common.model.Message;
 import fr.upem.chathack.context.ClientContext;
+import fr.upem.chathack.frame.AcceptPrivateConnection;
 import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
@@ -89,8 +90,15 @@ public class ClientChatHack {
     }
     if (line.startsWith("/accept")) {
       System.out.println("private connection accepted");
-      // var acceptMsg
-      // uniqueContext.queueMessage(bb);
+      var splited = line.split(" ");
+      if (splited.length < 2) {
+          System.err.println("usage: /accept login");
+          return;
+        }
+      var fromLogin = splited[1];
+      var addr = new InetSocketAddress(0);
+      var acceptMsg = new AcceptPrivateConnection(fromLogin, login, addr);
+      uniqueContext.queueMessage(acceptMsg.toBuffer());
     }
     if (line.startsWith("/reject")) {
       System.out.println(" private connection rejected");
