@@ -11,6 +11,7 @@ import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
 import fr.upem.chathack.frame.DirectMessage;
+import fr.upem.chathack.frame.DiscoverMessage;
 import fr.upem.chathack.frame.IFrame;
 import fr.upem.chathack.frame.IFrameVisitor;
 import fr.upem.chathack.frame.RejectPrivateConnection;
@@ -53,14 +54,11 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
     if (!sc.finishConnect()) {
       return;
     }
+
+    System.out.println("clinent login " + client.getLogin());
     updateInterestOps();
   }
 
-  @Override
-  public void visit(AnonymousConnection message) {}
-
-  @Override
-  public void visit(AuthentificatedConnection message) {}
 
   @Override
   public void visit(BroadcastMessage message) {
@@ -68,14 +66,7 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
   }
 
   @Override
-  public void visit(DirectMessage directMessage) {
-    System.out.println("TEST");
-    if (!client.havePrivateConnection(directMessage.getDestinator())) {
-      System.out.println("do prive connection");
-    } else {
-      System.out.println("send message");
-    }
-  }
+  public void visit(DirectMessage directMessage) {}
 
   @Override
   public void visit(ServerResponseMessage serverMessage) {
@@ -100,13 +91,26 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
 
   @Override
   public void visit(AcceptPrivateConnection responsePrivateConnection) {
-    System.out.println("private connection is established !");
-
+    var targetAddr = responsePrivateConnection.getTargetAddress();
+    client.doConnectionWithClient(targetAddr, responsePrivateConnection.getTargetLogin());
+    System.out.println("private connection is accepted !");
   }
 
-@Override
-public void visit(RejectPrivateConnection rejectPrivateConnection) {
-	System.out.println("private connection was rejected.");
-	
-}
+  @Override
+  public void visit(RejectPrivateConnection rejectPrivateConnection) {
+    System.out.println("private connection was rejected.");
+  }
+
+  @Override
+  public void visit(DiscoverMessage message) {
+    System.out.println("discover in Client context key hash: " + message.getKeyHashCode());
+    // client.registerPrivateClient(message.getLogin(), message.getKeyHashCode());
+  }
+
+  @Override
+  public void visit(AnonymousConnection message) {}
+
+  @Override
+  public void visit(AuthentificatedConnection message) {}
+
 }

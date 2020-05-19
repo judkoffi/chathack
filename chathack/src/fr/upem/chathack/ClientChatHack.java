@@ -1,8 +1,10 @@
 package fr.upem.chathack;
 
+import static fr.upem.chathack.utils.Helper.getCurrentIp;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -10,32 +12,26 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
 import fr.upem.chathack.common.model.Message;
+import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.context.ClientContext;
+import fr.upem.chathack.context.PrivateConnectionContext;
+import fr.upem.chathack.context.PrivateConnectionInfo;
 import fr.upem.chathack.frame.AcceptPrivateConnection;
 import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
+import fr.upem.chathack.frame.DirectMessage;
 import fr.upem.chathack.frame.RejectPrivateConnection;
 import fr.upem.chathack.frame.RequestPrivateConnection;
-import fr.upem.chathack.utils.Helper;
 
 public class ClientChatHack {
-
-  private enum ConnectionStatus {
-    PENDING, ALLOWED, NOT_ALLOWED
-  }
-
-  private static class PrivateConnectionInfo {
-
-  }
-
   private static final Logger logger = Logger.getLogger(ClientChatHack.class.getName());
   private final ArrayBlockingQueue<String> commandQueue = new ArrayBlockingQueue<>(10);
-  // map use to store private connection between a client and other clients
-  private final HashMap<String, PrivateConnectionInfo> map = new HashMap<>();
+  private final HashMap<String, PrivateConnectionInfo> alreadyConnection = new HashMap<>();
 
   private final SocketChannel sc;
   private final Selector selector;
@@ -85,7 +81,7 @@ public class ClientChatHack {
   }
 
   public boolean havePrivateConnection(String destinator) {
-    return map.containsKey(destinator);
+    return alreadyConnection.containsKey(destinator);
   }
 
   private void processPrefixBySlash(String line) {
@@ -133,7 +129,7 @@ public class ClientChatHack {
       .findFirst();
 
     if (isAcceptCommand) {
-      var addr = new InetSocketAddress(Helper.getCurrentIp(), 4500);
+      var addr = new InetSocketAddress(getCurrentIp(), serverSocketChannel.socket().getLocalPort());
       var acceptMsg = new AcceptPrivateConnection(fromLogin, login, addr);
       uniqueContext.queueMessage(acceptMsg.toBuffer());
       targetRequest.ifPresent(pendingPrivateRequests::remove);
@@ -158,7 +154,8 @@ public class ClientChatHack {
     var targetLogin = splited[0];
     var message = splited[1];
     if (havePrivateConnection(targetLogin)) {
-
+      var dmMsg = new DirectMessage(login, targetLogin, message);
+      alreadyConnection.get(targetLogin).getContext().queueMessage(dmMsg.toBuffer());
     } else {
       var dmRequest = new RequestPrivateConnection(login, targetLogin);
       if (pendingPrivateRequests.contains(dmRequest) || targetLogin.equals(login))
@@ -166,6 +163,7 @@ public class ClientChatHack {
       this.uniqueContext.queueMessage(dmRequest.toBuffer());
     }
   }
+
 
   private void processCommands() {
     for (;;) {
@@ -196,14 +194,49 @@ public class ClientChatHack {
     }
   }
 
+  public void putAlreadyConnection(String login, PrivateConnectionInfo privateConnectionInfo) {
+    alreadyConnection.put(login, privateConnectionInfo);
+  }
+
   public void addPrivateConnectionRequest(RequestPrivateConnection requestMessage) {
     if (!pendingPrivateRequests.contains(requestMessage))
       pendingPrivateRequests.add(requestMessage);
   }
 
+  private void doAccept(SelectionKey key) throws IOException {
+    SocketChannel sc = serverSocketChannel.accept();
+    if (sc == null)
+      return; // the selector gave a bad hint
+    sc.configureBlocking(false);
+    System.out.println("hhoohoo");
+    SelectionKey clientKey = sc.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+    var ctx = new PrivateConnectionContext(clientKey, this);
+    // map.put(targetLogin, new PrivateConnectionInfo(ctx));
+    // send discover paquet
+    clientKey.attach(ctx);
+  }
+
+  public void doConnectionWithClient(InetSocketAddress targetAddr, String targetLogin) {
+    try {
+      var socket = SocketChannel.open();
+      socket.configureBlocking(false);
+      var key = socket.register(selector, SelectionKey.OP_CONNECT);
+      var ctx = new PrivateConnectionContext(key, this);
+      key.attach(ctx);
+      alreadyConnection.put(targetLogin, new PrivateConnectionInfo(ctx));
+      System.out.println(alreadyConnection);
+      socket.connect(targetAddr);
+    } catch (IOException e) {
+      System.err.println("Failed to connect incomming client");
+    }
+  }
+
+
   public void launch() throws IOException {
     // binder un port random
     serverSocketChannel.bind(new InetSocketAddress(0));
+    serverSocketChannel.configureBlocking(false);
+    serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
 
     sc.configureBlocking(false);
     var key = sc.register(selector, SelectionKey.OP_CONNECT);
@@ -223,6 +256,7 @@ public class ClientChatHack {
     console.start();// run stdin thread
 
     while (!Thread.interrupted()) {
+      // printKeys();
       try {
         selector.select(this::treatKey);
         processCommands();
@@ -233,15 +267,29 @@ public class ClientChatHack {
   }
 
   private void treatKey(SelectionKey key) {
+    // printSelectedKey(key);
+    try {
+      if (key.isValid() && key.isAcceptable()) {
+        doAccept(key);
+      }
+    } catch (IOException ioe) {
+      throw new UncheckedIOException(ioe);
+    }
+
     try {
       if (key.isValid() && key.isConnectable()) {
-        uniqueContext.doConnect();
+        if (key.attachment() instanceof ClientContext) {
+          ((ClientContext) key.attachment()).doConnect();
+        }
+        if (key.attachment() instanceof PrivateConnectionContext) {
+          ((PrivateConnectionContext) key.attachment()).doConnect();
+        }
       }
       if (key.isValid() && key.isWritable()) {
-        uniqueContext.doWrite();
+        ((BaseContext) key.attachment()).doWrite();
       }
       if (key.isValid() && key.isReadable()) {
-        uniqueContext.doRead();
+        ((BaseContext) key.attachment()).doRead();
       }
     } catch (IOException ioe) {
       // lambda call in select requires to tunnel IOException
@@ -251,6 +299,80 @@ public class ClientChatHack {
 
   public void interruptConsole() {
     this.console.interrupt();
+  }
+
+
+  public String getLogin() {
+    return login;
+  }
+
+  private String interestOpsToString(SelectionKey key) {
+    if (!key.isValid()) {
+      return "CANCELLED";
+    }
+    int interestOps = key.interestOps();
+    ArrayList<String> list = new ArrayList<>();
+    if ((interestOps & SelectionKey.OP_ACCEPT) != 0)
+      list.add("OP_ACCEPT");
+    if ((interestOps & SelectionKey.OP_READ) != 0)
+      list.add("OP_READ");
+    if ((interestOps & SelectionKey.OP_WRITE) != 0)
+      list.add("OP_WRITE");
+    return String.join("|", list);
+  }
+
+  public void printKeys() {
+    Set<SelectionKey> selectionKeySet = selector.keys();
+    if (selectionKeySet.isEmpty()) {
+      System.out.println("The selector contains no key : this should not happen!");
+      return;
+    }
+    System.out.println("The selector contains:");
+    for (SelectionKey key : selectionKeySet) {
+      SelectableChannel channel = key.channel();
+      if (channel instanceof ServerSocketChannel) {
+        System.out.println("\tKey for ServerSocketChannel : " + interestOpsToString(key));
+      } else {
+        SocketChannel sc = (SocketChannel) channel;
+        System.out
+          .println(
+              "\tKey for Client " + remoteAddressToString(sc) + " : " + interestOpsToString(key));
+      }
+    }
+  }
+
+  private String remoteAddressToString(SocketChannel sc) {
+    try {
+      return sc.getRemoteAddress().toString();
+    } catch (IOException e) {
+      return "???";
+    }
+  }
+
+  public void printSelectedKey(SelectionKey key) {
+    SelectableChannel channel = key.channel();
+    if (channel instanceof ServerSocketChannel) {
+      System.out.println("\tServerSocketChannel can perform : " + possibleActionsToString(key));
+    } else {
+      SocketChannel sc = (SocketChannel) channel;
+      System.out
+        .println("\tClient " + remoteAddressToString(sc) + " can perform : "
+            + possibleActionsToString(key));
+    }
+  }
+
+  private String possibleActionsToString(SelectionKey key) {
+    if (!key.isValid()) {
+      return "CANCELLED";
+    }
+    ArrayList<String> list = new ArrayList<>();
+    if (key.isAcceptable())
+      list.add("ACCEPT");
+    if (key.isReadable())
+      list.add("READ");
+    if (key.isWritable())
+      list.add("WRITE");
+    return String.join(" and ", list);
   }
 
   private static void usage() {

@@ -10,6 +10,7 @@ import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
 import fr.upem.chathack.frame.DirectMessage;
+import fr.upem.chathack.frame.DiscoverMessage;
 import fr.upem.chathack.frame.IFrame;
 import fr.upem.chathack.frame.IFrameVisitor;
 import fr.upem.chathack.frame.RejectPrivateConnection;
@@ -58,9 +59,6 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
       silenceInputClose();
     }
   }
-
-  @Override
-  public void visit(DirectMessage directMessage) {}
 
   @Override
   public void visit(AnonymousConnection message) {
@@ -113,10 +111,6 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
     }
   }
 
-  @Override
-  public void visit(ServerResponseMessage serverMessage) {
-    System.out.println("qdsqsqsd");
-  }
 
   @Override
   public void visit(RequestPrivateConnection requestMessage) {
@@ -153,4 +147,22 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
     var targetKey = server.findKeyByLogin(rejectPrivateConnection.getFromLogin());
     server.sendMessageToClient(rejectPrivateConnection.toBuffer(), targetKey);
   }
+
+
+  /*****************************
+   * Not received by server
+   *****************************/
+
+  @Override
+  public void visit(DirectMessage directMessage) {}
+
+  @Override
+  public void visit(ServerResponseMessage serverMessage) {}
+
+  @Override
+  public void visit(DiscoverMessage message) {
+    System.out.println("discover in Server context");
+  }
+
+
 }

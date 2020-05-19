@@ -47,7 +47,6 @@ public class DirectMessageReader implements IReader<DirectMessage> {
         return ProcessStatus.DONE;
       }
       default:
-        System.out.println(state);
         throw new IllegalStateException();
     }
   }
@@ -65,6 +64,7 @@ public class DirectMessageReader implements IReader<DirectMessage> {
     state = State.WAITING_TARGET;
     targetReader.reset();
     messageReader.reset();
+    target = null;
     message = null;
   }
 }

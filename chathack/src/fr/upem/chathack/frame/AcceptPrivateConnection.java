@@ -54,9 +54,17 @@ public class AcceptPrivateConnection implements IFrame {
   public String getFromLogin() {
     return fromLogin.getValue();
   }
+  
+  public String getTargetLogin() {
+    return targetLogin.getValue();
+  }
 
   @Override
   public String toString() {
     return "AcceptResponse " + fromLogin + " " + targetLogin + " " + targetAddress;
+  }
+
+  public InetSocketAddress getTargetAddress() {
+    return targetAddress;
   }
 }

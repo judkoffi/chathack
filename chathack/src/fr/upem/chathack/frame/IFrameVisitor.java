@@ -2,19 +2,21 @@ package fr.upem.chathack.frame;
 
 public interface IFrameVisitor {
 
-	public void visit(AnonymousConnection message);
+  public void visit(DiscoverMessage message);
 
-	public void visit(AuthentificatedConnection message);
+  public void visit(AnonymousConnection message);
 
-	public void visit(BroadcastMessage message);
+  public void visit(AuthentificatedConnection message);
 
-	public void visit(DirectMessage directMessage);
+  public void visit(BroadcastMessage message);
 
-	public void visit(ServerResponseMessage serverMessage);
+  public void visit(DirectMessage directMessage);
 
-	public void visit(RequestPrivateConnection requestMessage);
+  public void visit(ServerResponseMessage serverMessage);
 
-	public void visit(AcceptPrivateConnection responsePrivateConnection);
+  public void visit(RequestPrivateConnection requestMessage);
 
-	public void visit(RejectPrivateConnection rejectPrivateConnection);
+  public void visit(AcceptPrivateConnection responsePrivateConnection);
+
+  public void visit(RejectPrivateConnection rejectPrivateConnection);
 }

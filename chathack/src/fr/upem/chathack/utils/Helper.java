@@ -37,6 +37,7 @@ public class Helper {
   }
 
   public static String getCurrentIp() {
+    /*
     try {
       URL url = new URL("http://bot.whatismyipaddress.com");
       BufferedReader sc = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -45,6 +46,10 @@ public class Helper {
 
     }
     return null;
-  }
+  */
+   
+    return "localhost";
+  } 
+  
 
 }
