@@ -3,8 +3,10 @@ package fr.upem.chathack.frame;
 import java.nio.ByteBuffer;
 import fr.upem.chathack.common.model.LongSizedString;
 import fr.upem.chathack.common.model.OpCode;
+import fr.upem.chathack.frame.visitor.IPrivateFrame;
+import fr.upem.chathack.frame.visitor.IPrivateFrameVisitor;
 
-public class DiscoverMessage implements IFrame {
+public class DiscoverMessage implements IPrivateFrame {
   private final LongSizedString sizedString;
   private final int keyHashCode;
 
@@ -39,7 +41,7 @@ public class DiscoverMessage implements IFrame {
   }
 
   @Override
-  public void accept(IFrameVisitor frameVisitor) {
+  public void accept(IPrivateFrameVisitor frameVisitor) {
     frameVisitor.visit(this);
   }
 

@@ -3,9 +3,9 @@ package fr.upem.chathack.common.reader.trame;
 import java.nio.ByteBuffer;
 import fr.upem.chathack.common.model.OpCode;
 import fr.upem.chathack.common.reader.IReader;
-import fr.upem.chathack.frame.IFrame;
+import fr.upem.chathack.frame.visitor.IPublicFrame;
 
-public class ServerFrameReader implements IReader<IFrame> {
+public class ServerFrameReader implements IReader<IPublicFrame> {
 
   private enum State {
     WAITING_OPCODE, WAITING_CONTENT, DONE, ERROR
@@ -20,15 +20,15 @@ public class ServerFrameReader implements IReader<IFrame> {
   private final RequestPrivateConnectionReader requestConnectionReader;
   private final AcceptPrivateConnectionReader acceptPrivateConnectionReader;
   private final RejectPrivateConnectionReader rejectPrivateConnectionReader;
-  
+
   private State state;
-  private IReader<? extends IFrame> currentFrameReader;
-  private IFrame value;
+  private IReader<? extends IPublicFrame> currentFrameReader;
+  private IPublicFrame value;
 
 
 
   public ServerFrameReader() {
-	this.broadcastMessageReader = new BroadcastMessageReader();
+    this.broadcastMessageReader = new BroadcastMessageReader();
     this.anonymousReader = new AnonymousConnectionReader();
     this.authenticatedReader = new AuthentificatedConnectionReader();
     this.requestConnectionReader = new RequestPrivateConnectionReader();
@@ -62,11 +62,11 @@ public class ServerFrameReader implements IReader<IFrame> {
             currentFrameReader = requestConnectionReader;
             break;
           case OpCode.SUCCEDED_PRIVATE_CLIENT_CONNECTION:
-        	 currentFrameReader = acceptPrivateConnectionReader; 
-        	 break;
+            currentFrameReader = acceptPrivateConnectionReader;
+            break;
           case OpCode.REJECTED_PRIVATE_CLIENT_CONNECTION:
-         	 currentFrameReader = rejectPrivateConnectionReader; 
-         	 break;
+            currentFrameReader = rejectPrivateConnectionReader;
+            break;
           default:
             throw new IllegalArgumentException("unknown opcode " + opcode);
         }
@@ -87,7 +87,7 @@ public class ServerFrameReader implements IReader<IFrame> {
   }
 
   @Override
-  public IFrame get() {
+  public IPublicFrame get() {
     if (state != State.DONE) {
       throw new IllegalStateException();
     }

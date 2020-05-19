@@ -3,8 +3,10 @@ package fr.upem.chathack.frame;
 import java.nio.ByteBuffer;
 import fr.upem.chathack.common.model.Message;
 import fr.upem.chathack.common.model.OpCode;
+import fr.upem.chathack.frame.visitor.IPublicFrame;
+import fr.upem.chathack.frame.visitor.IPublicFrameVisitor;
 
-public class BroadcastMessage implements IFrame {
+public class BroadcastMessage implements IPublicFrame {
   private final Message message;
 
   public BroadcastMessage(Message message) {
@@ -21,7 +23,7 @@ public class BroadcastMessage implements IFrame {
   }
 
   @Override
-  public void accept(IFrameVisitor frameVisitor) {
+  public void accept(IPublicFrameVisitor frameVisitor) {
     frameVisitor.visit(this);
   }
 

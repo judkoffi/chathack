@@ -10,15 +10,13 @@ import fr.upem.chathack.frame.AcceptPrivateConnection;
 import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
-import fr.upem.chathack.frame.DirectMessage;
-import fr.upem.chathack.frame.DiscoverMessage;
-import fr.upem.chathack.frame.IFrame;
-import fr.upem.chathack.frame.IFrameVisitor;
 import fr.upem.chathack.frame.RejectPrivateConnection;
 import fr.upem.chathack.frame.RequestPrivateConnection;
 import fr.upem.chathack.frame.ServerResponseMessage;
+import fr.upem.chathack.frame.visitor.IPublicFrame;
+import fr.upem.chathack.frame.visitor.IPublicFrameVisitor;
 
-public class ClientContext extends BaseContext implements IFrameVisitor {
+public class ClientContext extends BaseContext implements IPublicFrameVisitor {
   private final ClientFrameReader reader = new ClientFrameReader();
   private final ClientChatHack client;
 
@@ -27,7 +25,7 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
     this.client = client;
   }
 
-  private void handler(IFrame frame) {
+  private void handler(IPublicFrame frame) {
     frame.accept(this);
   }
 
@@ -66,9 +64,6 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
   }
 
   @Override
-  public void visit(DirectMessage directMessage) {}
-
-  @Override
   public void visit(ServerResponseMessage serverMessage) {
     System.out.println(serverMessage);
     if (serverMessage.isErrorMessage()) {
@@ -99,12 +94,6 @@ public class ClientContext extends BaseContext implements IFrameVisitor {
   @Override
   public void visit(RejectPrivateConnection rejectPrivateConnection) {
     System.out.println("private connection was rejected.");
-  }
-
-  @Override
-  public void visit(DiscoverMessage message) {
-    System.out.println("discover in Client context key hash: " + message.getKeyHashCode());
-    // client.registerPrivateClient(message.getLogin(), message.getKeyHashCode());
   }
 
   @Override

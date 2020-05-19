@@ -4,8 +4,10 @@ import java.nio.ByteBuffer;
 import fr.upem.chathack.common.model.LongSizedString;
 import fr.upem.chathack.common.model.Message;
 import fr.upem.chathack.common.model.OpCode;
+import fr.upem.chathack.frame.visitor.IPrivateFrame;
+import fr.upem.chathack.frame.visitor.IPrivateFrameVisitor;
 
-public class DirectMessage implements IFrame {
+public class DirectMessage implements IPrivateFrame {
   private final LongSizedString destinator;
   private final Message message;
 
@@ -29,12 +31,12 @@ public class DirectMessage implements IFrame {
     return bb.flip();
   }
 
-  @Override
-  public void accept(IFrameVisitor frameVisitor) {
-    frameVisitor.visit(this);
-  }
-
   public String getDestinator() {
     return destinator.getValue();
+  }
+
+  @Override
+  public void accept(IPrivateFrameVisitor frameVisitor) {
+    frameVisitor.visit(this);
   }
 }

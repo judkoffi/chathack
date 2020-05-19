@@ -5,8 +5,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import fr.upem.chathack.common.model.LongSizedString;
 import fr.upem.chathack.common.model.OpCode;
+import fr.upem.chathack.frame.visitor.IPublicFrame;
+import fr.upem.chathack.frame.visitor.IPublicFrameVisitor;
 
-public class AcceptPrivateConnection implements IFrame {
+public class AcceptPrivateConnection implements IPublicFrame {
   private final LongSizedString fromLogin;
   private final LongSizedString targetLogin;
   private final InetSocketAddress targetAddress;
@@ -47,14 +49,14 @@ public class AcceptPrivateConnection implements IFrame {
   }
 
   @Override
-  public void accept(IFrameVisitor frameVisitor) {
+  public void accept(IPublicFrameVisitor frameVisitor) {
     frameVisitor.visit(this);
   }
 
   public String getFromLogin() {
     return fromLogin.getValue();
   }
-  
+
   public String getTargetLogin() {
     return targetLogin.getValue();
   }

@@ -9,15 +9,13 @@ import fr.upem.chathack.frame.AcceptPrivateConnection;
 import fr.upem.chathack.frame.AnonymousConnection;
 import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.BroadcastMessage;
-import fr.upem.chathack.frame.DirectMessage;
-import fr.upem.chathack.frame.DiscoverMessage;
-import fr.upem.chathack.frame.IFrame;
-import fr.upem.chathack.frame.IFrameVisitor;
 import fr.upem.chathack.frame.RejectPrivateConnection;
 import fr.upem.chathack.frame.RequestPrivateConnection;
 import fr.upem.chathack.frame.ServerResponseMessage;
+import fr.upem.chathack.frame.visitor.IPublicFrame;
+import fr.upem.chathack.frame.visitor.IPublicFrameVisitor;
 
-public class ServerContext extends BaseContext implements IFrameVisitor {
+public class ServerContext extends BaseContext implements IPublicFrameVisitor {
   private final ServerFrameReader reader = new ServerFrameReader();
   private final ServerChatHack server;
 
@@ -26,7 +24,7 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
     this.server = server;
   }
 
-  private void handler(IFrame frame) {
+  private void handler(IPublicFrame frame) {
     frame.accept(this);
   }
 
@@ -36,7 +34,7 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
       IReader.ProcessStatus status = reader.process(bbin);
       switch (status) {
         case DONE:
-          IFrame frame = reader.get();
+          IPublicFrame frame = reader.get();
           handler(frame);
           reader.reset();
           break;
@@ -152,17 +150,7 @@ public class ServerContext extends BaseContext implements IFrameVisitor {
   /*****************************
    * Not received by server
    *****************************/
-
-  @Override
-  public void visit(DirectMessage directMessage) {}
-
   @Override
   public void visit(ServerResponseMessage serverMessage) {}
-
-  @Override
-  public void visit(DiscoverMessage message) {
-    System.out.println("discover in Server context");
-  }
-
 
 }

@@ -5,19 +5,12 @@ import java.nio.channels.SelectionKey;
 import fr.upem.chathack.ClientChatHack;
 import fr.upem.chathack.common.reader.IReader;
 import fr.upem.chathack.common.reader.trame.ClientAsServerFrameReader;
-import fr.upem.chathack.frame.AcceptPrivateConnection;
-import fr.upem.chathack.frame.AnonymousConnection;
-import fr.upem.chathack.frame.AuthentificatedConnection;
-import fr.upem.chathack.frame.BroadcastMessage;
 import fr.upem.chathack.frame.DirectMessage;
 import fr.upem.chathack.frame.DiscoverMessage;
-import fr.upem.chathack.frame.IFrame;
-import fr.upem.chathack.frame.IFrameVisitor;
-import fr.upem.chathack.frame.RejectPrivateConnection;
-import fr.upem.chathack.frame.RequestPrivateConnection;
-import fr.upem.chathack.frame.ServerResponseMessage;
+import fr.upem.chathack.frame.visitor.IPrivateFrame;
+import fr.upem.chathack.frame.visitor.IPrivateFrameVisitor;
 
-public class PrivateConnectionContext extends BaseContext implements IFrameVisitor {
+public class PrivateConnectionContext extends BaseContext implements IPrivateFrameVisitor {
   private final ClientChatHack client;
   private final ClientAsServerFrameReader reader = new ClientAsServerFrameReader();
 
@@ -26,7 +19,7 @@ public class PrivateConnectionContext extends BaseContext implements IFrameVisit
     this.client = client;
   }
 
-  private void handler(IFrame frame) {
+  private void handler(IPrivateFrame frame) {
     frame.accept(this);
   }
 
@@ -34,7 +27,7 @@ public class PrivateConnectionContext extends BaseContext implements IFrameVisit
     if (!sc.finishConnect()) {
       return;
     }
-   // System.out.println("send discover with key 39");
+    // System.out.println("send discover with key 39");
     var discoverMsg = new DiscoverMessage(client.getLogin(), 39);
     queueMessage(discoverMsg.toBuffer());
     updateInterestOps();
@@ -64,27 +57,6 @@ public class PrivateConnectionContext extends BaseContext implements IFrameVisit
   public void visit(DirectMessage directMessage) {
     System.out.println("direct message received");
   }
-
-  @Override
-  public void visit(AnonymousConnection message) {}
-
-  @Override
-  public void visit(AuthentificatedConnection message) {}
-
-  @Override
-  public void visit(BroadcastMessage message) {}
-
-  @Override
-  public void visit(ServerResponseMessage serverMessage) {}
-
-  @Override
-  public void visit(RequestPrivateConnection requestMessage) {}
-
-  @Override
-  public void visit(AcceptPrivateConnection responsePrivateConnection) {}
-
-  @Override
-  public void visit(RejectPrivateConnection rejectPrivateConnection) {}
 
   @Override
   public void visit(DiscoverMessage message) {

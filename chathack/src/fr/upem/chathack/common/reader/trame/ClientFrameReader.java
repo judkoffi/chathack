@@ -3,10 +3,10 @@ package fr.upem.chathack.common.reader.trame;
 import java.nio.ByteBuffer;
 import fr.upem.chathack.common.model.OpCode;
 import fr.upem.chathack.common.reader.IReader;
-import fr.upem.chathack.frame.IFrame;
 import fr.upem.chathack.frame.ServerMessageReader;
+import fr.upem.chathack.frame.visitor.IPublicFrame;
 
-public class ClientFrameReader implements IReader<IFrame> {
+public class ClientFrameReader implements IReader<IPublicFrame> {
   private enum State {
     WAITING_OPCODE, WAITING_CONTENT, DONE, ERROR
   }
@@ -35,8 +35,8 @@ public class ClientFrameReader implements IReader<IFrame> {
   }
 
   private State state;
-  private IReader<? extends IFrame> currentFrameReader;
-  private IFrame value;
+  private IReader<? extends IPublicFrame> currentFrameReader;
+  private IPublicFrame value;
 
   @Override
   public ProcessStatus process(ByteBuffer bb) {
@@ -56,9 +56,6 @@ public class ClientFrameReader implements IReader<IFrame> {
           case OpCode.BROADCAST_MESSAGE:
             currentFrameReader = broadcastMessageReader;
             break;
-          case OpCode.DIRECT_MESSAGE:
-            currentFrameReader = directMessageReader;
-            break;
           case OpCode.REQUEST_PRIVATE_CLIENT_CONNECTION:
             currentFrameReader = requestConnectionReader;
             break;
@@ -67,9 +64,6 @@ public class ClientFrameReader implements IReader<IFrame> {
             break;
           case OpCode.REJECTED_PRIVATE_CLIENT_CONNECTION:
             currentFrameReader = rejectPrivateConnectionReader;
-            break;
-          case OpCode.DISCOVER_MESSAGE:
-            currentFrameReader = discoverMessageReader;
             break;
           default:
             throw new IllegalArgumentException("unknown opcode " + opcode);
@@ -90,7 +84,7 @@ public class ClientFrameReader implements IReader<IFrame> {
   }
 
   @Override
-  public IFrame get() {
+  public IPublicFrame get() {
     if (state != State.DONE) {
       throw new IllegalStateException();
     }

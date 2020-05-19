@@ -3,13 +3,15 @@ package fr.upem.chathack.frame;
 import java.nio.ByteBuffer;
 import fr.upem.chathack.common.model.LongSizedString;
 import fr.upem.chathack.common.model.OpCode;
+import fr.upem.chathack.frame.visitor.IPublicFrame;
+import fr.upem.chathack.frame.visitor.IPublicFrameVisitor;
 
 /**
  * ----------------------------------------------------------------- --<br>
  * | Opcode (byte) | errorOrNot (-1 or 1) (byte) | length (long) | msg (string)|<br>
  * --------------------------------------------------------------------<br>
  */
-public class ServerResponseMessage implements IFrame {
+public class ServerResponseMessage implements IPublicFrame {
   private final LongSizedString value;
   private final boolean errorMessage;
 
@@ -38,7 +40,7 @@ public class ServerResponseMessage implements IFrame {
   }
 
   @Override
-  public void accept(IFrameVisitor frameVisitor) {
+  public void accept(IPublicFrameVisitor frameVisitor) {
     frameVisitor.visit(this);
   }
 

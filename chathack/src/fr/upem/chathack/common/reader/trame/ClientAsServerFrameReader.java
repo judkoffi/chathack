@@ -3,9 +3,9 @@ package fr.upem.chathack.common.reader.trame;
 import java.nio.ByteBuffer;
 import fr.upem.chathack.common.model.OpCode;
 import fr.upem.chathack.common.reader.IReader;
-import fr.upem.chathack.frame.IFrame;
+import fr.upem.chathack.frame.visitor.IPrivateFrame;
 
-public class ClientAsServerFrameReader implements IReader<IFrame> {
+public class ClientAsServerFrameReader implements IReader<IPrivateFrame> {
 
   private enum State {
     WAITING_OPCODE, WAITING_CONTENT, DONE, ERROR
@@ -20,8 +20,8 @@ public class ClientAsServerFrameReader implements IReader<IFrame> {
   private final DiscoverMessageReader discoverMessageReader;
 
   private State state;
-  private IReader<? extends IFrame> currentFrameReader;
-  private IFrame value;
+  private IReader<? extends IPrivateFrame> currentFrameReader;
+  private IPrivateFrame value;
 
   public ClientAsServerFrameReader() {
     this.state = State.WAITING_OPCODE;
@@ -42,9 +42,6 @@ public class ClientAsServerFrameReader implements IReader<IFrame> {
         var opcode = bb.get();
         bb.compact();
         switch (opcode) {
-          case OpCode.ANONYMOUS_CLIENT_CONNECTION:
-            currentFrameReader = anonymousConnectionReader;
-            break;
           case OpCode.DIRECT_MESSAGE:
             System.out.println("éjdnjqsnd");
             currentFrameReader = directMessageReader;
@@ -71,7 +68,7 @@ public class ClientAsServerFrameReader implements IReader<IFrame> {
   }
 
   @Override
-  public IFrame get() {
+  public IPrivateFrame get() {
     if (state != State.DONE) {
       throw new IllegalStateException();
     }
