@@ -9,8 +9,11 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -32,6 +35,11 @@ public class ClientChatHack {
   private static final Logger logger = Logger.getLogger(ClientChatHack.class.getName());
   private final ArrayBlockingQueue<String> commandQueue = new ArrayBlockingQueue<>(10);
   private final HashMap<String, PrivateConnectionInfo> alreadyConnection = new HashMap<>();
+  private final ArrayList<RequestPrivateConnection> pendingPrivateRequests = new ArrayList<>();
+
+  // key -> target user for connection
+  // value -> [key -> fromm] , value --> token
+  private final HashMap<String, Map.Entry<String, Long>> pendingConnections = new HashMap<>();
 
   private final SocketChannel sc;
   private final Selector selector;
@@ -40,7 +48,6 @@ public class ClientChatHack {
   private final String login;
   private String password;
   private final Thread console;
-  private final ArrayList<RequestPrivateConnection> pendingPrivateRequests;
   private ServerSocketChannel serverSocketChannel;
 
   public ClientChatHack(InetSocketAddress serverAddress, String path, String login)
@@ -51,7 +58,6 @@ public class ClientChatHack {
     this.serverSocketChannel = ServerSocketChannel.open();
     this.selector = Selector.open();
     this.console = new Thread(this::consoleRun);
-    this.pendingPrivateRequests = new ArrayList<>();
   }
 
   public ClientChatHack(InetSocketAddress serverAddress, String path, String login, String password)
@@ -82,6 +88,10 @@ public class ClientChatHack {
 
   public boolean havePrivateConnection(String destinator) {
     return alreadyConnection.containsKey(destinator);
+  }
+
+  public HashMap<String, Map.Entry<String, Long>> getPendingConnections() {
+    return pendingConnections;
   }
 
   private void processPrefixBySlash(String line) {
@@ -130,7 +140,9 @@ public class ClientChatHack {
 
     if (isAcceptCommand) {
       var addr = new InetSocketAddress(getCurrentIp(), serverSocketChannel.socket().getLocalPort());
-      var acceptMsg = new AcceptPrivateConnection(fromLogin, login, addr);
+      var token = new Random().nextLong();
+      System.out.println("accpet token: " + token);
+      var acceptMsg = new AcceptPrivateConnection(fromLogin, login, addr, token);
       uniqueContext.queueMessage(acceptMsg.toBuffer());
       targetRequest.ifPresent(pendingPrivateRequests::remove);
     }
@@ -154,6 +166,7 @@ public class ClientChatHack {
     var targetLogin = splited[0];
     var message = splited[1];
     if (havePrivateConnection(targetLogin)) {
+      System.out.println("have dp coonection");
       var dmMsg = new DirectMessage(login, targetLogin, message);
       alreadyConnection.get(targetLogin).getContext().queueMessage(dmMsg.toBuffer());
     } else {
@@ -194,8 +207,19 @@ public class ClientChatHack {
     }
   }
 
-  public void putAlreadyConnection(String login, PrivateConnectionInfo privateConnectionInfo) {
+  public void putConnected(String login, PrivateConnectionInfo privateConnectionInfo) {
     alreadyConnection.put(login, privateConnectionInfo);
+  }
+
+  public long getToken() {
+    return pendingConnections
+      .entrySet()
+      .stream()
+      .filter(p -> p.getKey().equals(login))
+      .findFirst()
+      .get()
+      .getValue()
+      .getValue();
   }
 
   public void addPrivateConnectionRequest(RequestPrivateConnection requestMessage) {
@@ -208,27 +232,35 @@ public class ClientChatHack {
     if (sc == null)
       return; // the selector gave a bad hint
     sc.configureBlocking(false);
-    System.out.println("hhoohoo");
     SelectionKey clientKey = sc.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
     var ctx = new PrivateConnectionContext(clientKey, this);
-    // map.put(targetLogin, new PrivateConnectionInfo(ctx));
-    // send discover paquet
     clientKey.attach(ctx);
   }
 
-  public void doConnectionWithClient(InetSocketAddress targetAddr, String targetLogin) {
+  public void doConnectionWithClient(AcceptPrivateConnection response) {
     try {
       var socket = SocketChannel.open();
       socket.configureBlocking(false);
       var key = socket.register(selector, SelectionKey.OP_CONNECT);
       var ctx = new PrivateConnectionContext(key, this);
+
+      var targetLogin = response.getTargetLogin();
+      var token = response.getToken();
+      System.out.println("do connection after received " + response);
       key.attach(ctx);
-      alreadyConnection.put(targetLogin, new PrivateConnectionInfo(ctx));
-      System.out.println(alreadyConnection);
-      socket.connect(targetAddr);
+      // var connectionInfo = new PrivateConnectionInfo(ctx, response.getToken());
+      // alreadyConnection.put(targetLogin, connectionInfo);
+
+      var v = new AbstractMap.SimpleEntry<String, Long>(targetLogin, token);
+      pendingConnections.put(login, v);
+      socket.connect(response.getTargetAddress());
     } catch (IOException e) {
-      System.err.println("Failed to connect incomming client");
+      logger.info("Failed to connect incomming client");
     }
+  }
+
+  public HashMap<String, PrivateConnectionInfo> getConnectedMap() {
+    return alreadyConnection;
   }
 
 
@@ -399,4 +431,5 @@ public class ClientChatHack {
     System.out.println("connection to server");
     client.launch();
   }
+
 }

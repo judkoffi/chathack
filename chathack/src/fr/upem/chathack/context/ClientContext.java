@@ -52,8 +52,6 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
     if (!sc.finishConnect()) {
       return;
     }
-
-    System.out.println("clinent login " + client.getLogin());
     updateInterestOps();
   }
 
@@ -86,8 +84,7 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
 
   @Override
   public void visit(AcceptPrivateConnection responsePrivateConnection) {
-    var targetAddr = responsePrivateConnection.getTargetAddress();
-    client.doConnectionWithClient(targetAddr, responsePrivateConnection.getTargetLogin());
+    client.doConnectionWithClient(responsePrivateConnection);
     System.out.println("private connection is accepted !");
   }
 

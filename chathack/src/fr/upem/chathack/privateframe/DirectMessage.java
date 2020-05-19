@@ -39,4 +39,9 @@ public class DirectMessage implements IPrivateFrame {
   public void accept(IPrivateFrameVisitor frameVisitor) {
     frameVisitor.visit(this);
   }
+
+  @Override
+  public String toString() {
+    return "from: " + destinator + " " + message;
+  }
 }

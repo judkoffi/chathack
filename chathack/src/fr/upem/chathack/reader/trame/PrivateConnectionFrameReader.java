@@ -5,7 +5,7 @@ import fr.upem.chathack.frame.IPrivateFrame;
 import fr.upem.chathack.model.OpCode;
 import fr.upem.chathack.reader.IReader;
 
-public class ClientAsServerFrameReader implements IReader<IPrivateFrame> {
+public class PrivateConnectionFrameReader implements IReader<IPrivateFrame> {
 
   private enum State {
     WAITING_OPCODE, WAITING_CONTENT, DONE, ERROR
@@ -14,19 +14,16 @@ public class ClientAsServerFrameReader implements IReader<IPrivateFrame> {
   /**
    * Readers
    */
-
   private final DirectMessageReader directMessageReader;
-  private final AnonymousConnectionReader anonymousConnectionReader;
   private final DiscoverMessageReader discoverMessageReader;
 
   private State state;
   private IReader<? extends IPrivateFrame> currentFrameReader;
   private IPrivateFrame value;
 
-  public ClientAsServerFrameReader() {
+  public PrivateConnectionFrameReader() {
     this.state = State.WAITING_OPCODE;
     this.directMessageReader = new DirectMessageReader();
-    this.anonymousConnectionReader = new AnonymousConnectionReader();
     this.discoverMessageReader = new DiscoverMessageReader();
   }
 
@@ -80,7 +77,6 @@ public class ClientAsServerFrameReader implements IReader<IPrivateFrame> {
     state = State.WAITING_OPCODE;
     value = null;
     directMessageReader.reset();
-    anonymousConnectionReader.reset();
     discoverMessageReader.reset();
   }
 }

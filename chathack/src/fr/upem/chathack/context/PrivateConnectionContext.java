@@ -7,12 +7,12 @@ import fr.upem.chathack.frame.IPrivateFrame;
 import fr.upem.chathack.privateframe.DirectMessage;
 import fr.upem.chathack.privateframe.DiscoverMessage;
 import fr.upem.chathack.reader.IReader;
-import fr.upem.chathack.reader.trame.ClientAsServerFrameReader;
+import fr.upem.chathack.reader.trame.PrivateConnectionFrameReader;
 import fr.upem.chathack.visitor.IPrivateFrameVisitor;
 
 public class PrivateConnectionContext extends BaseContext implements IPrivateFrameVisitor {
   private final ClientChatHack client;
-  private final ClientAsServerFrameReader reader = new ClientAsServerFrameReader();
+  private final PrivateConnectionFrameReader reader = new PrivateConnectionFrameReader();
 
   public PrivateConnectionContext(SelectionKey key, ClientChatHack client) {
     super(key);
@@ -27,8 +27,7 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
     if (!sc.finishConnect()) {
       return;
     }
-    // System.out.println("send discover with key 39");
-    var discoverMsg = new DiscoverMessage(client.getLogin(), 39);
+    var discoverMsg = new DiscoverMessage(client.getLogin(), client.getToken());
     queueMessage(discoverMsg.toBuffer());
     updateInterestOps();
   }
@@ -61,9 +60,9 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
   @Override
   public void visit(DiscoverMessage message) {
     System.out.println("discover in Client as server context ");
-    System.out.println(message);
-    client.putAlreadyConnection(message.getLogin(), new PrivateConnectionInfo(this));
-    System.out.println("received message discover");
+    client.putConnected(message.getLogin(), new PrivateConnectionInfo(this, message.getToken()));
+    System.out.println(client.getConnectedMap());
+    System.out.println(client.getPendingConnections());
+    System.out.println("received message discover " + message);
   }
-
 }

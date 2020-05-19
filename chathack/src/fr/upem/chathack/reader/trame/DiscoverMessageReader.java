@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.privateframe.DiscoverMessage;
 import fr.upem.chathack.reader.IReader;
-import fr.upem.chathack.reader.IntReader;
+import fr.upem.chathack.reader.LongReader;
 import fr.upem.chathack.reader.LongSizedStringReader;
 
 public class DiscoverMessageReader implements IReader<DiscoverMessage> {
@@ -15,7 +15,7 @@ public class DiscoverMessageReader implements IReader<DiscoverMessage> {
 
   private LongSizedString login;
   private final LongSizedStringReader longStringReader;
-  private final IntReader intReader;
+  private final LongReader longReader;
 
   private State state;
   private DiscoverMessage value;
@@ -23,7 +23,7 @@ public class DiscoverMessageReader implements IReader<DiscoverMessage> {
   public DiscoverMessageReader() {
     this.state = State.WAITING_LOGIN;
     this.longStringReader = new LongSizedStringReader();
-    this.intReader = new IntReader();
+    this.longReader = new LongReader();
   }
 
   @Override
@@ -38,11 +38,11 @@ public class DiscoverMessageReader implements IReader<DiscoverMessage> {
         state = State.WAITING_KEY_HASHCODE;
       }
       case WAITING_KEY_HASHCODE: {
-        var status = intReader.process(bb);
+        var status = longReader.process(bb);
         if (status != ProcessStatus.DONE) {
           return status;
         }
-        value = new DiscoverMessage(login, intReader.get());
+        value = new DiscoverMessage(login, longReader.get());
         state = State.DONE;
         return ProcessStatus.DONE;
       }
@@ -63,7 +63,7 @@ public class DiscoverMessageReader implements IReader<DiscoverMessage> {
   public void reset() {
     state = State.WAITING_LOGIN;
     longStringReader.reset();
-    intReader.reset();
+    longReader.reset();
     login = null;
     value = null;
   }

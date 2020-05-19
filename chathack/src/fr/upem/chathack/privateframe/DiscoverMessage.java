@@ -8,35 +8,29 @@ import fr.upem.chathack.visitor.IPrivateFrameVisitor;
 
 public class DiscoverMessage implements IPrivateFrame {
   private final LongSizedString sizedString;
-  private final int keyHashCode;
+  private final long token;
 
-
-  public DiscoverMessage(LongSizedString sizedString, int keyHashCode) {
+  public DiscoverMessage(LongSizedString sizedString, long token) {
     this.sizedString = sizedString;
-    this.keyHashCode = keyHashCode;
+    this.token = token;
   }
 
-  public DiscoverMessage(String login, int keyHashCode) {
+  public DiscoverMessage(String login, long token) {
     this.sizedString = new LongSizedString(login);
-    this.keyHashCode = keyHashCode;
+    this.token = token;
   }
 
   public String getLogin() {
     return sizedString.getValue();
   }
 
-  public int getKeyHashCode() {
-    return keyHashCode;
-  }
-
   @Override
   public ByteBuffer toBuffer() {
-    var size = Byte.BYTES + Integer.BYTES + sizedString.getTrameSize();
-    System.out.println("keyhash code: " + keyHashCode);
+    var size = Byte.BYTES + Long.BYTES + sizedString.getTrameSize();
     var bb = ByteBuffer.allocate((int) size);
     bb.put(OpCode.DISCOVER_MESSAGE);
     bb.put(sizedString.toBuffer());
-    bb.putInt(keyHashCode);
+    bb.putLong(token);
     return bb.flip();
   }
 
@@ -47,6 +41,10 @@ public class DiscoverMessage implements IPrivateFrame {
 
   @Override
   public String toString() {
-    return "discover login " + getLogin() + " key: " + keyHashCode;
+    return "discover login " + getLogin() + " key: " + token;
+  }
+
+  public long getToken() {
+    return token;
   }
 }

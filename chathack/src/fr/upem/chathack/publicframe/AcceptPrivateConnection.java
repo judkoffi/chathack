@@ -12,19 +12,22 @@ public class AcceptPrivateConnection implements IPublicFrame {
   private final LongSizedString fromLogin;
   private final LongSizedString targetLogin;
   private final InetSocketAddress targetAddress;
+  private final long token;
 
   public AcceptPrivateConnection(LongSizedString fromLogin, LongSizedString targetLogin,
-      InetSocketAddress targetAddress) {
+      InetSocketAddress targetAddress, long token) {
     this.fromLogin = fromLogin;
     this.targetLogin = targetLogin;
     this.targetAddress = targetAddress;
+    this.token = token;
   }
 
   public AcceptPrivateConnection(String fromLogin, String targetLogin,
-      InetSocketAddress targetAddress) {
+      InetSocketAddress targetAddress, long token) {
     this.fromLogin = new LongSizedString(fromLogin);
     this.targetLogin = new LongSizedString(targetLogin);
     this.targetAddress = targetAddress;
+    this.token = token;
   }
 
   private static long ipToLong(InetSocketAddress addr) {
@@ -37,13 +40,14 @@ public class AcceptPrivateConnection implements IPublicFrame {
 
   @Override
   public ByteBuffer toBuffer() {
-    var s = Byte.BYTES + targetLogin.getTrameSize() + (2 * Long.BYTES) + fromLogin.getTrameSize();
+    var s = Byte.BYTES + targetLogin.getTrameSize() + (3 * Long.BYTES) + fromLogin.getTrameSize();
     var bb = ByteBuffer.allocate((int) s);
     var ipInLong = ipToLong(targetAddress);
     bb.put(OpCode.SUCCEDED_PRIVATE_CLIENT_CONNECTION);
     bb.put(targetLogin.toBuffer());
     bb.putLong(ipInLong);
     bb.putLong((long) targetAddress.getPort());
+    bb.putLong(token);
     bb.put(fromLogin.toBuffer());
     return bb.flip();
   }
@@ -59,6 +63,10 @@ public class AcceptPrivateConnection implements IPublicFrame {
 
   public String getTargetLogin() {
     return targetLogin.getValue();
+  }
+
+  public long getToken() {
+    return token;
   }
 
   @Override
