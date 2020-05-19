@@ -9,10 +9,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
@@ -39,7 +37,7 @@ public class ClientChatHack {
 
   // key -> target user for connection
   // value -> [key -> fromm] , value --> token
-  private final HashMap<String, Map.Entry<String, Long>> pendingConnections = new HashMap<>();
+  private final HashMap<String, PrivateConnectionContext> pendingConnections = new HashMap<>();
 
   private final SocketChannel sc;
   private final Selector selector;
@@ -90,7 +88,7 @@ public class ClientChatHack {
     return alreadyConnection.containsKey(destinator);
   }
 
-  public HashMap<String, Map.Entry<String, Long>> getPendingConnections() {
+  public HashMap<String, PrivateConnectionContext> getPendingConnections() {
     return pendingConnections;
   }
 
@@ -212,14 +210,7 @@ public class ClientChatHack {
   }
 
   public long getToken() {
-    return pendingConnections
-      .entrySet()
-      .stream()
-      .filter(p -> p.getKey().equals(login))
-      .findFirst()
-      .get()
-      .getValue()
-      .getValue();
+    return 80;
   }
 
   public void addPrivateConnectionRequest(RequestPrivateConnection requestMessage) {
@@ -232,6 +223,7 @@ public class ClientChatHack {
     if (sc == null)
       return; // the selector gave a bad hint
     sc.configureBlocking(false);
+    System.out.println(pendingConnections);
     SelectionKey clientKey = sc.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
     var ctx = new PrivateConnectionContext(clientKey, this);
     clientKey.attach(ctx);
@@ -242,18 +234,18 @@ public class ClientChatHack {
       var socket = SocketChannel.open();
       socket.configureBlocking(false);
       var key = socket.register(selector, SelectionKey.OP_CONNECT);
-      var ctx = new PrivateConnectionContext(key, this);
 
       var targetLogin = response.getTargetLogin();
       var token = response.getToken();
+      var ctx = new PrivateConnectionContext(key, this, token);
       System.out.println("do connection after received " + response);
       key.attach(ctx);
       // var connectionInfo = new PrivateConnectionInfo(ctx, response.getToken());
       // alreadyConnection.put(targetLogin, connectionInfo);
 
-      var v = new AbstractMap.SimpleEntry<String, Long>(targetLogin, token);
-      pendingConnections.put(login, v);
+      pendingConnections.put(targetLogin, ctx);
       socket.connect(response.getTargetAddress());
+      System.out.println(pendingConnections);
     } catch (IOException e) {
       logger.info("Failed to connect incomming client");
     }

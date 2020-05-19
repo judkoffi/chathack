@@ -13,14 +13,25 @@ import fr.upem.chathack.visitor.IPrivateFrameVisitor;
 public class PrivateConnectionContext extends BaseContext implements IPrivateFrameVisitor {
   private final ClientChatHack client;
   private final PrivateConnectionFrameReader reader = new PrivateConnectionFrameReader();
+  private long token;
 
   public PrivateConnectionContext(SelectionKey key, ClientChatHack client) {
     super(key);
     this.client = client;
   }
 
+  public PrivateConnectionContext(SelectionKey key, ClientChatHack client, long token) {
+    super(key);
+    this.client = client;
+    this.token = token;
+  }
+
   private void handler(IPrivateFrame frame) {
     frame.accept(this);
+  }
+
+  public long getToken() {
+    return token;
   }
 
   public void doConnect() throws IOException {
