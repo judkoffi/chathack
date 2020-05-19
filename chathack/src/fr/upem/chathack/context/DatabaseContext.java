@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import fr.upem.chathack.ServerChatHack;
-import fr.upem.chathack.common.reader.IReader;
-import fr.upem.chathack.common.reader.trame.DatabaseReader;
 import fr.upem.chathack.frame.DatabaseTrame;
+import fr.upem.chathack.reader.IReader;
+import fr.upem.chathack.reader.trame.DatabaseReader;
 
 public class DatabaseContext extends BaseContext {
   private final DatabaseReader reader = new DatabaseReader();

@@ -3,12 +3,12 @@ package fr.upem.chathack.context;
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import fr.upem.chathack.ClientChatHack;
-import fr.upem.chathack.common.reader.IReader;
-import fr.upem.chathack.common.reader.trame.ClientAsServerFrameReader;
-import fr.upem.chathack.frame.DirectMessage;
-import fr.upem.chathack.frame.DiscoverMessage;
-import fr.upem.chathack.frame.visitor.IPrivateFrame;
-import fr.upem.chathack.frame.visitor.IPrivateFrameVisitor;
+import fr.upem.chathack.frame.IPrivateFrame;
+import fr.upem.chathack.privateframe.DirectMessage;
+import fr.upem.chathack.privateframe.DiscoverMessage;
+import fr.upem.chathack.reader.IReader;
+import fr.upem.chathack.reader.trame.ClientAsServerFrameReader;
+import fr.upem.chathack.visitor.IPrivateFrameVisitor;
 
 public class PrivateConnectionContext extends BaseContext implements IPrivateFrameVisitor {
   private final ClientChatHack client;

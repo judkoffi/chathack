@@ -18,14 +18,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import fr.upem.chathack.common.model.OpCode;
 import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.context.DatabaseContext;
 import fr.upem.chathack.context.ServerContext;
-import fr.upem.chathack.frame.AuthentificatedConnection;
 import fr.upem.chathack.frame.DatabaseTrame;
-import fr.upem.chathack.frame.RequestPrivateConnection;
-import fr.upem.chathack.frame.ServerResponseMessage;
+import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.publicframe.AuthentificatedConnection;
+import fr.upem.chathack.publicframe.RequestPrivateConnection;
+import fr.upem.chathack.publicframe.ServerResponseMessage;
 import fr.upem.chathack.utils.DatabaseRequestBuilder;
 import fr.upem.chathack.utils.Helper;
 

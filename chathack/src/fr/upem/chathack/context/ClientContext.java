@@ -4,17 +4,17 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import fr.upem.chathack.ClientChatHack;
-import fr.upem.chathack.common.reader.IReader;
-import fr.upem.chathack.common.reader.trame.ClientFrameReader;
-import fr.upem.chathack.frame.AcceptPrivateConnection;
-import fr.upem.chathack.frame.AnonymousConnection;
-import fr.upem.chathack.frame.AuthentificatedConnection;
-import fr.upem.chathack.frame.BroadcastMessage;
-import fr.upem.chathack.frame.RejectPrivateConnection;
-import fr.upem.chathack.frame.RequestPrivateConnection;
-import fr.upem.chathack.frame.ServerResponseMessage;
-import fr.upem.chathack.frame.visitor.IPublicFrame;
-import fr.upem.chathack.frame.visitor.IPublicFrameVisitor;
+import fr.upem.chathack.frame.IPublicFrame;
+import fr.upem.chathack.publicframe.AcceptPrivateConnection;
+import fr.upem.chathack.publicframe.AnonymousConnection;
+import fr.upem.chathack.publicframe.AuthentificatedConnection;
+import fr.upem.chathack.publicframe.BroadcastMessage;
+import fr.upem.chathack.publicframe.RejectPrivateConnection;
+import fr.upem.chathack.publicframe.RequestPrivateConnection;
+import fr.upem.chathack.publicframe.ServerResponseMessage;
+import fr.upem.chathack.reader.IReader;
+import fr.upem.chathack.reader.trame.ClientFrameReader;
+import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
 public class ClientContext extends BaseContext implements IPublicFrameVisitor {
   private final ClientFrameReader reader = new ClientFrameReader();

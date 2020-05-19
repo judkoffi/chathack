@@ -15,18 +15,18 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
-import fr.upem.chathack.common.model.Message;
 import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.context.ClientContext;
 import fr.upem.chathack.context.PrivateConnectionContext;
 import fr.upem.chathack.context.PrivateConnectionInfo;
-import fr.upem.chathack.frame.AcceptPrivateConnection;
-import fr.upem.chathack.frame.AnonymousConnection;
-import fr.upem.chathack.frame.AuthentificatedConnection;
-import fr.upem.chathack.frame.BroadcastMessage;
-import fr.upem.chathack.frame.DirectMessage;
-import fr.upem.chathack.frame.RejectPrivateConnection;
-import fr.upem.chathack.frame.RequestPrivateConnection;
+import fr.upem.chathack.model.Message;
+import fr.upem.chathack.privateframe.DirectMessage;
+import fr.upem.chathack.publicframe.AcceptPrivateConnection;
+import fr.upem.chathack.publicframe.AnonymousConnection;
+import fr.upem.chathack.publicframe.AuthentificatedConnection;
+import fr.upem.chathack.publicframe.BroadcastMessage;
+import fr.upem.chathack.publicframe.RejectPrivateConnection;
+import fr.upem.chathack.publicframe.RequestPrivateConnection;
 
 public class ClientChatHack {
   private static final Logger logger = Logger.getLogger(ClientChatHack.class.getName());

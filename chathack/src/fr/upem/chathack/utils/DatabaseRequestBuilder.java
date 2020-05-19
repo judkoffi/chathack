@@ -1,9 +1,9 @@
 package fr.upem.chathack.utils;
 
 import java.nio.ByteBuffer;
-import fr.upem.chathack.common.model.LongSizedString;
-import fr.upem.chathack.common.model.OpCode;
-import fr.upem.chathack.frame.AuthentificatedConnection;
+import fr.upem.chathack.model.LongSizedString;
+import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.publicframe.AuthentificatedConnection;
 
 public class DatabaseRequestBuilder {
   private DatabaseRequestBuilder() {}
