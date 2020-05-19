@@ -39,7 +39,6 @@ public class RejectPrivateConnection implements IPublicFrame {
 
   public String getFromLogin() {
     return fromLogin.getValue();
-
   }
 
 }
