@@ -14,7 +14,7 @@ public abstract class BaseContext implements IContext {
   protected final SocketChannel sc;
   protected final ByteBuffer bbin = ByteBuffer.allocate(BUFFER_SIZE);
   protected final ByteBuffer bbout = ByteBuffer.allocate(BUFFER_SIZE);
-  protected final Queue<ByteBuffer> queue = new LinkedList<>();
+  protected final Queue<ByteBuffer> queue = new LinkedList<>(); // borner la queue
   protected boolean closed = false;
 
   public BaseContext(SelectionKey key) {
@@ -34,6 +34,9 @@ public abstract class BaseContext implements IContext {
         return;
       queue.remove();
       bbout.put(bb);
+
+      // if (bb.has)
+      bb.flip();
     }
   }
 
@@ -41,6 +44,12 @@ public abstract class BaseContext implements IContext {
   public void updateInterestOps() {
     if (!key.isValid())
       return;
+
+    /**
+     * Si la key est pas authentifier, on cancel() la cle et on le remet a valid() quand cle est key
+     * est authentifier<br>
+     * Faite attention a pas fermer les cle cancel
+     */
 
     int interestOps = 0;
 

@@ -1,8 +1,8 @@
-package fr.upem.chathack.context;
+package fr.upem.chathack.server;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
-import fr.upem.chathack.ServerChatHack;
+import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.frame.IPublicFrame;
 import fr.upem.chathack.publicframe.AcceptPrivateConnection;
 import fr.upem.chathack.publicframe.AnonymousConnection;
@@ -50,7 +50,9 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
   @Override
   public void visit(BroadcastMessage message) {
     if (server.isConnected(message.getFromLogin())) {
-      server.broadcast(message.toBuffer());
+      var bb = message.toBuffer().asReadOnlyBuffer();
+      // donner une vue (sans possibiliter de write sur le buffer)
+      server.broadcast(bb);
     } else {
       var msg = new ServerResponseMessage("Not connected", true).toBuffer();
       queueMessage(msg);
@@ -112,14 +114,15 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
 
   @Override
   public void visit(RequestPrivateConnection requestMessage) {
-    if (!server.isConnected(requestMessage.getFromLogin().getValue())) {
+    if (!server.isConnected(requestMessage.getAppliant().getValue())) {
       var msg = new ServerResponseMessage("You must be authentificated", true).toBuffer();
       queueMessage(msg);
       silenceInputClose();
       return;
     }
 
-    var target = requestMessage.getTargetLogin().getValue();
+    System.out.println(requestMessage);
+    var target = requestMessage.getReceiver().getValue();
     if (!server.isExistLogin(target)) {
       var msg = new ServerResponseMessage("Unknown login", true);
       System.out.println(msg);
@@ -135,7 +138,7 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
   @Override
   public void visit(AcceptPrivateConnection responsePrivateConnection) {
     System.out.println(responsePrivateConnection);
-    var targetKey = server.findKeyByLogin(responsePrivateConnection.getFromLogin());
+    var targetKey = server.findKeyByLogin(responsePrivateConnection.getAppliant());
     server.sendMessageToClient(responsePrivateConnection.toBuffer(), targetKey);
   }
 

@@ -8,26 +8,26 @@ import fr.upem.chathack.model.OpCode;
 import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
 public class RequestPrivateConnection implements IPublicFrame {
-  private final LongSizedString fromLogin;
-  private final LongSizedString targetLogin;
+  private final LongSizedString appliant;
+  private final LongSizedString receiver;
 
-  public RequestPrivateConnection(LongSizedString fromLogin, LongSizedString targetLogin) {
-    this.fromLogin = fromLogin;
-    this.targetLogin = targetLogin;
+  public RequestPrivateConnection(LongSizedString appliant, LongSizedString receiver) {
+    this.appliant = appliant;
+    this.receiver = receiver;
   }
 
-  public RequestPrivateConnection(String fromLogin, String targetLogin) {
-    this.fromLogin = new LongSizedString(fromLogin);
-    this.targetLogin = new LongSizedString(targetLogin);
+  public RequestPrivateConnection(String appliant, String receiver) {
+    this.appliant = new LongSizedString(appliant);
+    this.receiver = new LongSizedString(receiver);
   }
 
   @Override
   public ByteBuffer toBuffer() {
-    var s = Byte.BYTES + fromLogin.getTrameSize() + targetLogin.getTrameSize();
+    var s = Byte.BYTES + appliant.getTrameSize() + receiver.getTrameSize();
     var bb = ByteBuffer.allocate((int) s);
     bb.put(OpCode.REQUEST_PRIVATE_CLIENT_CONNECTION);
-    bb.put(targetLogin.toBuffer());
-    bb.put(fromLogin.toBuffer());
+    bb.put(receiver.toBuffer());
+    bb.put(appliant.toBuffer());
     return bb.flip();
   }
 
@@ -36,12 +36,12 @@ public class RequestPrivateConnection implements IPublicFrame {
     frameVisitor.visit(this);
   }
 
-  public LongSizedString getFromLogin() {
-    return fromLogin;
+  public LongSizedString getAppliant() {
+    return appliant;
   }
 
-  public LongSizedString getTargetLogin() {
-    return targetLogin;
+  public LongSizedString getReceiver() {
+    return receiver;
   }
 
   @Override
@@ -50,16 +50,16 @@ public class RequestPrivateConnection implements IPublicFrame {
       return false;
 
     RequestPrivateConnection r = (RequestPrivateConnection) obj;
-    return r.fromLogin.equals(fromLogin) && r.targetLogin.equals(targetLogin);
+    return r.appliant.equals(appliant) && r.receiver.equals(receiver);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(fromLogin, targetLogin);
+    return Objects.hash(appliant, receiver);
   }
 
   @Override
   public String toString() {
-    return "Request from: [" + fromLogin + "] to " + targetLogin;
+    return "Request from: [" + appliant + "] to " + receiver;
   }
 }
