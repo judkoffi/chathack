@@ -1,10 +1,10 @@
 package fr.upem.chathack.client;
 
+import static fr.upem.chathack.model.PrivateConnectionInfo.PrivateConnectionState.SUCCEED;
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.frame.IPrivateFrame;
-import fr.upem.chathack.model.PrivateConnectionInfo.PrivateConnectionState;
 import fr.upem.chathack.privateframe.ConfirmDiscoverMessage;
 import fr.upem.chathack.privateframe.DirectMessage;
 import fr.upem.chathack.privateframe.DiscoverMessage;
@@ -64,7 +64,6 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
       switch (status) {
         case DONE:
           var msg = reader.get();
-          System.out.println("class: " + msg.getClass());
           handler(msg);
           reader.reset();
           break;
@@ -86,23 +85,22 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
   public void visit(DiscoverMessage message) {
     var login = message.getLogin();
     if (client.privateConnectionMap.get(login).getToken() == message.getToken()) {
-      System.out.println("good token");
       var connectionInfo = client.privateConnectionMap.get(login);
-      connectionInfo.setState(PrivateConnectionState.SUCCEED);
+      connectionInfo.setState(SUCCEED);
       connectionInfo.setDestinatorContext(this);
       var confirmMsg = new ConfirmDiscoverMessage(login, client.getLogin());
       queueMessage(confirmMsg.toBuffer());
     } else {
-      System.out.println("bad token");
+      System.err.println("bad token");
+      silentlyClose();
     }
   }
 
   @Override
   public void visit(ConfirmDiscoverMessage confirmDiscoverMessage) {
     var connectionInfo = client.privateConnectionMap.get(confirmDiscoverMessage.getSender());
-
-    connectionInfo.setState(PrivateConnectionState.SUCCEED);
+    connectionInfo.setState(SUCCEED);
     connectionInfo.setDestinatorContext(this);
-    System.out.println("connection succeded with " + confirmDiscoverMessage.getSender());
+    // System.out.println("connection succeded with " + confirmDiscoverMessage.getSender());
   }
 }
