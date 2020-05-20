@@ -63,7 +63,8 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
 
   @Override
   public void visit(ServerResponseMessage serverMessage) {
-    System.out.println(serverMessage);
+    System.out
+      .println("public void visit(ServerResponseMessage serverMessage): " + serverMessage);
     if (serverMessage.isErrorMessage()) {
       this.client.interruptConsole();
       System.exit(-1);

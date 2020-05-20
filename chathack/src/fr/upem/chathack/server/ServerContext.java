@@ -50,9 +50,9 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
   @Override
   public void visit(BroadcastMessage message) {
     if (server.isConnected(message.getFromLogin())) {
-      var bb = message.toBuffer().asReadOnlyBuffer();
+      // var bb = message.toBuffer().asReadOnlyBuffer();
       // donner une vue (sans possibiliter de write sur le buffer)
-      server.broadcast(bb);
+      server.broadcast(message.toBuffer());
     } else {
       var msg = new ServerResponseMessage("Not connected", true).toBuffer();
       queueMessage(msg);

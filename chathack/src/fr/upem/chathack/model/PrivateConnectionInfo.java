@@ -1,6 +1,8 @@
 package fr.upem.chathack.model;
 
+import java.util.LinkedList;
 import fr.upem.chathack.client.PrivateConnectionContext;
+import fr.upem.chathack.privateframe.DirectMessage;
 
 public class PrivateConnectionInfo {
 
@@ -12,17 +14,20 @@ public class PrivateConnectionInfo {
   private PrivateConnectionState state;
   private long token;
   private PrivateConnectionContext destinatorContext;
+  private LinkedList<DirectMessage> pendingDirectMessages;
 
   public PrivateConnectionInfo(String receiver) {
     this.receiver = receiver;
     this.token = -1;
     this.state = PrivateConnectionState.PENDING;
+    this.pendingDirectMessages = new LinkedList<>();
   }
 
   public PrivateConnectionInfo(String receiver, PrivateConnectionState state, long token) {
     this.receiver = receiver;
     this.token = token;
     this.state = state;
+    this.pendingDirectMessages = new LinkedList<>();
   }
 
   public void setToken(long token) {
@@ -45,7 +50,6 @@ public class PrivateConnectionInfo {
     return state;
   }
 
-
   public void setDestinatorContext(PrivateConnectionContext destinatorContext) {
     this.destinatorContext = destinatorContext;
   }
@@ -54,9 +58,14 @@ public class PrivateConnectionInfo {
     return destinatorContext;
   }
 
+  public LinkedList<DirectMessage> getMessageQueue() {
+    return pendingDirectMessages;
+  }
+
   @Override
   public String toString() {
-    return "private connect with: " + receiver + " token: " + token + "; state: " + state;
+    return "private connect with: " + receiver + " token: " + token + "; state: " + state
+        + "dest ctx " + destinatorContext;
   }
 
 }

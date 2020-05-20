@@ -78,7 +78,7 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
 
   @Override
   public void visit(DirectMessage directMessage) {
-
+    System.out.println("DM received: " + directMessage);
   }
 
   @Override
@@ -101,6 +101,11 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
     var connectionInfo = client.privateConnectionMap.get(confirmDiscoverMessage.getSender());
     connectionInfo.setState(SUCCEED);
     connectionInfo.setDestinatorContext(this);
-    // System.out.println("connection succeded with " + confirmDiscoverMessage.getSender());
+
+    var pendingMessageQuue = connectionInfo.getMessageQueue();
+    while (!pendingMessageQuue.isEmpty()) {
+      var dm = pendingMessageQuue.remove();
+      connectionInfo.getDestinatorContext().queueMessage(dm.toBuffer());
+    }
   }
 }

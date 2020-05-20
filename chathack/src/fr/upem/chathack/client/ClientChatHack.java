@@ -145,10 +145,7 @@ public class ClientChatHack {
       uniqueContext.queueMessage(rejectMsg.toBuffer());
       targetRequest.ifPresent(pendingPrivateRequests::remove);
     }
-
-    System.out.println(privateConnectionMap);
   }
-
 
   private void processPrefixByAlt(String line) {
     // @login msg -> login msg
@@ -162,6 +159,7 @@ public class ClientChatHack {
     var message = Arrays.stream(splited).skip(1).collect(Collectors.joining(" "));
 
     var privateConnection = privateConnectionMap.get(receiver);
+    var dmMsg = new DirectMessage(login, receiver, message);
 
     // send private connectionrequest
     if (privateConnection == null) {
@@ -169,20 +167,21 @@ public class ClientChatHack {
       if (pendingPrivateRequests.contains(dmRequest) || receiver.equals(login))
         return;
 
-      // store un queue first message
       privateConnectionMap.put(receiver, new PrivateConnectionInfo(receiver));
+
+      // add first message
+      privateConnectionMap.get(receiver).getMessageQueue().add(dmMsg);
       this.uniqueContext.queueMessage(dmRequest.toBuffer());
       return;
     }
 
     switch (privateConnection.getState()) {
       case SUCCEED:
-        var dmMsg = new DirectMessage(login, receiver, message);
         privateConnectionMap.get(receiver).getDestinatorContext().queueMessage(dmMsg.toBuffer());
         break;
       case PENDING:
       case WAITING_COMFIRM_TOKEN:
-        // TODO store in queue and send when received accepted
+        privateConnectionMap.get(receiver).getMessageQueue().add(dmMsg);
         break;
       default:
         throw new AssertionError();
@@ -217,12 +216,6 @@ public class ClientChatHack {
         }
       }
     }
-  }
-
-  public long getToken() {
-    System.out.println("getToken");
-    System.out.println(privateConnectionMap);
-    return 80;
   }
 
   private void doAccept(SelectionKey key) throws IOException {

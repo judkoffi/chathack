@@ -34,9 +34,6 @@ public abstract class BaseContext implements IContext {
         return;
       queue.remove();
       bbout.put(bb);
-
-      // if (bb.has)
-      bb.flip();
     }
   }
 
