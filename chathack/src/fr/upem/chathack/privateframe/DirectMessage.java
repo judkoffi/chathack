@@ -42,6 +42,6 @@ public class DirectMessage implements IPrivateFrame {
 
   @Override
   public String toString() {
-    return "from: " + destinator + " " + message;
+    return "" + message;
   }
 }

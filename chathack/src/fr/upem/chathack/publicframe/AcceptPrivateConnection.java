@@ -9,23 +9,23 @@ import fr.upem.chathack.model.OpCode;
 import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
 public class AcceptPrivateConnection implements IPublicFrame {
-  private final LongSizedString fromLogin;
-  private final LongSizedString targetLogin;
+  private final LongSizedString applicant;
+  private final LongSizedString receiver;
   private final InetSocketAddress targetAddress;
   private final long token;
 
-  public AcceptPrivateConnection(LongSizedString fromLogin, LongSizedString targetLogin,
+  public AcceptPrivateConnection(LongSizedString applicant, LongSizedString receiver,
       InetSocketAddress targetAddress, long token) {
-    this.fromLogin = fromLogin;
-    this.targetLogin = targetLogin;
+    this.applicant = applicant;
+    this.receiver = receiver;
     this.targetAddress = targetAddress;
     this.token = token;
   }
 
-  public AcceptPrivateConnection(String fromLogin, String targetLogin,
-      InetSocketAddress targetAddress, long token) {
-    this.fromLogin = new LongSizedString(fromLogin);
-    this.targetLogin = new LongSizedString(targetLogin);
+  public AcceptPrivateConnection(String applicant, String receiver, InetSocketAddress targetAddress,
+      long token) {
+    this.applicant = new LongSizedString(applicant);
+    this.receiver = new LongSizedString(receiver);
     this.targetAddress = targetAddress;
     this.token = token;
   }
@@ -40,15 +40,15 @@ public class AcceptPrivateConnection implements IPublicFrame {
 
   @Override
   public ByteBuffer toBuffer() {
-    var s = Byte.BYTES + targetLogin.getTrameSize() + (3 * Long.BYTES) + fromLogin.getTrameSize();
+    var s = Byte.BYTES + receiver.getTrameSize() + (3 * Long.BYTES) + applicant.getTrameSize();
     var bb = ByteBuffer.allocate((int) s);
     var ipInLong = ipToLong(targetAddress);
     bb.put(OpCode.SUCCEDED_PRIVATE_CLIENT_CONNECTION);
-    bb.put(targetLogin.toBuffer());
+    bb.put(receiver.toBuffer());
     bb.putLong(ipInLong);
     bb.putLong((long) targetAddress.getPort());
     bb.putLong(token);
-    bb.put(fromLogin.toBuffer());
+    bb.put(applicant.toBuffer());
     return bb.flip();
   }
 
@@ -57,12 +57,12 @@ public class AcceptPrivateConnection implements IPublicFrame {
     frameVisitor.visit(this);
   }
 
-  public String getFromLogin() {
-    return fromLogin.getValue();
+  public String getAppliant() {
+    return applicant.getValue();
   }
 
-  public String getTargetLogin() {
-    return targetLogin.getValue();
+  public String getReceiver() {
+    return receiver.getValue();
   }
 
   public long getToken() {
@@ -71,7 +71,7 @@ public class AcceptPrivateConnection implements IPublicFrame {
 
   @Override
   public String toString() {
-    return "AcceptResponse " + fromLogin + " " + targetLogin + " " + targetAddress;
+    return "AcceptResponse " + applicant + " " + receiver + " " + targetAddress;
   }
 
   public InetSocketAddress getTargetAddress() {

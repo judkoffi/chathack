@@ -16,6 +16,7 @@ public class PrivateConnectionFrameReader implements IReader<IPrivateFrame> {
    */
   private final DirectMessageReader directMessageReader;
   private final DiscoverMessageReader discoverMessageReader;
+  private final ConfirmDiscoverMessageReader confirmDiscoverMessageReader;
 
   private State state;
   private IReader<? extends IPrivateFrame> currentFrameReader;
@@ -25,6 +26,7 @@ public class PrivateConnectionFrameReader implements IReader<IPrivateFrame> {
     this.state = State.WAITING_OPCODE;
     this.directMessageReader = new DirectMessageReader();
     this.discoverMessageReader = new DiscoverMessageReader();
+    this.confirmDiscoverMessageReader = new ConfirmDiscoverMessageReader();
   }
 
   @Override
@@ -40,11 +42,13 @@ public class PrivateConnectionFrameReader implements IReader<IPrivateFrame> {
         bb.compact();
         switch (opcode) {
           case OpCode.DIRECT_MESSAGE:
-            System.out.println("éjdnjqsnd");
             currentFrameReader = directMessageReader;
             break;
           case OpCode.DISCOVER_MESSAGE:
             currentFrameReader = discoverMessageReader;
+            break;
+          case OpCode.DISCOVER_CONFIRMATION:
+            currentFrameReader = confirmDiscoverMessageReader;
             break;
           default:
             throw new IllegalArgumentException("unknown opcode " + opcode);
@@ -78,5 +82,6 @@ public class PrivateConnectionFrameReader implements IReader<IPrivateFrame> {
     value = null;
     directMessageReader.reset();
     discoverMessageReader.reset();
+    confirmDiscoverMessageReader.reset();
   }
 }

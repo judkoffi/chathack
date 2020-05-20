@@ -1,4 +1,4 @@
-package fr.upem.chathack;
+package fr.upem.chathack.server;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -20,7 +20,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.context.DatabaseContext;
-import fr.upem.chathack.context.ServerContext;
 import fr.upem.chathack.frame.DatabaseTrame;
 import fr.upem.chathack.model.OpCode;
 import fr.upem.chathack.publicframe.AuthentificatedConnection;
@@ -33,7 +32,9 @@ import fr.upem.chathack.utils.Helper;
 public class ServerChatHack {
   /**
    * Class used to keep some information about connected client
+   *
    */
+  // TODO: mettre ca dans le context
   private static class ClientInfo {
     private boolean isAuthenticated;
     private boolean anonymous; // type of connection (anonymous or with credentials)
@@ -91,6 +92,10 @@ public class ServerChatHack {
     findContextByKey(key).ifPresent(c -> c.queueMessage(msg));
   }
 
+  /**
+   * bbout1.put(bbMsg); bbMsg.flip(); bbout2.put(bbMsg);
+   **/
+  // on peut reutiliser le memem bb
   public void broadcast(ByteBuffer bb) {
     selector
       .keys()
@@ -115,7 +120,7 @@ public class ServerChatHack {
   }
 
   public void sendPrivateConnectionRequest(RequestPrivateConnection request) {
-    var target = request.getTargetLogin().getValue();
+    var target = request.getReceiver().getValue();
     map.get(target).context.queueMessage(request.toBuffer());
   }
 
@@ -130,7 +135,6 @@ public class ServerChatHack {
       .map(m -> (ServerContext) m.attachment())
       .findFirst();
   }
-
 
   public SelectionKey findKeyByLogin(String fromLogin) {
     return this.map.get(fromLogin).key;
@@ -200,7 +204,7 @@ public class ServerChatHack {
 
   private void dbConnection() throws IOException {
     dbChannel.configureBlocking(false);
-    var dbKey = dbChannel.register(selector, SelectionKey.OP_WRITE);
+    var dbKey = dbChannel.register(selector, SelectionKey.OP_READ);
     databaseContext = new DatabaseContext(dbKey, this);
     dbKey.attach(databaseContext);
   }

@@ -1,9 +1,9 @@
-package fr.upem.chathack.context;
+package fr.upem.chathack.client;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
-import fr.upem.chathack.ClientChatHack;
+import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.frame.IPublicFrame;
 import fr.upem.chathack.publicframe.AcceptPrivateConnection;
 import fr.upem.chathack.publicframe.AnonymousConnection;
@@ -79,13 +79,14 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
 
   @Override
   public void visit(RequestPrivateConnection requestMessage) {
-    client.addPrivateConnectionRequest(requestMessage);
+    if (client.pendingPrivateRequests.contains(requestMessage))
+      return;
+    client.pendingPrivateRequests.add(requestMessage);
   }
 
   @Override
   public void visit(AcceptPrivateConnection responsePrivateConnection) {
     client.doConnectionWithClient(responsePrivateConnection);
-    System.out.println("private connection is accepted !");
   }
 
   @Override

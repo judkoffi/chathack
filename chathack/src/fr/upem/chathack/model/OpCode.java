@@ -4,6 +4,9 @@ public class OpCode {
   private OpCode() {}
 
   public static final byte DISCOVER_MESSAGE = (byte) 20;
+  public static final byte DISCOVER_CONFIRMATION = (byte) 21;
+
+
   public static final byte ANONYMOUS_CLIENT_CONNECTION = (byte) 0;
   public static final byte AUTHENTICATED_CLIENT_CONNECTION = (byte) 1;
   public static final byte BROADCAST_MESSAGE = (byte) 2;

@@ -23,12 +23,12 @@ public class Main {
     bb.flip();
     sc.write(bb);
     
-    System.out.println("readdd");
+   // System.out.println("readdd");
     bb.clear();
     sc.read(bb);
-    System.out.println(bb);
+    //System.out.println(bb);
     bb.flip();
-    System.out.println(bb);
+   // System.out.println(bb);
 
     byte b = bb.get();
     long s = bb.getLong();
@@ -112,25 +112,10 @@ public class Main {
     var sc = SocketChannel.open(addr);
     
     
-    System.out.println(ipToLong(addr));
+  //  System.out.println(ipToLong(addr));
     
     var login = args[0];
 
-    String ip = "192.168.1.24";
-    InetAddress inetAddress = InetAddress.getByName(ip);
-    
-    var bytes= inetAddress.getAddress();
-    
-    for(int i = 0; i < bytes.length; i++) {
-      System.out.println(bytes[i]);
-    }
-
-    // ByteOrder.BIG_ENDIAN by default
-    ByteBuffer buffer = ByteBuffer.allocate(Long.SIZE);
-    buffer.put(inetAddress.getAddress());
-    buffer.position(0);
-    Long longValue = buffer.getLong();
-    System.out.println("dksqn: "+longValue);
     // sendAuthenticatedConnection(sc, login, "test");
     //sendAnonymousConnection(sc, login);
     sendBroadcastMsg(sc, login, "hello");

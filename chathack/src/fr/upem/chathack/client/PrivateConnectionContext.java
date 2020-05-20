@@ -1,9 +1,11 @@
-package fr.upem.chathack.context;
+package fr.upem.chathack.client;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
-import fr.upem.chathack.ClientChatHack;
+import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.frame.IPrivateFrame;
+import fr.upem.chathack.model.PrivateConnectionInfo.PrivateConnectionState;
+import fr.upem.chathack.privateframe.ConfirmDiscoverMessage;
 import fr.upem.chathack.privateframe.DirectMessage;
 import fr.upem.chathack.privateframe.DiscoverMessage;
 import fr.upem.chathack.reader.IReader;
@@ -15,6 +17,9 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
   private final PrivateConnectionFrameReader reader = new PrivateConnectionFrameReader();
   private long token;
 
+  // Destinator in private connection
+  private String receiver;
+
   public PrivateConnectionContext(SelectionKey key, ClientChatHack client) {
     super(key);
     this.client = client;
@@ -24,6 +29,14 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
     super(key);
     this.client = client;
     this.token = token;
+  }
+
+  public PrivateConnectionContext(SelectionKey key, ClientChatHack client, long token,
+      String receiver) {
+    super(key);
+    this.client = client;
+    this.token = token;
+    this.receiver = receiver;
   }
 
   private void handler(IPrivateFrame frame) {
@@ -38,7 +51,8 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
     if (!sc.finishConnect()) {
       return;
     }
-    var discoverMsg = new DiscoverMessage(client.getLogin(), client.getToken());
+    var currentToken = client.privateConnectionMap.get(receiver).getToken();
+    var discoverMsg = new DiscoverMessage(client.getLogin(), currentToken);
     queueMessage(discoverMsg.toBuffer());
     updateInterestOps();
   }
@@ -65,15 +79,30 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
 
   @Override
   public void visit(DirectMessage directMessage) {
-    System.out.println("direct message received");
+
   }
 
   @Override
   public void visit(DiscoverMessage message) {
-    System.out.println("discover in Client as server context ");
-    client.putConnected(message.getLogin(), new PrivateConnectionInfo(this, message.getToken()));
-    System.out.println(client.getConnectedMap());
-    System.out.println(client.getPendingConnections());
-    System.out.println("received message discover " + message);
+    var login = message.getLogin();
+    if (client.privateConnectionMap.get(login).getToken() == message.getToken()) {
+      System.out.println("good token");
+      var connectionInfo = client.privateConnectionMap.get(login);
+      connectionInfo.setState(PrivateConnectionState.SUCCEED);
+      connectionInfo.setDestinatorContext(this);
+      var confirmMsg = new ConfirmDiscoverMessage(login, client.getLogin());
+      queueMessage(confirmMsg.toBuffer());
+    } else {
+      System.out.println("bad token");
+    }
+  }
+
+  @Override
+  public void visit(ConfirmDiscoverMessage confirmDiscoverMessage) {
+    var connectionInfo = client.privateConnectionMap.get(confirmDiscoverMessage.getSender());
+
+    connectionInfo.setState(PrivateConnectionState.SUCCEED);
+    connectionInfo.setDestinatorContext(this);
+    System.out.println("connection succeded with " + confirmDiscoverMessage.getSender());
   }
 }
