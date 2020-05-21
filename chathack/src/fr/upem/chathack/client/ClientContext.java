@@ -46,6 +46,10 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
     }
   }
 
+  boolean isClosed() {
+    return closed;
+  }
+
   public void doConnect() throws IOException {
     if (!sc.finishConnect()) {
       return;
@@ -64,7 +68,8 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
     System.out.println(serverMessage);
     if (serverMessage.isErrorMessage()) {
       this.client.interruptConsole();
-      System.exit(-1);
+      
+      //System.exit(-1);
     }
   }
 

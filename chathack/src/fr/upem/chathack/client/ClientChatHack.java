@@ -269,11 +269,17 @@ public class ClientChatHack {
         : new AuthentificatedConnection(login, password);
 
     this.uniqueContext.putInQueue(request.toBuffer());
+    console.setDaemon(true);
     console.start();// run stdin thread
 
     while (!Thread.interrupted()) {
       // printKeys();
       try {
+        if (uniqueContext.isClosed()) {
+          console.interrupt();
+          selector.close();
+          return;
+        }
         selector.select(this::treatKey);
         processCommands();
       } catch (UncheckedIOException tunneled) {
