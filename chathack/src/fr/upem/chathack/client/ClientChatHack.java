@@ -228,13 +228,13 @@ public class ClientChatHack {
   }
 
   public void doConnectionWithClient(AcceptPrivateConnection response) {
+    var receiver = response.getReceiver();
+    var token = response.getToken();
+
     try {
       var socket = SocketChannel.open();
       socket.configureBlocking(false);
       var key = socket.register(selector, SelectionKey.OP_CONNECT);
-
-      var receiver = response.getReceiver();
-      var token = response.getToken();
 
       privateConnectionMap.get(receiver).setState(WAITING_COMFIRM_TOKEN);
       privateConnectionMap.get(receiver).setToken(token);
@@ -244,7 +244,6 @@ public class ClientChatHack {
       socket.connect(response.getTargetAddress());
     } catch (IOException e) {
       logger.info("Failed to connect incomming client");
-      // TODO: send failed connection message
     }
   }
 

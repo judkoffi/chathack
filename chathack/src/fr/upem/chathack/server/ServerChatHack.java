@@ -198,7 +198,6 @@ public class ServerChatHack {
       } catch (UncheckedIOException tunneled) {
         throw tunneled.getCause();
       }
-      // System.out.println("Select finished");
     }
   }
 

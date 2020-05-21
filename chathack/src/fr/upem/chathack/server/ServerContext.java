@@ -127,7 +127,7 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
       var msg = new ServerResponseMessage("Unknown login", true);
       System.out.println(msg);
       queueMessage(msg.toBuffer());
-      silenceInputClose();
+      // silenceInputClose();
       return;
     }
 

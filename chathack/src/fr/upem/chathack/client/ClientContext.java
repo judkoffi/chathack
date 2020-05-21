@@ -66,11 +66,11 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
   @Override
   public void visit(ServerResponseMessage serverMessage) {
     System.out.println(serverMessage);
-    if (serverMessage.isErrorMessage()) {
-      this.client.interruptConsole();
-      
-      //System.exit(-1);
-    }
+    // if (serverMessage.isErrorMessage()) {
+    // this.client.interruptConsole();
+
+    // System.exit(-1);
+    // }
   }
 
   /*
