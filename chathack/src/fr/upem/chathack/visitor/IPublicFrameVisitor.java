@@ -10,13 +10,13 @@ import fr.upem.chathack.publicframe.ServerResponseMessage;
 
 public interface IPublicFrameVisitor extends IFrameVisitor {
 
-  public void visit(AnonymousConnection message);
+  public default void visit(AnonymousConnection message) {}
 
-  public void visit(AuthentificatedConnection message);
+  public default void visit(AuthentificatedConnection message) {}
 
   public void visit(BroadcastMessage message);
 
-  public void visit(ServerResponseMessage serverMessage);
+  public default void visit(ServerResponseMessage serverMessage) {}
 
   public void visit(RequestPrivateConnection requestMessage);
 

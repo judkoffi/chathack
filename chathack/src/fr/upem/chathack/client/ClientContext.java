@@ -6,8 +6,6 @@ import java.nio.channels.SelectionKey;
 import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.frame.IPublicFrame;
 import fr.upem.chathack.publicframe.AcceptPrivateConnection;
-import fr.upem.chathack.publicframe.AnonymousConnection;
-import fr.upem.chathack.publicframe.AuthentificatedConnection;
 import fr.upem.chathack.publicframe.BroadcastMessage;
 import fr.upem.chathack.publicframe.RejectPrivateConnection;
 import fr.upem.chathack.publicframe.RequestPrivateConnection;
@@ -63,8 +61,7 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
 
   @Override
   public void visit(ServerResponseMessage serverMessage) {
-    System.out
-      .println("public void visit(ServerResponseMessage serverMessage): " + serverMessage);
+    System.out.println(serverMessage);
     if (serverMessage.isErrorMessage()) {
       this.client.interruptConsole();
       System.exit(-1);
@@ -86,19 +83,12 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
   }
 
   @Override
-  public void visit(AcceptPrivateConnection responsePrivateConnection) {
-    client.doConnectionWithClient(responsePrivateConnection);
+  public void visit(AcceptPrivateConnection response) {
+    client.doConnectionWithClient(response);
   }
 
   @Override
-  public void visit(RejectPrivateConnection rejectPrivateConnection) {
-    System.out.println("private connection was rejected.");
+  public void visit(RejectPrivateConnection response) {
+    client.privateConnectionMap.remove(response.getReceiver());
   }
-
-  @Override
-  public void visit(AnonymousConnection message) {}
-
-  @Override
-  public void visit(AuthentificatedConnection message) {}
-
 }

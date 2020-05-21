@@ -145,15 +145,7 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
   @Override
   public void visit(RejectPrivateConnection rejectPrivateConnection) {
     System.out.println(rejectPrivateConnection);
-    var targetKey = server.findKeyByLogin(rejectPrivateConnection.getFromLogin());
+    var targetKey = server.findKeyByLogin(rejectPrivateConnection.getAppliant());
     server.sendMessageToClient(rejectPrivateConnection.toBuffer(), targetKey);
   }
-
-
-  /*****************************
-   * Not received by server
-   *****************************/
-  @Override
-  public void visit(ServerResponseMessage serverMessage) {}
-
 }

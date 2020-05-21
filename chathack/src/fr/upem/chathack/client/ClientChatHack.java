@@ -160,7 +160,6 @@ public class ClientChatHack {
 
     var privateConnection = privateConnectionMap.get(receiver);
     var dmMsg = new DirectMessage(login, receiver, message);
-
     // send private connectionrequest
     if (privateConnection == null) {
       var dmRequest = new RequestPrivateConnection(login, receiver);
