@@ -1,6 +1,7 @@
 package fr.upem.chathack.reader.trame;
 
 import static fr.upem.chathack.utils.Helper.BUFFER_SIZE;
+import static fr.upem.chathack.utils.Helper.LIMIT_FILE_CONTENT_SIZE;
 
 import java.nio.ByteBuffer;
 
@@ -26,7 +27,7 @@ public class FileMessageReader implements IReader<FileMessage> {
 	private FileMessage value;
 	private State state;
 
-	private ByteBuffer internalbb = ByteBuffer.allocate(BUFFER_SIZE);
+	private ByteBuffer internalbb = ByteBuffer.allocate(LIMIT_FILE_CONTENT_SIZE);
 
 	public FileMessageReader() {
 		this.sizeStringReader = new LongSizedStringReader();
@@ -61,7 +62,7 @@ public class FileMessageReader implements IReader<FileMessage> {
 				return status;
 
 			contentSize = intReader.get();
-			if (contentSize <= 0 || contentSize > BUFFER_SIZE) {
+			if (contentSize <= 0 || contentSize > LIMIT_FILE_CONTENT_SIZE) {
 				state = State.ERROR;
 				return ProcessStatus.ERROR;
 			}

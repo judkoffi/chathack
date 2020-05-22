@@ -11,7 +11,8 @@ import java.nio.charset.StandardCharsets;
 public class Helper {
   private Helper() {}
 
-  public static final int BUFFER_SIZE = 4096;
+  public static final int BUFFER_SIZE = 10240;
+  public static final int LIMIT_FILE_CONTENT_SIZE = 8*1024;
   public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
   public static final String WELCOME_MESSAGE = "Welcome to ChatHack !\n" + "To use this chat : \n"
       + "public message => no prefix\n" + "@login msg => private message\n"

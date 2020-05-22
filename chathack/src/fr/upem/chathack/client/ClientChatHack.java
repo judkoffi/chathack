@@ -1,6 +1,7 @@
 package fr.upem.chathack.client;
 
 import static fr.upem.chathack.model.PrivateConnectionInfo.PrivateConnectionState.WAITING_COMFIRM_TOKEN;
+import static fr.upem.chathack.utils.Helper.LIMIT_FILE_CONTENT_SIZE;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -57,6 +58,7 @@ public class ClientChatHack {
 	private String password;
 	private final Thread console;
 	private ServerSocketChannel serverSocketChannel;
+	String path;
 
 	public ClientChatHack(InetSocketAddress serverAddress, String path, String login) throws IOException {
 		this.serverAddress = serverAddress;
@@ -65,6 +67,7 @@ public class ClientChatHack {
 		this.serverSocketChannel = ServerSocketChannel.open();
 		this.selector = Selector.open();
 		this.console = new Thread(this::consoleRun);
+		this.path = path;
 	}
 
 	public ClientChatHack(InetSocketAddress serverAddress, String path, String login, String password)
@@ -96,7 +99,7 @@ public class ClientChatHack {
 	private ByteBuffer readFile(String filename) {
 		try (RandomAccessFile reader = new RandomAccessFile(filename, "r");
 				FileChannel channel = reader.getChannel()) {
-			int bufferSize = 1024;
+			int bufferSize = LIMIT_FILE_CONTENT_SIZE;
 			if (bufferSize > channel.size()) {
 				bufferSize = (int) channel.size();
 			}
@@ -114,6 +117,8 @@ public class ClientChatHack {
 		
 	}
 
+	
+	
 	private void processPrefixBySlash(String line) {
 		if (line.startsWith("/file")) {
 			System.out.println("send files");

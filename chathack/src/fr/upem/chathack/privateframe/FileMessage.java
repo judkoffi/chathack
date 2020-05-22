@@ -41,6 +41,14 @@ public class FileMessage implements IPrivateFrame{
 		frameVisitor.visit(this);
 		
 	}
+	
+	public String getFilename() {
+		return filename.getValue();
+	}
+	
+	public ByteBuffer getContent() {
+		return content;
+	}
 
 	@Override
 	public String toString() {
