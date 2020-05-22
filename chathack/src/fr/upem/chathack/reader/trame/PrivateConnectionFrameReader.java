@@ -17,6 +17,7 @@ public class PrivateConnectionFrameReader implements IReader<IPrivateFrame> {
   private final DirectMessageReader directMessageReader;
   private final DiscoverMessageReader discoverMessageReader;
   private final ConfirmDiscoverMessageReader confirmDiscoverMessageReader;
+  private final FileMessageReader fileMessageReader;
 
   private State state;
   private IReader<? extends IPrivateFrame> currentFrameReader;
@@ -27,6 +28,7 @@ public class PrivateConnectionFrameReader implements IReader<IPrivateFrame> {
     this.directMessageReader = new DirectMessageReader();
     this.discoverMessageReader = new DiscoverMessageReader();
     this.confirmDiscoverMessageReader = new ConfirmDiscoverMessageReader();
+    this.fileMessageReader = new FileMessageReader();
   }
 
   @Override
@@ -50,6 +52,9 @@ public class PrivateConnectionFrameReader implements IReader<IPrivateFrame> {
           case OpCode.DISCOVER_CONFIRMATION:
             currentFrameReader = confirmDiscoverMessageReader;
             break;
+          case OpCode.FILE_SEND:
+        	  currentFrameReader = fileMessageReader;
+        	  break;
           default:
             throw new IllegalArgumentException("unknown opcode " + opcode);
         }
@@ -83,5 +88,6 @@ public class PrivateConnectionFrameReader implements IReader<IPrivateFrame> {
     directMessageReader.reset();
     discoverMessageReader.reset();
     confirmDiscoverMessageReader.reset();
+    fileMessageReader.reset();
   }
 }

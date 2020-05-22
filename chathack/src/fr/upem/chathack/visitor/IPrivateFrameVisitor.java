@@ -3,6 +3,7 @@ package fr.upem.chathack.visitor;
 import fr.upem.chathack.privateframe.ConfirmDiscoverMessage;
 import fr.upem.chathack.privateframe.DirectMessage;
 import fr.upem.chathack.privateframe.DiscoverMessage;
+import fr.upem.chathack.privateframe.FileMessage;
 
 public interface IPrivateFrameVisitor extends IFrameVisitor {
 
@@ -11,5 +12,7 @@ public interface IPrivateFrameVisitor extends IFrameVisitor {
   public void visit(DiscoverMessage message);
 
   public void visit(ConfirmDiscoverMessage confirmDiscoverMessage);
+
+public void visit(FileMessage fileMessage);
 
 }

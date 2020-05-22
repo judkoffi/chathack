@@ -21,7 +21,7 @@ public class Main {
     bb.putLong(msgbb.limit());
     bb.put(msgbb);
     bb.flip();
-    sc.write(bb);
+    sc.write(bb); 
     
    // System.out.println("readdd");
     bb.clear();

@@ -1,5 +1,6 @@
 package fr.upem.chathack.model;
 
+import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import fr.upem.chathack.client.PrivateConnectionContext;
 import fr.upem.chathack.privateframe.DirectMessage;
@@ -14,7 +15,7 @@ public class PrivateConnectionInfo {
   private PrivateConnectionState state;
   private long token;
   private PrivateConnectionContext destinatorContext;
-  private LinkedList<DirectMessage> pendingDirectMessages;
+  private LinkedList<ByteBuffer> pendingDirectMessages;
 
   public PrivateConnectionInfo(String receiver) {
     this.receiver = receiver;
@@ -58,7 +59,7 @@ public class PrivateConnectionInfo {
     return destinatorContext;
   }
 
-  public LinkedList<DirectMessage> getMessageQueue() {
+  public LinkedList<ByteBuffer> getMessageQueue() {
     return pendingDirectMessages;
   }
 

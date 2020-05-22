@@ -8,6 +8,7 @@ import fr.upem.chathack.frame.IPrivateFrame;
 import fr.upem.chathack.privateframe.ConfirmDiscoverMessage;
 import fr.upem.chathack.privateframe.DirectMessage;
 import fr.upem.chathack.privateframe.DiscoverMessage;
+import fr.upem.chathack.privateframe.FileMessage;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.trame.PrivateConnectionFrameReader;
 import fr.upem.chathack.visitor.IPrivateFrameVisitor;
@@ -105,7 +106,12 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
     var pendingMessageQuue = connectionInfo.getMessageQueue();
     while (!pendingMessageQuue.isEmpty()) {
       var dm = pendingMessageQuue.remove();
-      connectionInfo.getDestinatorContext().queueMessage(dm.toBuffer());
+      connectionInfo.getDestinatorContext().queueMessage(dm);
     }
   }
+
+@Override
+public void visit(FileMessage fileMessage) {
+	System.out.println("filename message:" + fileMessage);
+}
 }
