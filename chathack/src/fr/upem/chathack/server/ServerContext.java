@@ -138,13 +138,15 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
   @Override
   public void visit(AcceptPrivateConnection responsePrivateConnection) {
     System.out.println(responsePrivateConnection);
-    var targetKey = server.findKeyByLogin(responsePrivateConnection.getAppliant());
+    var login = responsePrivateConnection.getAppliant();
+    var targetKey = server.map.get(login).key;
     server.sendMessageToClient(responsePrivateConnection.toBuffer(), targetKey);
   }
 
   @Override
   public void visit(RejectPrivateConnection rejectPrivateConnection) {
-    var targetKey = server.findKeyByLogin(rejectPrivateConnection.getAppliant());
+    var login = rejectPrivateConnection.getAppliant();
+    var targetKey = server.map.get(login).key;
     server.sendMessageToClient(rejectPrivateConnection.toBuffer(), targetKey);
   }
 

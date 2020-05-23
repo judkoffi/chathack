@@ -36,12 +36,12 @@ public class ServerChatHack {
    *
    */
   // TODO: mettre ca dans le context
-  private static class ClientInfo {
+  static class ClientInfo {
     private boolean isAuthenticated;
     private boolean anonymous; // type of connection (anonymous or with credentials)
-    private SelectionKey key;
+    SelectionKey key;
     private long id;
-    private ServerContext context;
+    ServerContext context;
 
     private ClientInfo(boolean anonymous, boolean isAuthenticated, SelectionKey key, long id) {
       this.anonymous = Objects.requireNonNull(anonymous);
@@ -140,12 +140,8 @@ public class ServerChatHack {
       .findFirst();
   }
 
-  public SelectionKey findKeyByLogin(String fromLogin) {
-    return this.map.get(fromLogin).key;
-  }
-
   public void removeClientByKey(SelectionKey key) {
-    findLoginByKey(key).ifPresent(this::removeLoginInMap);
+    findLoginByKey(key).ifPresent(login -> map.remove(login));
   }
 
   private Optional<String> findLoginByKey(SelectionKey key) {
@@ -155,10 +151,6 @@ public class ServerChatHack {
       .filter(entry -> entry.getValue().key.equals(key))
       .map(Map.Entry::getKey)
       .findFirst();
-  }
-
-  private void removeLoginInMap(String login) {
-    map.remove(login);
   }
 
   /*****************************
