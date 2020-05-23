@@ -1,6 +1,7 @@
 package fr.upem.chathack.client;
 
 import static fr.upem.chathack.model.PrivateConnectionInfo.PrivateConnectionState.WAITING_COMFIRM_TOKEN;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -72,11 +73,11 @@ public class ClientChatHack {
   }
 
   private void checkPath(String path) {
-    // Path file = new File(path).toPath();
-
-    // boolean exists = Files.exists(file); // Check if the file exists
-    // boolean isDirectory = Files.isDirectory(file); // Check if it's a directory
-    // boolean isFile = Files.isRegularFile(file); // Check if it's a regular file
+    Path file = new File(path).toPath();
+    boolean exists = Files.exists(file); // Check if the file exists
+    boolean isDirectory = Files.isDirectory(file); // Check if it's a directory
+    if (!exists || !isDirectory)
+      throw new IllegalArgumentException(path + " must be exist and a directory");
   }
 
   public ClientChatHack(InetSocketAddress serverAddress, String path, String login, String password)

@@ -4,7 +4,6 @@ import static fr.upem.chathack.model.PrivateConnectionInfo.PrivateConnectionStat
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.channels.SelectionKey;
 import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.frame.IPrivateFrame;
@@ -106,31 +105,28 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
     connectionInfo.setState(SUCCEED);
     connectionInfo.setDestinatorContext(this);
 
-    var pendingMessageQuue = connectionInfo.getMessageQueue();
-    while (!pendingMessageQuue.isEmpty()) {
-      var dm = pendingMessageQuue.remove();
+    var pendingMessageQueue = connectionInfo.getMessageQueue();
+    while (!pendingMessageQueue.isEmpty()) {
+      var dm = pendingMessageQueue.remove();
       connectionInfo.getDestinatorContext().queueMessage(dm);
     }
   }
 
   private void writeFile(String filename, ByteBuffer buffer) throws IOException {
-    System.out.println("FILENAME " + filename);
-    try (RandomAccessFile stream = new RandomAccessFile(filename, "rw");
-        FileChannel channel = stream.getChannel();) {
-
+    var filePath = client.path + "/" + filename;
+    try (var stream = new RandomAccessFile(filePath, "rw"); var channel = stream.getChannel();) {
       channel.write(buffer);
-
     }
-
   }
 
   @Override
   public void visit(FileMessage fileMessage) {
-    System.out.println("filename message:" + fileMessage);
     try {
-      writeFile(client.path + "/" + fileMessage.getFilename(), fileMessage.getContent());
+      writeFile(fileMessage.getFilename(), fileMessage.getContent());
     } catch (IOException e) {
       System.err.println(e.getMessage());
     }
+    System.out
+      .println("file reveiced and strore at " + client.path + "/" + fileMessage.getFilename());
   }
 }
