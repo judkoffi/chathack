@@ -20,6 +20,7 @@ public class ServerFrameReader implements IReader<IPublicFrame> {
   private final RequestPrivateConnectionReader requestConnectionReader;
   private final AcceptPrivateConnectionReader acceptPrivateConnectionReader;
   private final RejectPrivateConnectionReader rejectPrivateConnectionReader;
+  private final LogOutMessageReader logOutMessageReader;
 
   private State state;
   private IReader<? extends IPublicFrame> currentFrameReader;
@@ -34,6 +35,7 @@ public class ServerFrameReader implements IReader<IPublicFrame> {
     this.requestConnectionReader = new RequestPrivateConnectionReader();
     this.acceptPrivateConnectionReader = new AcceptPrivateConnectionReader();
     this.rejectPrivateConnectionReader = new RejectPrivateConnectionReader();
+    this.logOutMessageReader = new LogOutMessageReader();
     this.state = State.WAITING_OPCODE;
   }
 
@@ -66,6 +68,9 @@ public class ServerFrameReader implements IReader<IPublicFrame> {
             break;
           case OpCode.REJECTED_PRIVATE_CLIENT_CONNECTION:
             currentFrameReader = rejectPrivateConnectionReader;
+            break;
+          case OpCode.CLIENT_LOG_OUT:
+            currentFrameReader = logOutMessageReader;
             break;
           default:
             throw new IllegalArgumentException("unknown opcode " + opcode);
@@ -104,5 +109,6 @@ public class ServerFrameReader implements IReader<IPublicFrame> {
     requestConnectionReader.reset();
     acceptPrivateConnectionReader.reset();
     rejectPrivateConnectionReader.reset();
+    logOutMessageReader.reset();
   }
 }

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
@@ -43,10 +44,10 @@ public class ServerChatHack {
     private ServerContext context;
 
     private ClientInfo(boolean anonymous, boolean isAuthenticated, SelectionKey key, long id) {
-      this.anonymous = anonymous;
-      this.isAuthenticated = isAuthenticated;
-      this.key = key;
-      this.id = id;
+      this.anonymous = Objects.requireNonNull(anonymous);
+      this.isAuthenticated = Objects.requireNonNull(isAuthenticated);
+      this.key = Objects.requireNonNull(key);
+      this.id = Objects.requireNonNull(id);
     }
 
     private ClientInfo(boolean anonymous, SelectionKey key, long id) {
@@ -63,11 +64,14 @@ public class ServerChatHack {
   private final Selector selector;
   private final ServerSocketChannel serverSocketChannel;
   private final SocketChannel dbChannel;
-  private final HashMap<String, ClientInfo> map = new HashMap<>();
+  final HashMap<String, ClientInfo> map = new HashMap<>();
   private DatabaseContext databaseContext;
   private final InetSocketAddress databaseAddress;
 
   public ServerChatHack(int port, String dbHostname, int dbPort) throws IOException {
+    Objects.requireNonNull(dbHostname);
+    Objects.requireNonNull(port);
+    Objects.requireNonNull(dbPort);
     serverSocketChannel = ServerSocketChannel.open();
     serverSocketChannel.bind(new InetSocketAddress(port));
     dbChannel = SocketChannel.open();

@@ -1,25 +1,23 @@
 package fr.upem.chathack.reader.trame;
 
 import java.nio.ByteBuffer;
-import fr.upem.chathack.publicframe.BroadcastMessage;
+import fr.upem.chathack.publicframe.LogOutMessage;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.MessageReader;
 
-public class BroadcastMessageReader implements IReader<BroadcastMessage> {
-
+public class LogOutMessageReader implements IReader<LogOutMessage> {
   private enum State {
     WAITING_MESSAGE, DONE, ERROR
   }
 
   private final MessageReader reader;
   private State state;
-  private BroadcastMessage value;
+  private LogOutMessage value;
 
-  public BroadcastMessageReader() {
+  public LogOutMessageReader() {
     this.reader = new MessageReader();
     this.state = State.WAITING_MESSAGE;
   }
-
 
   @Override
   public ProcessStatus process(ByteBuffer bb) {
@@ -30,17 +28,19 @@ public class BroadcastMessageReader implements IReader<BroadcastMessage> {
           return status;
         }
         var message = reader.get();
-        value = new BroadcastMessage(message);
+        value = new LogOutMessage(message);
         state = State.DONE;
         return ProcessStatus.DONE;
       }
       default:
-        throw new IllegalStateException("illegal state: " + state);
+        System.out.println(state);
+        throw new IllegalStateException();
     }
   }
 
+
   @Override
-  public BroadcastMessage get() {
+  public LogOutMessage get() {
     if (state != State.DONE) {
       throw new IllegalStateException();
     }
@@ -53,5 +53,4 @@ public class BroadcastMessageReader implements IReader<BroadcastMessage> {
     reader.reset();
     value = null;
   }
-
 }

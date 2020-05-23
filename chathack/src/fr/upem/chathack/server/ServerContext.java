@@ -8,6 +8,7 @@ import fr.upem.chathack.publicframe.AcceptPrivateConnection;
 import fr.upem.chathack.publicframe.AnonymousConnection;
 import fr.upem.chathack.publicframe.AuthentificatedConnection;
 import fr.upem.chathack.publicframe.BroadcastMessage;
+import fr.upem.chathack.publicframe.LogOutMessage;
 import fr.upem.chathack.publicframe.RejectPrivateConnection;
 import fr.upem.chathack.publicframe.RequestPrivateConnection;
 import fr.upem.chathack.publicframe.ServerResponseMessage;
@@ -127,7 +128,6 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
       var msg = new ServerResponseMessage("Unknown login", true);
       System.out.println(msg);
       queueMessage(msg.toBuffer());
-      // silenceInputClose();
       return;
     }
 
@@ -144,8 +144,18 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
 
   @Override
   public void visit(RejectPrivateConnection rejectPrivateConnection) {
-    System.out.println(rejectPrivateConnection);
     var targetKey = server.findKeyByLogin(rejectPrivateConnection.getAppliant());
     server.sendMessageToClient(rejectPrivateConnection.toBuffer(), targetKey);
+  }
+
+  @Override
+  public void visit(LogOutMessage disconnectionMessage) {
+    var from = disconnectionMessage.getMessage().getFrom().getValue();
+    if (!server.map.containsKey(from)) {
+      silentlyClose();
+      return;
+    }
+    silentlyClose();
+    server.map.remove(from);
   }
 }

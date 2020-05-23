@@ -36,6 +36,7 @@ import fr.upem.chathack.publicframe.AcceptPrivateConnection;
 import fr.upem.chathack.publicframe.AnonymousConnection;
 import fr.upem.chathack.publicframe.AuthentificatedConnection;
 import fr.upem.chathack.publicframe.BroadcastMessage;
+import fr.upem.chathack.publicframe.LogOutMessage;
 import fr.upem.chathack.publicframe.RejectPrivateConnection;
 import fr.upem.chathack.publicframe.RequestPrivateConnection;
 
@@ -164,6 +165,10 @@ public class ClientChatHack {
       requestHandler();
     }
 
+    if (line.startsWith("/logout")) {
+      logoutHandler();
+    }
+
     var isAcceptCommand = line.startsWith("/accept");
     var isRejectCommand = line.startsWith("/reject");
 
@@ -209,6 +214,11 @@ public class ClientChatHack {
     targetRequest.ifPresent(pendingPrivateRequests::remove);
   }
 
+
+  private void logoutHandler() {
+    var msg = new LogOutMessage(new Message(login, ""));
+    uniqueContext.queueMessage(msg.toBuffer());
+  }
 
   private boolean existPrivateConnection(String receiver) {
     return privateConnectionMap.containsKey(receiver);

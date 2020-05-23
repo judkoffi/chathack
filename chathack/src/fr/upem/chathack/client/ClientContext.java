@@ -7,6 +7,7 @@ import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.frame.IPublicFrame;
 import fr.upem.chathack.publicframe.AcceptPrivateConnection;
 import fr.upem.chathack.publicframe.BroadcastMessage;
+import fr.upem.chathack.publicframe.LogOutMessage;
 import fr.upem.chathack.publicframe.RejectPrivateConnection;
 import fr.upem.chathack.publicframe.RequestPrivateConnection;
 import fr.upem.chathack.publicframe.ServerResponseMessage;
@@ -68,7 +69,6 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
     System.out.println(serverMessage);
     // if (serverMessage.isErrorMessage()) {
     // this.client.interruptConsole();
-
     // System.exit(-1);
     // }
   }
@@ -96,4 +96,7 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
   public void visit(RejectPrivateConnection response) {
     client.privateConnectionMap.remove(response.getReceiver());
   }
+
+  @Override
+  public void visit(LogOutMessage disconnectionMessage) {}
 }
