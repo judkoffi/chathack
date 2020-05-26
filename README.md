@@ -9,7 +9,7 @@
 
 ## code source
 ```
-Tout ce qu'il y a sous chathack/
+Tout ce qu'il y a sous chathack/src/
 ```
 
 ## commandes
@@ -20,7 +20,8 @@ java -jar ServerMDP.jar 8888 password.txt ---> pour lancer la base de données
 
 ### Dans chathack/bin/
 ```   
-java fr.upem.chathack.server.ServerChatHack 7777 localhost 8888 ---> pour lancer le server    
-java fr.upem.chathack.client.ClientChatHack localhost 7777 . alice ---> pour lancer un client    
+java fr.upem.chathack.server.ServerChatHack 7777 localhost 8888 --->le server    
+java fr.upem.chathack.client.ClientChatHack localhost 7777 joey-dir/ joey ---> client 1 
+java fr.upem.chathack.client.ClientChatHack localhost 7777 joeyette-dir/ joeyette ---> client 2  
 ```    
 - TODO : checker les entiers passes dans les buffers dans les Frames 
