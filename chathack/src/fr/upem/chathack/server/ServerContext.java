@@ -16,6 +16,9 @@ import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.trame.ServerFrameReader;
 import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
+/**
+ * Class use to represent context between a server and client
+ */
 public class ServerContext extends BaseContext implements IPublicFrameVisitor {
   private final ServerFrameReader reader = new ServerFrameReader();
   private final ServerChatHack server;

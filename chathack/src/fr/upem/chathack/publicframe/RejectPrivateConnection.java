@@ -6,6 +6,10 @@ import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.model.OpCode;
 import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
+/**
+ * Class use to represent a frame send through the server to notify when a client refuse a private
+ * connection with an another client
+ */
 public class RejectPrivateConnection implements IPublicFrame {
   private final LongSizedString appliant;
   private final LongSizedString receiver;

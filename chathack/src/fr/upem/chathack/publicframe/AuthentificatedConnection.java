@@ -6,6 +6,9 @@ import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.model.OpCode;
 import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
+/**
+ * Class use to represent a frame send when a client connected to server with a login and password
+ */
 public class AuthentificatedConnection implements IPublicFrame {
   private final LongSizedString login;
   private final LongSizedString password;
@@ -45,6 +48,6 @@ public class AuthentificatedConnection implements IPublicFrame {
 
   @Override
   public String toString() {
-    return "2 | " + login + " : " + password;
+    return login + " : " + password;
   }
 }

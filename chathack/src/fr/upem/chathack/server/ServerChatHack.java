@@ -29,13 +29,14 @@ import fr.upem.chathack.publicframe.ServerResponseMessage;
 import fr.upem.chathack.utils.DatabaseRequestBuilder;
 import fr.upem.chathack.utils.Helper;
 
-
+/**
+ * Class use to represent a server of protocol ChatHack
+ */
 public class ServerChatHack {
+
   /**
-   * Class used to keep some information about connected client
-   *
+   * Internal class use to keep some information about connected client
    */
-  // TODO: mettre ca dans le context
   static class ClientInfo {
     private boolean isAuthenticated;
     private boolean anonymous; // type of connection (anonymous or with credentials)

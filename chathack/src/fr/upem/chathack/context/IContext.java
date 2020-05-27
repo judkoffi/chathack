@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
- * 
- * Interface use to have mandatory methods of acontext
- *
+ * Interface use to have mandatory methods of a context
  */
 public interface IContext {
   /**

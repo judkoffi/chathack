@@ -9,7 +9,7 @@ import java.util.ArrayDeque;
 import java.util.Objects;
 
 /**
- * Abstract class use to factorize commun methods of different context
+ * Abstract class use to factorize common methods of different context
  */
 public abstract class BaseContext implements IContext {
   protected final SelectionKey key;

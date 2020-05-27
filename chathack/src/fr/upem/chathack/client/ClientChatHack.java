@@ -42,7 +42,7 @@ import fr.upem.chathack.publicframe.RequestPrivateConnection;
 
 /**
  * 
- * Class use to create client with protocole Chaton
+ * Class use to create client with protocol ChatHack
  */
 public class ClientChatHack {
   // Map use to keep information about private connection between clients

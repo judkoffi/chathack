@@ -9,6 +9,9 @@ import fr.upem.chathack.publicframe.RejectPrivateConnection;
 import fr.upem.chathack.publicframe.RequestPrivateConnection;
 import fr.upem.chathack.publicframe.ServerResponseMessage;
 
+/**
+ * Interface use to contains visit methods of all public frame
+ */
 public interface IPublicFrameVisitor extends IFrameVisitor {
 
   public default void visit(AnonymousConnection message) {}

@@ -9,7 +9,7 @@ import fr.upem.chathack.reader.trame.DatabaseReader;
 import fr.upem.chathack.server.ServerChatHack;
 
 /**
- * Class use to represent context between a database server and server chaton
+ * Class use to represent context between a database server and server ChatHack
  */
 public class DatabaseContext extends BaseContext {
   private final DatabaseReader reader = new DatabaseReader();

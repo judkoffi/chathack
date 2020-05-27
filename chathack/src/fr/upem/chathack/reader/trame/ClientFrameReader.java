@@ -3,7 +3,6 @@ package fr.upem.chathack.reader.trame;
 import java.nio.ByteBuffer;
 import fr.upem.chathack.frame.IPublicFrame;
 import fr.upem.chathack.model.OpCode;
-import fr.upem.chathack.publicframe.ServerMessageReader;
 import fr.upem.chathack.reader.IReader;
 
 public class ClientFrameReader implements IReader<IPublicFrame> {

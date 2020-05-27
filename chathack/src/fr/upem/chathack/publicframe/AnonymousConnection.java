@@ -6,6 +6,10 @@ import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.model.OpCode;
 import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
+/**
+ * Class use to represent a frame send when a client connected to server with only a login (no
+ * password)
+ */
 public class AnonymousConnection implements IPublicFrame {
   private final LongSizedString sizedString;
 

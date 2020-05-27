@@ -1,7 +1,8 @@
-package fr.upem.chathack.publicframe;
+package fr.upem.chathack.reader.trame;
 
 import java.nio.ByteBuffer;
 import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.publicframe.ServerResponseMessage;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.LongSizedStringReader;
 

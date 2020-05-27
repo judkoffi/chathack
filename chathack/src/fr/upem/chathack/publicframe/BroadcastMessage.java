@@ -6,6 +6,9 @@ import fr.upem.chathack.model.Message;
 import fr.upem.chathack.model.OpCode;
 import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
+/**
+ * Class use to represent a frame contains a public message to be send to all connected client
+ */
 public class BroadcastMessage implements IPublicFrame {
   private final Message message;
 
@@ -27,12 +30,12 @@ public class BroadcastMessage implements IPublicFrame {
     frameVisitor.visit(this);
   }
 
+  public String getFromLogin() {
+    return message.getFrom().getValue();
+  }
+
   @Override
   public String toString() {
     return message.toString();
-  }
-
-  public String getFromLogin() {
-    return message.getFrom().getValue();
   }
 }

@@ -11,6 +11,9 @@ import fr.upem.chathack.visitor.IPublicFrameVisitor;
  * | Opcode (byte) | errorOrNot (-1 or 1) (byte) | length (long) | msg (string)|<br>
  * --------------------------------------------------------------------<br>
  */
+/**
+ * Class use to represent a frame send by the server to send message to client (notification, error)
+ */
 public class ServerResponseMessage implements IPublicFrame {
   private final LongSizedString value;
   private final boolean errorMessage;

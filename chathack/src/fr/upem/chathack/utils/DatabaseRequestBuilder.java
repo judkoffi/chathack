@@ -5,6 +5,9 @@ import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.model.OpCode;
 import fr.upem.chathack.publicframe.AuthentificatedConnection;
 
+/**
+ * Helper class use to build frame use to send request to database server
+ */
 public class DatabaseRequestBuilder {
   private DatabaseRequestBuilder() {}
 

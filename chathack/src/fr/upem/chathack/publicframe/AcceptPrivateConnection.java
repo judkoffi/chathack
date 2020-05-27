@@ -8,6 +8,10 @@ import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.model.OpCode;
 import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
+/**
+ * Class use to represent a frame send through the server to notify when a client accept a private
+ * connection with an another client
+ */
 public class AcceptPrivateConnection implements IPublicFrame {
   private final LongSizedString applicant;
   private final LongSizedString receiver;
@@ -30,6 +34,9 @@ public class AcceptPrivateConnection implements IPublicFrame {
     this.token = token;
   }
 
+  /*
+   * Method use to convert bytes of IP address to long
+   */
   private static long ipToLong(InetSocketAddress addr) {
     ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES).order(ByteOrder.BIG_ENDIAN);
     buffer.put(new byte[] {0, 0, 0, 0});
