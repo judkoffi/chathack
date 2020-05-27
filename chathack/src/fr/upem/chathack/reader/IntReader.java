@@ -2,6 +2,10 @@ package fr.upem.chathack.reader;
 
 import java.nio.ByteBuffer;
 
+/**
+ * Class use to read int type
+ *
+ */
 public class IntReader implements IReader<Integer> {
 
   private enum State {

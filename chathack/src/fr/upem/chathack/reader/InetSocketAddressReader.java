@@ -3,6 +3,10 @@ package fr.upem.chathack.reader;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
+/**
+ * Class use to read InetSocketAddress type
+ *
+ */
 public class InetSocketAddressReader implements IReader<InetSocketAddress> {
   private enum State {
     WAITING_IP, WAITING_PORT, DONE, ERROR

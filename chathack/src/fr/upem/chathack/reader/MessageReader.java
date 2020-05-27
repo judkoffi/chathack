@@ -4,6 +4,10 @@ import java.nio.ByteBuffer;
 import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.model.Message;
 
+/**
+ * Class use to read Message type
+ *
+ */
 public class MessageReader implements IReader<Message> {
 	private enum State {
 		WAITING_FROM, WAITING_MESSAGE, DONE, ERROR

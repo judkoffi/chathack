@@ -4,6 +4,10 @@ import static fr.upem.chathack.utils.Helper.BUFFER_SIZE;
 import static fr.upem.chathack.utils.Helper.DEFAULT_CHARSET;
 import java.nio.ByteBuffer;
 
+/**
+ * Class used to read String type 
+ * 
+ */
 public class StringReader implements IReader<String> {
   private enum State {
     WAITING_SIZE, WAITING_OCTET_CHAINE, DONE, ERROR

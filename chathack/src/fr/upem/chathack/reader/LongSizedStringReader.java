@@ -5,6 +5,10 @@ import static fr.upem.chathack.utils.Helper.DEFAULT_CHARSET;
 import java.nio.ByteBuffer;
 import fr.upem.chathack.model.LongSizedString;
 
+/**
+ * Class used to read LongSizedString type
+ *
+ */
 public class LongSizedStringReader implements IReader<LongSizedString> {
   private enum State {
     WAITING_SIZE, WAITING_OCTET_CHAINE, DONE, ERROR

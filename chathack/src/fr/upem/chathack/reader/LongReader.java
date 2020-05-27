@@ -2,6 +2,10 @@ package fr.upem.chathack.reader;
 
 import java.nio.ByteBuffer;
 
+/**
+ * Class use to read Long type
+ *
+ */
 public class LongReader implements IReader<Long> {
 
   private enum State {
