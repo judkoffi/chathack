@@ -15,10 +15,13 @@ import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.trame.PrivateConnectionFrameReader;
 import fr.upem.chathack.visitor.IPrivateFrameVisitor;
 
+/**
+ * Class use to represent context between a client and another client
+ */
 public class PrivateConnectionContext extends BaseContext implements IPrivateFrameVisitor {
   private final ClientChatHack client;
   private final PrivateConnectionFrameReader reader = new PrivateConnectionFrameReader();
-  private long token;
+  private long token; // token use to certify private connection established between two clients
 
   // Destinator in private connection
   private String receiver;

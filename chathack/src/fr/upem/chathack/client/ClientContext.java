@@ -15,6 +15,9 @@ import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.trame.ClientFrameReader;
 import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
+/**
+ * Class use to represent context between a client and server
+ */
 public class ClientContext extends BaseContext implements IPublicFrameVisitor {
   private final ClientFrameReader reader = new ClientFrameReader();
   private final ClientChatHack client;
@@ -47,6 +50,10 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
     }
   }
 
+  /**
+   * 
+   * @return true if socket channel is closed
+   */
   boolean isClosed() {
     return closed;
   }
@@ -73,8 +80,10 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
     // }
   }
 
-  /*
+  /**
    * Put in a queue without run processOut(), use to send authentication message at client launch
+   * 
+   * @param bb: buffer to be send
    */
   public void putInQueue(ByteBuffer bb) {
     queue.add(bb);

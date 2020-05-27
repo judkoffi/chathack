@@ -9,6 +9,9 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Queue;
 
+/**
+ * Abstract class use to factorize commun methods of different context
+ */
 public abstract class BaseContext implements IContext {
   protected final SelectionKey key;
   protected final SocketChannel sc;

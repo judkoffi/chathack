@@ -40,11 +40,15 @@ import fr.upem.chathack.publicframe.LogOutMessage;
 import fr.upem.chathack.publicframe.RejectPrivateConnection;
 import fr.upem.chathack.publicframe.RequestPrivateConnection;
 
+/**
+ * 
+ * Class use to create client with protocole Chaton
+ */
 public class ClientChatHack {
-  /*
-   * Package access
-   */
+  // Map use to keep information about private connection between clients
   final Map<String, PrivateConnectionInfo> privateConnectionMap = new HashMap<>();
+
+  // Map use to keep information about pending private connection between clients
   final ArrayList<RequestPrivateConnection> pendingPrivateRequests = new ArrayList<>();
 
   private static final Logger logger = Logger.getLogger(ClientChatHack.class.getName());
@@ -73,6 +77,12 @@ public class ClientChatHack {
     this.console = new Thread(this::consoleRun);
   }
 
+  /**
+   * Method use to check if path as client directory use to store shared files give on command line
+   * is valid
+   * 
+   * @param path
+   */
   private void checkPath(String path) {
     Path file = new File(path).toPath();
     boolean exists = Files.exists(file); // Check if the file exists
@@ -304,6 +314,12 @@ public class ClientChatHack {
     clientKey.attach(ctx);
   }
 
+  /**
+   * Method use to make socket connection beetween two clients
+   * 
+   * @param response: a abject of @link {@link AcceptPrivateConnection} which contains IP and port
+   *        to make conection
+   */
   public void doConnectionWithClient(AcceptPrivateConnection response) {
     var receiver = response.getReceiver();
     var token = response.getToken();
@@ -337,6 +353,11 @@ public class ClientChatHack {
     sc.connect(serverAddress);
   }
 
+  /**
+   * Method use to launch a client
+   * 
+   * @throws IOException
+   */
   public void launch() throws IOException {
     initBinding();
     var request = this.password == null ? new AnonymousConnection(login)
