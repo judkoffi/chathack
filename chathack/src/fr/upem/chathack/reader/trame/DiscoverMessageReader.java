@@ -6,7 +6,10 @@ import fr.upem.chathack.privateframe.DiscoverMessage;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.LongReader;
 import fr.upem.chathack.reader.LongSizedStringReader;
-
+/**
+ * Class use to read DiscoverMessage type
+ *
+ */
 public class DiscoverMessageReader implements IReader<DiscoverMessage> {
 
   private enum State {

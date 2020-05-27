@@ -5,7 +5,10 @@ import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.privateframe.ConfirmDiscoverMessage;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.LongSizedStringReader;
-
+/**
+ * Class use to read ConfirmDiscoverMessage type
+ *
+ */
 public class ConfirmDiscoverMessageReader implements IReader<ConfirmDiscoverMessage> {
   private enum State {
     WAITING_RECEIVER_LOGIN, WAITING_SENDER_LOGIN, DONE, ERROR

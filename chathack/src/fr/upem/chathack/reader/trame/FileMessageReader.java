@@ -7,7 +7,10 @@ import fr.upem.chathack.privateframe.FileMessage;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.IntReader;
 import fr.upem.chathack.reader.LongSizedStringReader;
-
+/**
+ * Class use to read FileMessage type
+ *
+ */
 public class FileMessageReader implements IReader<FileMessage> {
   private enum State {
     WAITING_TARGET, WAITING_FILENAME, WAITING_CONTENT_SIZE, WAITING_FILE_CONTENT, DONE, ERROR

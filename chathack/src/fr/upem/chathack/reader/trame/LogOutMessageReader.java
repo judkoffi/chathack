@@ -4,7 +4,10 @@ import java.nio.ByteBuffer;
 import fr.upem.chathack.publicframe.LogOutMessage;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.MessageReader;
-
+/**
+ * Class use to read LogOutMessage type
+ *
+ */
 public class LogOutMessageReader implements IReader<LogOutMessage> {
   private enum State {
     WAITING_MESSAGE, DONE, ERROR

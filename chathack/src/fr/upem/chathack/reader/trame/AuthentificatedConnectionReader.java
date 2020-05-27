@@ -5,7 +5,10 @@ import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.publicframe.AuthentificatedConnection;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.LongSizedStringReader;
-
+/**
+ * Class use to read AthenticatedConnection type
+ *
+ */
 public class AuthentificatedConnectionReader implements IReader<AuthentificatedConnection> {
   private enum State {
     WAITING_LOGIN, WAITING_PASSWORD, DONE, ERROR

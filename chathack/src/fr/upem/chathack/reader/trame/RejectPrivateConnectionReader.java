@@ -5,7 +5,10 @@ import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.publicframe.RejectPrivateConnection;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.LongSizedStringReader;
-
+/**
+ * Class use to read RejectPrivateConnection type
+ *
+ */
 public class RejectPrivateConnectionReader implements IReader<RejectPrivateConnection> {
 	private enum State {
 		WAITING_TARGET_LOGIN, WAITING_FROM_LOGIN, DONE, ERROR

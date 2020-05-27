@@ -4,7 +4,10 @@ import java.nio.ByteBuffer;
 import fr.upem.chathack.publicframe.BroadcastMessage;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.MessageReader;
-
+/**
+ * Class use to read BroadcastMessage type
+ *
+ */
 public class BroadcastMessageReader implements IReader<BroadcastMessage> {
 
   private enum State {

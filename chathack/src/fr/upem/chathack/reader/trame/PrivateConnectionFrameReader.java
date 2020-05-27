@@ -4,7 +4,10 @@ import java.nio.ByteBuffer;
 import fr.upem.chathack.frame.IPrivateFrame;
 import fr.upem.chathack.model.OpCode;
 import fr.upem.chathack.reader.IReader;
-
+/**
+ * Class use to read PrivateConnectionFrame type
+ *
+ */
 public class PrivateConnectionFrameReader implements IReader<IPrivateFrame> {
 
   private enum State {

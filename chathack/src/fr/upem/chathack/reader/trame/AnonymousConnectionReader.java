@@ -4,7 +4,10 @@ import java.nio.ByteBuffer;
 import fr.upem.chathack.publicframe.AnonymousConnection;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.LongSizedStringReader;
-
+/**
+ * Class use to read AnonymousConnection type
+ *
+ */
 public class AnonymousConnectionReader implements IReader<AnonymousConnection> {
   private enum State {
     WAITING_DATA, DONE, ERROR

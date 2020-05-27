@@ -6,7 +6,10 @@ import fr.upem.chathack.privateframe.DirectMessage;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.LongSizedStringReader;
 import fr.upem.chathack.reader.MessageReader;
-
+/**
+ * Class use to read DirectMessage type
+ *
+ */
 public class DirectMessageReader implements IReader<DirectMessage> {
   private enum State {
     WAITING_TARGET, WAITING_MESSAGE, DONE, ERROR

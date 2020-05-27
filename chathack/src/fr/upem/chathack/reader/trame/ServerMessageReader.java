@@ -6,6 +6,10 @@ import fr.upem.chathack.publicframe.ServerResponseMessage;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.LongSizedStringReader;
 
+/**
+ * Class use to read ServerMessage type
+ *
+ */
 public class ServerMessageReader implements IReader<ServerResponseMessage> {
   private enum State {
     WAITING_MSG_TYPE, WAITING_MSG, DONE, ERROR

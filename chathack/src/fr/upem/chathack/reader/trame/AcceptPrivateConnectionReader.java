@@ -8,7 +8,10 @@ import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.InetSocketAddressReader;
 import fr.upem.chathack.reader.LongReader;
 import fr.upem.chathack.reader.LongSizedStringReader;
-
+/**
+ * Class use to read AcceptPrivateConnection type
+ *
+ */
 public class AcceptPrivateConnectionReader implements IReader<AcceptPrivateConnection> {
   private enum State {
     WAITING_TARGET_LOGIN, WAITING_TARGET_ADDR, WAITING_TOKEN, WAITING_FROM_LOGIN, DONE, ERROR

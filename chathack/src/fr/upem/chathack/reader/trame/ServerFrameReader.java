@@ -4,7 +4,10 @@ import java.nio.ByteBuffer;
 import fr.upem.chathack.frame.IPublicFrame;
 import fr.upem.chathack.model.OpCode;
 import fr.upem.chathack.reader.IReader;
-
+/**
+ * Class use to read all public frame exchange between client and server
+ *
+ */
 public class ServerFrameReader implements IReader<IPublicFrame> {
 
   private enum State {

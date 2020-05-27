@@ -4,7 +4,10 @@ import java.nio.ByteBuffer;
 import fr.upem.chathack.frame.DatabaseTrame;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.LongReader;
-
+/**
+ * Class use to read DatabaseTrame type
+ *
+ */
 public class DatabaseReader implements IReader<DatabaseTrame> {
   private enum State {
     WAITING_OPCODE, WAITING_RESULT, DONE, ERROR
