@@ -6,6 +6,9 @@ import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.model.OpCode;
 import fr.upem.chathack.visitor.IPrivateFrameVisitor;
 
+/**
+ * Class use to represent a confirmation frame of token during private connection between clients
+ */
 public class ConfirmDiscoverMessage implements IPrivateFrame {
   private final LongSizedString destinator;
   private final LongSizedString sender;
@@ -41,6 +44,6 @@ public class ConfirmDiscoverMessage implements IPrivateFrame {
 
   @Override
   public String toString() {
-    return "recived tokne confirm from " + sender;
+    return "received token confirmation from " + sender;
   }
 }

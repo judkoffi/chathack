@@ -1,10 +1,14 @@
 package fr.upem.chathack.model;
 
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import fr.upem.chathack.client.PrivateConnectionContext;
-import fr.upem.chathack.privateframe.DirectMessage;
 
+/**
+ * 
+ * Class use to contains some informations about a private information between two clients
+ */
 public class PrivateConnectionInfo {
 
   public enum PrivateConnectionState {
@@ -15,20 +19,20 @@ public class PrivateConnectionInfo {
   private PrivateConnectionState state;
   private long token;
   private PrivateConnectionContext destinatorContext;
-  private LinkedList<ByteBuffer> pendingDirectMessages;
+  private ArrayDeque<ByteBuffer> pendingDirectMessages;
 
   public PrivateConnectionInfo(String receiver) {
     this.receiver = receiver;
     this.token = -1;
     this.state = PrivateConnectionState.PENDING;
-    this.pendingDirectMessages = new LinkedList<>();
+    this.pendingDirectMessages = new ArrayDeque<>();
   }
 
   public PrivateConnectionInfo(String receiver, PrivateConnectionState state, long token) {
     this.receiver = receiver;
     this.token = token;
     this.state = state;
-    this.pendingDirectMessages = new LinkedList<>();
+    this.pendingDirectMessages = new ArrayDeque<>();
   }
 
   public void setToken(long token) {
@@ -59,7 +63,7 @@ public class PrivateConnectionInfo {
     return destinatorContext;
   }
 
-  public LinkedList<ByteBuffer> getMessageQueue() {
+  public Deque<ByteBuffer> getMessageQueue() {
     return pendingDirectMessages;
   }
 

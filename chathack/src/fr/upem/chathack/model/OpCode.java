@@ -1,5 +1,9 @@
 package fr.upem.chathack.model;
 
+/**
+ * 
+ * Class use to contains opcodes of all frames of protocol Chaton
+ */
 public class OpCode {
   private OpCode() {}
 

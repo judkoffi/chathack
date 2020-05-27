@@ -5,9 +5,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.Objects;
-import java.util.Queue;
 
 /**
  * Abstract class use to factorize commun methods of different context
@@ -17,7 +16,7 @@ public abstract class BaseContext implements IContext {
   protected final SocketChannel sc;
   protected final ByteBuffer bbin = ByteBuffer.allocate(BUFFER_SIZE);
   protected final ByteBuffer bbout = ByteBuffer.allocate(BUFFER_SIZE);
-  protected final Queue<ByteBuffer> queue = new LinkedList<>(); // borner la queue
+  protected final ArrayDeque<ByteBuffer> queue = new ArrayDeque<>(); // borner la queue
   protected boolean closed = false;
 
   public BaseContext(SelectionKey key) {

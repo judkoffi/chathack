@@ -2,6 +2,10 @@ package fr.upem.chathack.model;
 
 import java.nio.ByteBuffer;
 
+/**
+ * 
+ * Model class use to represent a frame represent a message (sender login and message)
+ */
 public class Message {
   private final LongSizedString from;
   private final LongSizedString content;

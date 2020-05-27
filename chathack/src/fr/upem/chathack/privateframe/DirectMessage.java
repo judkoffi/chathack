@@ -7,6 +7,9 @@ import fr.upem.chathack.model.Message;
 import fr.upem.chathack.model.OpCode;
 import fr.upem.chathack.visitor.IPrivateFrameVisitor;
 
+/**
+ * Class use to represent a private message frame send between two clients
+ */
 public class DirectMessage implements IPrivateFrame {
   private final LongSizedString destinator;
   private final Message message;
@@ -31,6 +34,11 @@ public class DirectMessage implements IPrivateFrame {
     return bb.flip();
   }
 
+  /**
+   * Getter of destinator of private message
+   * 
+   * @return: a {@link String } represent a login of destinator of private message
+   */
   public String getDestinator() {
     return destinator.getValue();
   }

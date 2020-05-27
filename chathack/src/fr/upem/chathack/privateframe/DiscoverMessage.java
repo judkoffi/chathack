@@ -6,6 +6,10 @@ import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.model.OpCode;
 import fr.upem.chathack.visitor.IPrivateFrameVisitor;
 
+/**
+ * Class use to represent a first frame send when private connection was established to exchange
+ * token
+ */
 public class DiscoverMessage implements IPrivateFrame {
   private final LongSizedString sizedString;
   private final long token;

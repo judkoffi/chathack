@@ -5,6 +5,10 @@ import static fr.upem.chathack.utils.Helper.cloneByteBuffer;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 
+/**
+ * 
+ * Model class use to represent a frame contain a string with this string size
+ */
 public class LongSizedString {
   private final long size;
   private final String content;

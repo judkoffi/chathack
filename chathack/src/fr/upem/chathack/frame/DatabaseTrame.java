@@ -2,6 +2,9 @@ package fr.upem.chathack.frame;
 
 import java.nio.ByteBuffer;
 
+/**
+ * Class use to represent frame exchange between server and database server
+ */
 public class DatabaseTrame {
   private final byte opcode;
   private final long result;

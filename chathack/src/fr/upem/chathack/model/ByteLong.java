@@ -3,6 +3,10 @@ package fr.upem.chathack.model;
 import static fr.upem.chathack.utils.Helper.cloneByteBuffer;
 import java.nio.ByteBuffer;
 
+/**
+ * 
+ * Model class use to represent a frame contain a byte and and long value
+ */
 public class ByteLong {
   private final byte opcode;
   private final long value;

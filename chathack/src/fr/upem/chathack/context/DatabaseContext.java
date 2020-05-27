@@ -7,7 +7,6 @@ import fr.upem.chathack.frame.DatabaseTrame;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.trame.DatabaseReader;
 import fr.upem.chathack.server.ServerChatHack;
-import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
 /**
  * Class use to represent context between a database server and server chaton
