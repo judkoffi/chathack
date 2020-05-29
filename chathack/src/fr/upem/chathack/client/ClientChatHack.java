@@ -24,6 +24,7 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import fr.upem.chathack.context.BaseContext;
@@ -239,7 +240,7 @@ public class ClientChatHack {
         logger.severe("failed to get server address");
         return;
       }
-      var token = new Random().nextLong();
+      var token = ThreadLocalRandom.current().nextLong(Long.MAX_VALUE);
       var acceptMsg = new AcceptPrivateConnection(receiver, login, addr, token);
       var info = new PrivateConnectionInfo(receiver, WAITING_COMFIRM_TOKEN, token);
       privateConnectionMap.put(receiver, info);
@@ -269,8 +270,12 @@ public class ClientChatHack {
     var closeMsg = new ClosePrivateConnectionMessage(login).toBuffer();
     var targetCtx = privateConnectionMap.get(target).destinatorContext;
     targetCtx.queueMessage(closeMsg);
-    targetCtx.processOut();
-    targetCtx.silentlyClose();
+//    try {
+//		targetCtx.processOut();
+//	} catch (IOException e) {
+//		
+//	}
+    //targetCtx.silentlyClose();
     privateConnectionMap.remove(target);
   }
 

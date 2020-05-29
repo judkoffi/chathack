@@ -163,5 +163,8 @@ public class ServerFrameReader implements IReader<IPublicFrame> {
     acceptPrivateConnectionReader.reset();
     rejectPrivateConnectionReader.reset();
     logOutMessageReader.reset();
+    longSizedStringReader.reset();
+    longReader.reset();
+    socketAddressReader.reset();
   }
 }

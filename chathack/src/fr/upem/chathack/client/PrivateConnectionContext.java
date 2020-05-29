@@ -77,6 +77,7 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
         case REFILL:
           return;
         case ERROR:
+        	System.err.println("process private context erreur");
           silentlyClose();
           return;
       }

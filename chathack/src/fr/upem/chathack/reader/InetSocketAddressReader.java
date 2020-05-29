@@ -14,7 +14,7 @@ public class InetSocketAddressReader implements IReader<InetSocketAddress> {
     WAITING_IP_SIZE, WAITING_IP, WAITING_PORT, DONE, ERROR
   }
 
-  private ByteBuffer address;
+  private final ByteBuffer address = ByteBuffer.allocate(Byte.BYTES * 16);
   private int port;
   private State state;
   private int ipSize;
@@ -39,7 +39,7 @@ public class InetSocketAddressReader implements IReader<InetSocketAddress> {
         state = State.WAITING_IP;
       }
       case WAITING_IP: {
-        address = ByteBuffer.allocate(ipSize);
+        address.limit(ipSize);
         bb.flip();
         try {
           if (bb.remaining() <= address.remaining()) {

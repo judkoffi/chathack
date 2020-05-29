@@ -140,5 +140,9 @@ public class ClientFrameReader implements IReader<IPublicFrame> {
     requestConnectionReader.reset();
     acceptPrivateConnectionReader.reset();
     rejectPrivateConnectionReader.reset();
+    longSizedStringReader.reset();
+    longReader.reset();
+    socketAddressReader.reset();
+    byteReader.reset();
   }
 }

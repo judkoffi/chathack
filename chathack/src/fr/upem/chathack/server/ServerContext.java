@@ -135,7 +135,6 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
       return;
     }
 
-    System.out.println(requestMessage);
     var target = requestMessage.getReceiver().getValue();
     if (!server.isExistLogin(target)) {
       var msg = new ServerResponseMessage("Unknown login", true);
