@@ -4,6 +4,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 
 /**
  * Class use to store constants, shared values, default values
@@ -13,6 +15,7 @@ public class Helper {
 
   public static final int BUFFER_SIZE = 50_000_000; // 50 mb
   public static final int LIMIT_FILE_CONTENT_SIZE = 30_000_000; // 30 mb
+  public static final String LIMIT_SIZE_MSG = humanReadableByteCountSI(LIMIT_FILE_CONTENT_SIZE);
   public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
   private static final String FOX =
@@ -32,7 +35,7 @@ public class Helper {
   public static final String WELCOME_MESSAGE = FOX + "\n" + TITLE + "\nCommand list: \n"
       + "public message => no prefix\n" + "@login msg => private message\n"
       + "/requests => list private connection\n" + "/accept login => accept private connection\n"
-      + "/reject login => reject private connection\n" + "/file login filename => send file\n"
+      + "/reject login => reject private connection\n" + "/file login filename (max file size "+ LIMIT_SIZE_MSG+ ") => send file\n"
       + "/logout => disconnection from server\n"
       + "/close login => close private connection between client\n";
 
@@ -49,4 +52,16 @@ public class Helper {
     bb.position(pos);
     return copy;
   }
+  
+  public static String humanReadableByteCountSI(long bytes) {
+	    if (-1000 < bytes && bytes < 1000) {
+	        return bytes + " B";
+	    }
+	    CharacterIterator ci = new StringCharacterIterator("kMGTPE");
+	    while (bytes <= -999_950 || bytes >= 999_950) {
+	        bytes /= 1000;
+	        ci.next();
+	    }
+	    return String.format("%.1f %cB", bytes / 1000.0, ci.current());
+	}
 }

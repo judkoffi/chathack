@@ -39,6 +39,7 @@ import fr.upem.chathack.publicframe.BroadcastMessage;
 import fr.upem.chathack.publicframe.LogOutMessage;
 import fr.upem.chathack.publicframe.RejectPrivateConnection;
 import fr.upem.chathack.publicframe.RequestPrivateConnection;
+import fr.upem.chathack.utils.Helper;
 
 /**
  * 
@@ -153,6 +154,11 @@ public class ClientChatHack {
     }
 
     ByteBuffer fileContent = readFile(filePath);
+    if(fileContent.limit() > Helper.LIMIT_FILE_CONTENT_SIZE) {
+    	System.err.println("file is too big. It must be under " + Helper.LIMIT_SIZE_MSG);
+    	return;
+    }
+    	
     var fileMsg = new FileMessage(filename, receiver, fileContent);
     if (!existPrivateConnection(receiver)) {
       sendPrivateConnectionRequest(receiver);
