@@ -2,8 +2,20 @@ package fr.upem.chathack.reader.trame;
 
 import java.nio.ByteBuffer;
 import fr.upem.chathack.frame.IPublicFrame;
-import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.model.Message;
+import fr.upem.chathack.publicframe.AcceptPrivateConnection;
+import fr.upem.chathack.publicframe.BroadcastMessage;
+import fr.upem.chathack.publicframe.RejectPrivateConnection;
+import fr.upem.chathack.publicframe.RequestPrivateConnection;
+import fr.upem.chathack.publicframe.ServerResponseMessage;
+import fr.upem.chathack.reader.ByteReader;
 import fr.upem.chathack.reader.IReader;
+import fr.upem.chathack.reader.InetSocketAddressReader;
+import fr.upem.chathack.reader.LongReader;
+import fr.upem.chathack.reader.LongSizedStringReader;
+import fr.upem.chathack.reader.builder.ReaderBuilder;
+import fr.upem.chathack.utils.OpCode;
+
 /**
  * Class use to read all public frame exchange between client and server
  *
@@ -14,29 +26,55 @@ public class ClientFrameReader implements IReader<IPublicFrame> {
   }
 
   /**
-   * Readers
+   * Base readers
    */
-  private final ServerMessageReader serverMessageReader;
-  private final BroadcastMessageReader broadcastMessageReader;
-  private final DirectMessageReader directMessageReader;
-  private final RequestPrivateConnectionReader requestConnectionReader;
-  private final AcceptPrivateConnectionReader acceptPrivateConnectionReader;
-  private final RejectPrivateConnectionReader rejectPrivateConnectionReader;
-  private final DiscoverMessageReader discoverMessageReader;
+  private final LongSizedStringReader longSizedStringReader = new LongSizedStringReader();
+  private final LongReader longReader = new LongReader();
+  private final InetSocketAddressReader socketAddressReader = new InetSocketAddressReader();
+  private final ByteReader byteReader = new ByteReader();
 
 
-  public ClientFrameReader() {
-    this.serverMessageReader = new ServerMessageReader();
-    this.broadcastMessageReader = new BroadcastMessageReader();
-    this.directMessageReader = new DirectMessageReader();
-    this.requestConnectionReader = new RequestPrivateConnectionReader();
-    this.acceptPrivateConnectionReader = new AcceptPrivateConnectionReader();
-    this.rejectPrivateConnectionReader = new RejectPrivateConnectionReader();
-    this.discoverMessageReader = new DiscoverMessageReader();
-    this.state = State.WAITING_OPCODE;
-  }
+  /**
+   * Builded readers
+   */
+  private final IReader<BroadcastMessage> broadcastMessageReader = ReaderBuilder
+    .<BroadcastMessage>create()
+    .addSubReader(longSizedStringReader)
+    .addSubReader(longSizedStringReader)
+    .addConstructor(params -> new BroadcastMessage(Message.of(params)))
+    .build();
 
-  private State state;
+  private final IReader<RequestPrivateConnection> requestConnectionReader = ReaderBuilder
+    .<RequestPrivateConnection>create()
+    .addSubReader(longSizedStringReader)
+    .addSubReader(longSizedStringReader)
+    .addConstructor(RequestPrivateConnection::of)
+    .build();
+
+  private final IReader<AcceptPrivateConnection> acceptPrivateConnectionReader = ReaderBuilder
+    .<AcceptPrivateConnection>create()
+    .addSubReader(longSizedStringReader)// receiver
+    .addSubReader(socketAddressReader)// ip + port
+    .addSubReader(longReader)// token
+    .addSubReader(longSizedStringReader)// from
+    .addConstructor(AcceptPrivateConnection::of)
+    .build();
+
+  private final IReader<RejectPrivateConnection> rejectPrivateConnectionReader = ReaderBuilder
+    .<RejectPrivateConnection>create()
+    .addSubReader(longSizedStringReader)
+    .addSubReader(longSizedStringReader)
+    .addConstructor(RejectPrivateConnection::of)
+    .build();
+
+  private final IReader<ServerResponseMessage> serverMessageReader = ReaderBuilder
+    .<ServerResponseMessage>create()
+    .addSubReader(byteReader)
+    .addSubReader(longSizedStringReader)
+    .addConstructor(ServerResponseMessage::of)
+    .build();
+
+  private State state = State.WAITING_OPCODE;
   private IReader<? extends IPublicFrame> currentFrameReader;
   private IPublicFrame value;
 
@@ -99,10 +137,8 @@ public class ClientFrameReader implements IReader<IPublicFrame> {
     value = null;
     serverMessageReader.reset();
     broadcastMessageReader.reset();
-    directMessageReader.reset();
     requestConnectionReader.reset();
     acceptPrivateConnectionReader.reset();
     rejectPrivateConnectionReader.reset();
-    discoverMessageReader.reset();
   }
 }

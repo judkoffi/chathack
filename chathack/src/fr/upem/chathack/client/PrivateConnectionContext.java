@@ -1,12 +1,13 @@
 package fr.upem.chathack.client;
 
-import static fr.upem.chathack.model.PrivateConnectionInfo.PrivateConnectionState.SUCCEED;
+import static fr.upem.chathack.client.PrivateConnectionInfo.PrivateConnectionState.SUCCEED;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
+import java.nio.file.Path;
 import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.frame.IPrivateFrame;
+import fr.upem.chathack.privateframe.ClosePrivateConnectionMessage;
 import fr.upem.chathack.privateframe.ConfirmDiscoverMessage;
 import fr.upem.chathack.privateframe.DirectMessage;
 import fr.upem.chathack.privateframe.DiscoverMessage;
@@ -57,7 +58,7 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
     if (!sc.finishConnect()) {
       return;
     }
-    var currentToken = client.privateConnectionMap.get(receiver).getToken();
+    var currentToken = client.privateConnectionMap.get(receiver).token;
     var discoverMsg = new DiscoverMessage(client.login, currentToken);
     queueMessage(discoverMsg.toBuffer());
     updateInterestOps();
@@ -90,10 +91,10 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
   @Override
   public void visit(DiscoverMessage message) {
     var login = message.getLogin();
-    if (client.privateConnectionMap.get(login).getToken() == message.getToken()) {
+    if (client.privateConnectionMap.get(login).token == message.getToken()) {
       var connectionInfo = client.privateConnectionMap.get(login);
-      connectionInfo.setState(SUCCEED);
-      connectionInfo.setDestinatorContext(this);
+      connectionInfo.state = SUCCEED;
+      connectionInfo.destinatorContext = this;
       var confirmMsg = new ConfirmDiscoverMessage(login, client.login);
       queueMessage(confirmMsg.toBuffer());
     } else {
@@ -105,31 +106,33 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
   @Override
   public void visit(ConfirmDiscoverMessage confirmDiscoverMessage) {
     var connectionInfo = client.privateConnectionMap.get(confirmDiscoverMessage.getSender());
-    connectionInfo.setState(SUCCEED);
-    connectionInfo.setDestinatorContext(this);
+    connectionInfo.state = SUCCEED;
+    connectionInfo.destinatorContext = this;
 
-    var pendingMessageQueue = connectionInfo.getMessageQueue();
+    var pendingMessageQueue = connectionInfo.pendingDirectMessages;
     while (!pendingMessageQueue.isEmpty()) {
       var dm = pendingMessageQueue.remove();
-      connectionInfo.getDestinatorContext().queueMessage(dm);
-    }
-  }
-
-  private void writeFile(String filename, ByteBuffer buffer) throws IOException {
-    var filePath = client.path + "/" + filename;
-    try (var stream = new RandomAccessFile(filePath, "rw"); var channel = stream.getChannel();) {
-      channel.write(buffer);
+      connectionInfo.destinatorContext.queueMessage(dm);
     }
   }
 
   @Override
   public void visit(FileMessage fileMessage) {
-    try {
-      writeFile(fileMessage.getFilename(), fileMessage.getContent());
+    var filename = fileMessage.getFilename();
+    var buffer = fileMessage.getContent();
+
+    var filePath = Path.of(client.directoryPath.toAbsolutePath().toString(), filename);
+    try (var stream = new RandomAccessFile(filePath.toFile(), "rw");
+        var channel = stream.getChannel();) {
+      channel.write(buffer);
     } catch (IOException e) {
       System.err.println(e.getMessage());
     }
-    System.out
-      .println("file reveiced and strore at " + client.path + "/" + fileMessage.getFilename());
+    System.out.println("file reveiced and store at " + filePath);
+  }
+
+  @Override
+  public void visit(ClosePrivateConnectionMessage closePrivateConnectionMessage) {
+    System.out.println("received private connection close");
   }
 }

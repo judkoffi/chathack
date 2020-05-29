@@ -1,9 +1,11 @@
 package fr.upem.chathack.publicframe;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import fr.upem.chathack.frame.IPublicFrame;
 import fr.upem.chathack.model.LongSizedString;
-import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.reader.builder.Box;
+import fr.upem.chathack.utils.OpCode;
 import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
 /**
@@ -21,6 +23,15 @@ public class AuthentificatedConnection implements IPublicFrame {
   public AuthentificatedConnection(String login, String password) {
     this.login = new LongSizedString(login);
     this.password = new LongSizedString(password);
+  }
+
+  public static AuthentificatedConnection of(List<Box<?>> params) {
+    if (params.size() != 2) {
+      throw new IllegalArgumentException(params + " size is invalid");
+    }
+    var login = (LongSizedString) params.get(0).getBoxedValue();
+    var password = (LongSizedString) params.get(1).getBoxedValue();
+    return new AuthentificatedConnection(login, password);
   }
 
   @Override

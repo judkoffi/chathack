@@ -73,11 +73,11 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
 
   @Override
   public void visit(ServerResponseMessage serverMessage) {
-    System.out.println(serverMessage);
-    // if (serverMessage.isErrorMessage()) {
-    // this.client.interruptConsole();
-    // System.exit(-1);
-    // }
+    if (serverMessage.isErrorMessage()) {
+      System.err.println(serverMessage);
+    } else {
+      System.out.println(serverMessage);
+    }
   }
 
   /**
@@ -93,6 +93,7 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
   public void visit(RequestPrivateConnection requestMessage) {
     if (client.pendingPrivateRequests.contains(requestMessage))
       return;
+    System.out.println(requestMessage);
     client.pendingPrivateRequests.add(requestMessage);
   }
 
@@ -103,6 +104,7 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
 
   @Override
   public void visit(RejectPrivateConnection response) {
+    System.out.println(response);
     client.privateConnectionMap.remove(response.getReceiver());
   }
 

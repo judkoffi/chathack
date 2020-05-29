@@ -1,5 +1,6 @@
 package fr.upem.chathack.visitor;
 
+import fr.upem.chathack.privateframe.ClosePrivateConnectionMessage;
 import fr.upem.chathack.privateframe.ConfirmDiscoverMessage;
 import fr.upem.chathack.privateframe.DirectMessage;
 import fr.upem.chathack.privateframe.DiscoverMessage;
@@ -40,5 +41,9 @@ public interface IPrivateFrameVisitor extends IFrameVisitor {
    * @param fileMessage:a {@link FileMessage} represent a received file frame
    */
   public void visit(FileMessage fileMessage);
+
+
+
+  public void visit(ClosePrivateConnectionMessage closePrivateConnectionMessage);
 
 }

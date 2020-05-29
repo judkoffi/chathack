@@ -1,9 +1,11 @@
 package fr.upem.chathack.privateframe;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import fr.upem.chathack.frame.IPrivateFrame;
 import fr.upem.chathack.model.LongSizedString;
-import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.reader.builder.Box;
+import fr.upem.chathack.utils.OpCode;
 import fr.upem.chathack.visitor.IPrivateFrameVisitor;
 
 /**
@@ -24,6 +26,17 @@ public class FileMessage implements IPrivateFrame {
     this.filename = new LongSizedString(filename);
     this.destinator = new LongSizedString(destinator);
     this.content = buffer;
+  }
+
+  public static FileMessage of(List<Box<?>> params) {
+    if (params.size() != 3) {
+      throw new IllegalArgumentException(params + " size is invalid");
+    }
+
+    var dest = (LongSizedString) params.get(0).getBoxedValue();
+    var filename = (LongSizedString) params.get(1).getBoxedValue();
+    var buffer = (ByteBuffer) params.get(2).getBoxedValue();
+    return new FileMessage(filename, dest, buffer);
   }
 
   @Override
@@ -54,6 +67,6 @@ public class FileMessage implements IPrivateFrame {
 
   @Override
   public String toString() {
-    return filename + " " + content + ";destinataire: " + destinator;
+    return "file: " + filename;
   }
 }

@@ -1,10 +1,12 @@
 package fr.upem.chathack.publicframe;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Objects;
 import fr.upem.chathack.frame.IPublicFrame;
 import fr.upem.chathack.model.LongSizedString;
-import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.reader.builder.Box;
+import fr.upem.chathack.utils.OpCode;
 import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
 /**
@@ -23,6 +25,15 @@ public class RequestPrivateConnection implements IPublicFrame {
   public RequestPrivateConnection(String appliant, String receiver) {
     this.appliant = new LongSizedString(appliant);
     this.receiver = new LongSizedString(receiver);
+  }
+
+  public static RequestPrivateConnection of(List<Box<?>> params) {
+    if (params.size() != 2) {
+      throw new IllegalArgumentException(params + " size is invalid");
+    }
+    var receiver = (LongSizedString) params.get(0).getBoxedValue();
+    var appliant = (LongSizedString) params.get(1).getBoxedValue();
+    return new RequestPrivateConnection(appliant, receiver);
   }
 
   @Override
@@ -53,8 +64,8 @@ public class RequestPrivateConnection implements IPublicFrame {
     if (!(obj instanceof RequestPrivateConnection))
       return false;
 
-    RequestPrivateConnection r = (RequestPrivateConnection) obj;
-    return r.appliant.equals(appliant) && r.receiver.equals(receiver);
+    RequestPrivateConnection request = (RequestPrivateConnection) obj;
+    return request.appliant.equals(appliant) && request.receiver.equals(receiver);
   }
 
   @Override
@@ -64,6 +75,6 @@ public class RequestPrivateConnection implements IPublicFrame {
 
   @Override
   public String toString() {
-    return "Request from: [" + appliant + "] to " + receiver;
+    return "Private connextion request from: [" + appliant + "]";
   }
 }

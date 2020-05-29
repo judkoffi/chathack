@@ -21,47 +21,24 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.context.DatabaseContext;
-import fr.upem.chathack.frame.DatabaseTrame;
-import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.dbframe.CheckCredentialMessage;
+import fr.upem.chathack.dbframe.CheckLoginMessage;
+import fr.upem.chathack.dbframe.DatabaseResponseMessage;
 import fr.upem.chathack.publicframe.AuthentificatedConnection;
 import fr.upem.chathack.publicframe.RequestPrivateConnection;
 import fr.upem.chathack.publicframe.ServerResponseMessage;
-import fr.upem.chathack.utils.DatabaseRequestBuilder;
 import fr.upem.chathack.utils.Helper;
+import fr.upem.chathack.utils.OpCode;
 
 /**
  * Class use to represent a server of protocol ChatHack
  */
 public class ServerChatHack {
 
-  /**
-   * Internal class use to keep some information about connected client
-   */
-  static class ClientInfo {
-    private boolean isAuthenticated;
-    private boolean anonymous; // type of connection (anonymous or with credentials)
-    SelectionKey key;
-    private long id;
-    ServerContext context;
 
-    private ClientInfo(boolean anonymous, boolean isAuthenticated, SelectionKey key, long id) {
-      this.anonymous = Objects.requireNonNull(anonymous);
-      this.isAuthenticated = Objects.requireNonNull(isAuthenticated);
-      this.key = Objects.requireNonNull(key);
-      this.id = Objects.requireNonNull(id);
-    }
-
-    private ClientInfo(boolean anonymous, SelectionKey key, long id) {
-      this(anonymous, false, key, id);
-    }
-
-    @Override
-    public String toString() {
-      return "id: " + id;
-    }
-  }
 
   private static final Logger logger = Logger.getLogger(ServerChatHack.class.getName());
+  private static final int TIMEOUT = 500; // 500 ms
   private final Selector selector;
   private final ServerSocketChannel serverSocketChannel;
   private final SocketChannel dbChannel;
@@ -97,10 +74,7 @@ public class ServerChatHack {
     findContextByKey(key).ifPresent(c -> c.queueMessage(msg));
   }
 
-  /**
-   * bbout1.put(bbMsg); bbMsg.flip(); bbout2.put(bbMsg);
-   **/
-  // on peut reutiliser le memem bb
+
   public void broadcast(ByteBuffer bb) {
     selector
       .keys()
@@ -111,7 +85,7 @@ public class ServerChatHack {
       .forEach(k ->
       {
         var ctx = ((ServerContext) k.attachment());
-        ctx.queueMessage(Helper.cloneByteBuffer(bb));
+        ctx.queueMessage(bb);
       });
   }
 
@@ -142,7 +116,7 @@ public class ServerChatHack {
   }
 
   public void removeClientByKey(SelectionKey key) {
-    findLoginByKey(key).ifPresent(login -> map.remove(login));
+    findLoginByKey(key).ifPresent(map::remove);
   }
 
   private Optional<String> findLoginByKey(SelectionKey key) {
@@ -160,18 +134,21 @@ public class ServerChatHack {
 
   public void registerAnonymousClient(String login, SelectionKey clientKey) {
     map.put(login, new ClientInfo(true, clientKey, getNextMapId()));
-    var bb = DatabaseRequestBuilder.checkLoginRequest(map.get(login).id, login);
-    databaseContext.checkLogin(bb);
+    var msg = new CheckLoginMessage(login, map.get(login).id);
+    // var bb = DatabaseRequestBuilder.checkLoginRequest(map.get(login).id, login);
+    databaseContext.checkLogin(msg.toBuffer());
   }
 
   public void registerAuthenticatedClient(AuthentificatedConnection message, SelectionKey key) {
     var login = message.getLogin().getValue();
     map.put(login, new ClientInfo(false, key, getNextMapId()));
-    var bb = DatabaseRequestBuilder.checkCredentialsRequest(map.get(login).id, message);
-    databaseContext.checkLogin(bb);
+    var id = map.get(login).id;
+    var msg = new CheckCredentialMessage(message.getLogin(), message.getPassword(), id);
+    // var bb = DatabaseRequestBuilder.checkCredentialsRequest(map.get(login).id, message);
+    databaseContext.checkLogin(msg.toBuffer());
   }
 
-  public void responseCheckLogin(DatabaseTrame trame) {
+  public void responseCheckLogin(DatabaseResponseMessage trame) {
     var clt = map.entrySet().stream().filter(p -> p.getValue().id == trame.getResult()).findFirst();
     if (clt.isEmpty())
       return;
@@ -186,14 +163,36 @@ public class ServerChatHack {
     serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
     dbConnection();
 
+    var lastCheck = System.currentTimeMillis();
     while (!Thread.interrupted()) {
       // System.out.println("Starting select");
       printKeys();
       try {
         selector.select(this::treatKey);
+        var currentTime = System.currentTimeMillis();
+        if (currentTime >= lastCheck + TIMEOUT) {
+          lastCheck = currentTime;
+          clearInvalidSelectionKey();
+        }
         System.out.println(map);
       } catch (UncheckedIOException tunneled) {
         throw tunneled.getCause();
+      }
+    }
+  }
+
+  /**
+   * Remove in map private connection with invalid key
+   */
+  private void clearInvalidSelectionKey() {
+    for (var key : selector.keys()) {
+      if (!key.isValid()) {
+        var target = map.entrySet().stream().filter(p -> p.getValue().key.equals(key)).findFirst();
+        target.ifPresent(t ->
+        {
+          t.getValue().context.silentlyClose();
+          map.remove(t.getKey());
+        });
       }
     }
   }
@@ -206,48 +205,53 @@ public class ServerChatHack {
   }
 
   private void handlerDbResponse(ServerContext c, byte b, Entry<String, ClientInfo> entry) {
+    ServerResponseMessage msg = null;
     switch (b) {
       /**
        * DB respose trame opcde:<br>
        * 1 -> valid response <br>
        * 0 -> invalid response
        */
-      case OpCode.DB_INVALID_RESPONSE:
+
+      case OpCode.DB_INVALID_RESPONSE: {
         // Login free in db
         if (map.get(entry.getKey()).anonymous) {
           map.get(entry.getKey()).isAuthenticated = true;
           map.get(entry.getKey()).context = c;
         }
 
-        var m = map.get(entry.getKey()).isAuthenticated
+        msg = map.get(entry.getKey()).isAuthenticated
             ? new ServerResponseMessage(Helper.WELCOME_MESSAGE, false)
             : new ServerResponseMessage("Wrong credentials", true);
-        c.queueMessage(m.toBuffer());
-
-        if (!map.get(entry.getKey()).isAuthenticated) {
-          map.remove(entry.getKey());
-        }
-
+        c.queueMessage(msg.toBuffer());
         break;
-      case OpCode.DB_VALID_RESPONSE:
+      }
+      case OpCode.DB_VALID_RESPONSE: {
         // good credentials
         if (!map.get(entry.getKey()).anonymous) {
           map.get(entry.getKey()).isAuthenticated = true;
           map.get(entry.getKey()).context = c;
         }
 
-        var msg = map.get(entry.getKey()).isAuthenticated
+        msg = map.get(entry.getKey()).isAuthenticated
             ? new ServerResponseMessage(Helper.WELCOME_MESSAGE, false)
             : new ServerResponseMessage("Not available login", true);
+
         c.queueMessage(msg.toBuffer());
-
-        if (!map.get(entry.getKey()).isAuthenticated) {
-          map.remove(entry.getKey());
-        }
-
         break;
+      }
       default:
         throw new IllegalArgumentException("unknown db response byte" + b);
+    }
+
+    if (!map.get(entry.getKey()).isAuthenticated) {
+      try {
+        c.doWrite();// force writing msg
+      } catch (IOException e) {
+        //
+      }
+      map.remove(entry.getKey());
+      c.silentlyClose();
     }
   }
 

@@ -2,8 +2,18 @@ package fr.upem.chathack.reader.trame;
 
 import java.nio.ByteBuffer;
 import fr.upem.chathack.frame.IPrivateFrame;
-import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.privateframe.ClosePrivateConnectionMessage;
+import fr.upem.chathack.privateframe.ConfirmDiscoverMessage;
+import fr.upem.chathack.privateframe.DirectMessage;
+import fr.upem.chathack.privateframe.DiscoverMessage;
+import fr.upem.chathack.privateframe.FileMessage;
+import fr.upem.chathack.reader.BufferReader;
 import fr.upem.chathack.reader.IReader;
+import fr.upem.chathack.reader.LongReader;
+import fr.upem.chathack.reader.LongSizedStringReader;
+import fr.upem.chathack.reader.builder.ReaderBuilder;
+import fr.upem.chathack.utils.OpCode;
+
 /**
  * Class use to read PrivateConnectionFrame type
  *
@@ -15,24 +25,54 @@ public class PrivateConnectionFrameReader implements IReader<IPrivateFrame> {
   }
 
   /**
+   * Base readers
+   */
+  private final LongSizedStringReader longSizedStringReader = new LongSizedStringReader();
+  private final LongReader longReader = new LongReader();
+  private final BufferReader bufferReader = new BufferReader();
+
+  /**
    * Readers
    */
-  private final DirectMessageReader directMessageReader;
-  private final DiscoverMessageReader discoverMessageReader;
-  private final ConfirmDiscoverMessageReader confirmDiscoverMessageReader;
-  private final FileMessageReader fileMessageReader;
+  private final IReader<DirectMessage> directMessageReader = ReaderBuilder
+    .<DirectMessage>create()
+    .addSubReader(longSizedStringReader)// destinator
+    .addSubReader(longSizedStringReader)// from
+    .addSubReader(longSizedStringReader)// message
+    .addConstructor(DirectMessage::of)
+    .build();
 
-  private State state;
+  private final IReader<DiscoverMessage> discoverMessageReader = ReaderBuilder
+    .<DiscoverMessage>create()
+    .addSubReader(longSizedStringReader)// message
+    .addSubReader(longReader)// token
+    .addConstructor(DiscoverMessage::of)
+    .build();
+
+  private final IReader<ConfirmDiscoverMessage> confirmDiscoverMessageReader = ReaderBuilder
+    .<ConfirmDiscoverMessage>create()
+    .addSubReader(longSizedStringReader)// destinator
+    .addSubReader(longSizedStringReader)// sender
+    .addConstructor(ConfirmDiscoverMessage::of)
+    .build();
+
+  private final IReader<FileMessage> fileMessageReader = ReaderBuilder
+    .<FileMessage>create()
+    .addSubReader(longSizedStringReader)// destinator
+    .addSubReader(longSizedStringReader)// filename
+    .addSubReader(bufferReader)// content
+    .addConstructor(FileMessage::of)
+    .build();
+
+  private final IReader<ClosePrivateConnectionMessage> privateConnectionCloseReader = ReaderBuilder
+    .<ClosePrivateConnectionMessage>create()
+    .addSubReader(longSizedStringReader)// from
+    .addConstructor(ClosePrivateConnectionMessage::of)
+    .build();
+
+  private State state = State.WAITING_OPCODE;
   private IReader<? extends IPrivateFrame> currentFrameReader;
   private IPrivateFrame value;
-
-  public PrivateConnectionFrameReader() {
-    this.state = State.WAITING_OPCODE;
-    this.directMessageReader = new DirectMessageReader();
-    this.discoverMessageReader = new DiscoverMessageReader();
-    this.confirmDiscoverMessageReader = new ConfirmDiscoverMessageReader();
-    this.fileMessageReader = new FileMessageReader();
-  }
 
   @Override
   public ProcessStatus process(ByteBuffer bb) {
@@ -56,8 +96,11 @@ public class PrivateConnectionFrameReader implements IReader<IPrivateFrame> {
             currentFrameReader = confirmDiscoverMessageReader;
             break;
           case OpCode.FILE_SEND:
-        	  currentFrameReader = fileMessageReader;
-        	  break;
+            currentFrameReader = fileMessageReader;
+            break;
+          case OpCode.PRIVATE_CONNECTION_CLOSE:
+            currentFrameReader = privateConnectionCloseReader;
+            break;
           default:
             throw new IllegalArgumentException("unknown opcode " + opcode);
         }
@@ -92,5 +135,8 @@ public class PrivateConnectionFrameReader implements IReader<IPrivateFrame> {
     discoverMessageReader.reset();
     confirmDiscoverMessageReader.reset();
     fileMessageReader.reset();
+    longSizedStringReader.reset();
+    longReader.reset();
+    bufferReader.reset();
   }
 }

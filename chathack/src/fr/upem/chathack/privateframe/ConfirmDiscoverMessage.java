@@ -1,9 +1,11 @@
 package fr.upem.chathack.privateframe;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import fr.upem.chathack.frame.IPrivateFrame;
 import fr.upem.chathack.model.LongSizedString;
-import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.reader.builder.Box;
+import fr.upem.chathack.utils.OpCode;
 import fr.upem.chathack.visitor.IPrivateFrameVisitor;
 
 /**
@@ -21,6 +23,16 @@ public class ConfirmDiscoverMessage implements IPrivateFrame {
   public ConfirmDiscoverMessage(LongSizedString destinator, LongSizedString sender) {
     this.destinator = destinator;
     this.sender = sender;
+  }
+
+  public static ConfirmDiscoverMessage of(List<Box<?>> params) {
+    if (params.size() != 2) {
+      throw new IllegalArgumentException(params + " size is invalid");
+    }
+
+    var destinator = (LongSizedString) params.get(0).getBoxedValue();
+    var sender = (LongSizedString) params.get(1).getBoxedValue();
+    return new ConfirmDiscoverMessage(destinator, sender);
   }
 
   @Override

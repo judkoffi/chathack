@@ -2,10 +2,11 @@ package fr.upem.chathack.publicframe;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.util.List;
 import fr.upem.chathack.frame.IPublicFrame;
 import fr.upem.chathack.model.LongSizedString;
-import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.reader.builder.Box;
+import fr.upem.chathack.utils.OpCode;
 import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
 /**
@@ -34,27 +35,32 @@ public class AcceptPrivateConnection implements IPublicFrame {
     this.token = token;
   }
 
-  /*
-   * Method use to convert bytes of IP address to long
-   */
-  private static long ipToLong(InetSocketAddress addr) {
-    ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES).order(ByteOrder.BIG_ENDIAN);
-    buffer.put(new byte[] {0, 0, 0, 0});
-    buffer.put(addr.getAddress().getAddress());
-    buffer.flip();
-    return buffer.getLong();
+  public static AcceptPrivateConnection of(List<Box<?>> params) {
+    if (params.size() != 4) {
+      throw new IllegalArgumentException(params + " size is invalid");
+    }
+
+    var applicant = (LongSizedString) params.get(3).getBoxedValue();
+    var receiver = (LongSizedString) params.get(0).getBoxedValue();
+    var targetAddress = (InetSocketAddress) params.get(1).getBoxedValue();
+    var token = (Long) params.get(2).getBoxedValue();
+    return new AcceptPrivateConnection(applicant, receiver, targetAddress, token);
   }
 
   @Override
   public ByteBuffer toBuffer() {
-    var s = Byte.BYTES + receiver.getTrameSize() + (3 * Long.BYTES) + applicant.getTrameSize();
+    var bytes = targetAddress.getAddress().getAddress();
+    var bytesSize = Byte.BYTES * bytes.length;
+    var s = Byte.BYTES + receiver.getTrameSize() + (2 * Integer.BYTES) + bytesSize + Long.BYTES
+        + applicant.getTrameSize();
     var bb = ByteBuffer.allocate((int) s);
-    var ipInLong = ipToLong(targetAddress);
+
     bb.put(OpCode.SUCCEDED_PRIVATE_CLIENT_CONNECTION);
     bb.put(receiver.toBuffer());
-    bb.putLong(ipInLong);
-    bb.putLong((long) targetAddress.getPort());
-    bb.putLong(token);
+    bb.putInt(bytes.length);// ip byte size
+    bb.put(bytes);// ip addr bytes
+    bb.putInt(targetAddress.getPort()); // port
+    bb.putLong(token);// token
     bb.put(applicant.toBuffer());
     return bb.flip();
   }

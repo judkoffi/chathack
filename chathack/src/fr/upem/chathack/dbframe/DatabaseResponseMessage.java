@@ -1,20 +1,31 @@
-package fr.upem.chathack.frame;
+package fr.upem.chathack.dbframe;
 
 import java.nio.ByteBuffer;
+import java.util.List;
+import fr.upem.chathack.reader.builder.Box;
 
 /**
  * Class use to represent frame exchange between server and database server
  */
-public class DatabaseTrame {
+public class DatabaseResponseMessage {
   private final byte opcode;
   private final long result;
   private final ByteBuffer bb;
 
-  public DatabaseTrame(byte opcode, long result) {
+  public DatabaseResponseMessage(byte opcode, long result) {
     this.opcode = opcode;
     this.result = result;
     this.bb = ByteBuffer.allocate(Byte.BYTES + Long.BYTES);
     fillBuffer();
+  }
+
+  public static DatabaseResponseMessage of(List<Box<?>> params) {
+    if (params.size() != 2) {
+      throw new IllegalArgumentException(params + "size is not valid");
+    }
+    var opcode = (Byte) params.get(0).getBoxedValue();
+    var result = (Long) params.get(1).getBoxedValue();
+    return new DatabaseResponseMessage(opcode, result);
   }
 
   private void fillBuffer() {
