@@ -40,9 +40,13 @@ public class IntReader implements IReader<Integer> {
       return ProcessStatus.REFILL;
     }
 
-    state = State.DONE;
     internalbb.flip();
     value = internalbb.getInt();
+    if(value <= 0 || value >= Integer.MAX_VALUE) {
+    	state = State.ERROR;
+    	return ProcessStatus.ERROR;
+    }
+    state = State.DONE;
     return ProcessStatus.DONE;
   }
 

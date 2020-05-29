@@ -19,25 +19,12 @@ public class StringReader implements IReader<String> {
   private int size;
   private final ByteBuffer internalbb = ByteBuffer.allocate(BUFFER_SIZE);
 
-  private ProcessStatus processSize(ByteBuffer bb) {
-    var sizeStatus = intReader.process(bb);
-    switch (sizeStatus) {
-      case ERROR:
-        return ProcessStatus.ERROR;
-      case REFILL:
-        return ProcessStatus.REFILL;
-      case DONE:
-        return ProcessStatus.DONE;
-      default:
-        throw new AssertionError();
-    }
-  }
 
   @Override
   public ProcessStatus process(ByteBuffer bb) {
     switch (state) {
       case WAITING_SIZE: {
-        var status = processSize(bb);
+        var status = intReader.process(bb);
         if (status != ProcessStatus.DONE)
           return status;
 
