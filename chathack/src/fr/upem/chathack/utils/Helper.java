@@ -32,12 +32,15 @@ public class Helper {
           + "        \\/     \\/     \\/             \\/      \\/     \\/     \\/";
 
 
-  public static final String WELCOME_MESSAGE = FOX + "\n" + TITLE + "\nCommand list: \n"
-      + "public message => no prefix\n" + "@login msg => private message\n"
-      + "/requests => list private connection\n" + "/accept login => accept private connection\n"
-      + "/reject login => reject private connection\n" + "/file login filename (max file size "+ LIMIT_SIZE_MSG+ ") => send file\n"
-      + "/logout => disconnection from server\n"
-      + "/close login => close private connection between client\n";
+  public static final String COMMAND_LIST =  "\nCommands list: \n"
+	      + "public message => no prefix\n" + "@login msg => private message\n"
+	      + "/requests => list private connection\n" + "/accept login => accept private connection\n"
+	      + "/reject login => reject private connection\n" + "/file login filename (max file size "+ LIMIT_SIZE_MSG+ ") => send file\n"
+	      + "/logout => disconnection from server\n"
+	      + "/close login => close private connection between client\n"
+	      + "/help => display command list\n";
+  
+  public static final String WELCOME_MESSAGE = FOX + "\n" + TITLE + "\n" + COMMAND_LIST;
 
   public static ByteBuffer cloneByteBuffer(ByteBuffer bb) {
     int capacity = bb.limit();

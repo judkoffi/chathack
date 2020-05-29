@@ -23,5 +23,4 @@ java -jar ServerMDP.jar 8888 password.txt ---> pour lancer la base de données
 java fr.upem.chathack.server.ServerChatHack 7777 localhost 8888 --->le server    
 java fr.upem.chathack.client.ClientChatHack localhost 7777 joey-dir/ joey ---> client 1 
 java fr.upem.chathack.client.ClientChatHack localhost 7777 joeyette-dir/ joeyette ---> client 2  
-```    
-- TODO : checker les entiers passes dans les buffers dans les Frames 
+``` 

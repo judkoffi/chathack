@@ -197,6 +197,11 @@ public class ClientChatHack {
       closeHandler(line);
       return;
     }
+    
+    if(line.startsWith("/help")) {
+    	System.out.println(Helper.COMMAND_LIST);
+    	return;
+    }
 
     var isAcceptCommand = line.startsWith("/accept");
     var isRejectCommand = line.startsWith("/reject");
