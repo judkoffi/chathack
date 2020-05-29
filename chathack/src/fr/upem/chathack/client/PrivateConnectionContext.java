@@ -135,5 +135,11 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
   @Override
   public void visit(ClosePrivateConnectionMessage closePrivateConnectionMessage) {
     System.out.println("received private connection close");
+    var from = closePrivateConnectionMessage.getFrom();
+    var value = client.privateConnectionMap.get(from);
+    if(value != null) {
+    	value.destinatorContext.silentlyClose();
+    }
+    
   }
 }

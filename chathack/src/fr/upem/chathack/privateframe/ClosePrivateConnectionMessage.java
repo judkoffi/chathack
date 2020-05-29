@@ -36,9 +36,14 @@ public class ClosePrivateConnectionMessage implements IPrivateFrame {
     bb.put(from.toBuffer());
     return bb.flip();
   }
+  
+  public String getFrom() {
+	return from.getValue();
+}
 
   @Override
   public void accept(IPrivateFrameVisitor frameVisitor) {
     frameVisitor.visit(this);
   }
+  
 }

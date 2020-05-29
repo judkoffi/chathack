@@ -426,7 +426,7 @@ public class ClientChatHack {
 
     var lastCheck = System.currentTimeMillis();
     while (!Thread.interrupted()) {
-      // printKeys();
+      //printKeys();
       try {
         if (uniqueContext.isClosed()) {
           console.interrupt();
@@ -469,7 +469,7 @@ public class ClientChatHack {
   }
 
   private void treatKey(SelectionKey key) {
-    // printSelectedKey(key);
+    //printSelectedKey(key);
     try {
       if (key.isValid() && key.isAcceptable()) {
         doAccept(key);
