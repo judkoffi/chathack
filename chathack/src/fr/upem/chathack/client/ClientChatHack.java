@@ -1,6 +1,6 @@
 package fr.upem.chathack.client;
 
-import static fr.upem.chathack.model.PrivateConnectionInfo.PrivateConnectionState.WAITING_COMFIRM_TOKEN;
+import static fr.upem.chathack.client.PrivateConnectionInfo.PrivateConnectionState.WAITING_COMFIRM_TOKEN;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 import fr.upem.chathack.context.BaseContext;
 import fr.upem.chathack.frame.IPrivateFrame;
 import fr.upem.chathack.model.Message;
-import fr.upem.chathack.model.PrivateConnectionInfo;
+import fr.upem.chathack.privateframe.ClosePrivateConnectionMessage;
 import fr.upem.chathack.privateframe.DirectMessage;
 import fr.upem.chathack.privateframe.FileMessage;
 import fr.upem.chathack.publicframe.AcceptPrivateConnection;
@@ -51,6 +51,8 @@ public class ClientChatHack {
   // Map use to keep information about pending private connection between clients
   final ArrayList<RequestPrivateConnection> pendingPrivateRequests = new ArrayList<>();
 
+  private static final int TIMEOUT = 500; // 500 ms
+
   private static final Logger logger = Logger.getLogger(ClientChatHack.class.getName());
   private final ArrayBlockingQueue<String> commandQueue = new ArrayBlockingQueue<>(10);
 
@@ -63,14 +65,14 @@ public class ClientChatHack {
   private ServerSocketChannel serverSocketChannel;
 
   final String login;
-  final String path;
+  final Path directoryPath;
 
   public ClientChatHack(InetSocketAddress serverAddress, String path, String login)
       throws IOException {
     this.serverAddress = Objects.requireNonNull(serverAddress);
     this.login = Objects.requireNonNull(login);
-    this.path = Objects.requireNonNull(path);
     checkPath(path);
+    this.directoryPath = Path.of(path);
     this.sc = SocketChannel.open();
     this.serverSocketChannel = ServerSocketChannel.open();
     this.selector = Selector.open();
@@ -83,7 +85,8 @@ public class ClientChatHack {
    * 
    * @param path
    */
-  private void checkPath(String path) {
+  private static void checkPath(String path) {
+    Objects.requireNonNull(path);
     Path file = new File(path).toPath();
     boolean exists = Files.exists(file); // Check if the file exists
     boolean isDirectory = Files.isDirectory(file); // Check if it's a directory
@@ -117,15 +120,16 @@ public class ClientChatHack {
     }
   }
 
-  private ByteBuffer readFile(String filename) {
-    try (var reader = new RandomAccessFile(filename, "r"); var channel = reader.getChannel()) {
+  private ByteBuffer readFile(Path filePath) {
+    try (var reader = new RandomAccessFile(filePath.toFile(), "r");
+        var channel = reader.getChannel()) {
       int bufferSize = (int) channel.size();
       ByteBuffer buff = ByteBuffer.allocate(bufferSize);
       channel.read(buff);
       buff.flip();
       return buff;
     } catch (FileNotFoundException e) {
-      logger.info(filename + " file does not exist");
+      logger.info(filePath + " file does not exist");
     } catch (IOException e) {
       logger.info(e.getMessage());
     }
@@ -139,19 +143,20 @@ public class ClientChatHack {
       System.err.println("usage: /file login filename");
       return;
     }
-    var receiver = splited[1];
-    var filename = splited[2];
-    var filePath = Path.of(splited[2]);
+    String receiver = splited[1];
+    String filename = splited[2];
+    Path filePath = Path.of(directoryPath.toAbsolutePath().toString(), filename);
+
     if (!Files.exists(filePath)) {
       System.err.println(splited[2] + " file does not exist.");
       return;
     }
 
-    var fileContent = readFile(filename);
+    ByteBuffer fileContent = readFile(filePath);
     var fileMsg = new FileMessage(filename, receiver, fileContent);
     if (!existPrivateConnection(receiver)) {
       sendPrivateConnectionRequest(receiver);
-      privateConnectionMap.get(receiver).getMessageQueue().add(fileMsg.toBuffer());
+      privateConnectionMap.get(receiver).pendingDirectMessages.add(fileMsg.toBuffer());
       return;
     }
     handlerPrivateFrameSending(fileMsg, receiver);
@@ -169,14 +174,22 @@ public class ClientChatHack {
   private void processPrefixedBySlash(String line) {
     if (line.startsWith("/file")) {
       fileHandler(line);
+      return;
     }
 
     if (line.startsWith("/requests")) {
       requestHandler();
+      return;
     }
 
     if (line.startsWith("/logout")) {
       logoutHandler();
+      return;
+    }
+
+    if (line.startsWith("/close")) {
+      closeHandler(line);
+      return;
     }
 
     var isAcceptCommand = line.startsWith("/accept");
@@ -208,7 +221,13 @@ public class ClientChatHack {
       .findFirst();
 
     if (isAcceptCommand) {
-      var addr = new InetSocketAddress("localhost", serverSocketChannel.socket().getLocalPort());
+      InetSocketAddress addr;
+      try {
+        addr = (InetSocketAddress) serverSocketChannel.getLocalAddress();
+      } catch (IOException e) {
+        logger.severe("failed to get server address");
+        return;
+      }
       var token = new Random().nextLong();
       var acceptMsg = new AcceptPrivateConnection(receiver, login, addr, token);
       var info = new PrivateConnectionInfo(receiver, WAITING_COMFIRM_TOKEN, token);
@@ -224,6 +243,25 @@ public class ClientChatHack {
     targetRequest.ifPresent(pendingPrivateRequests::remove);
   }
 
+
+  private void closeHandler(String line) {
+    var splited = line.split(" ");
+    if (splited.length < 2) {
+      System.err.println("usage: /close login");
+      return;
+    }
+
+    var target = splited[1];
+    if (!privateConnectionMap.containsKey(target))
+      return;
+
+    var closeMsg = new ClosePrivateConnectionMessage(login).toBuffer();
+    var targetCtx = privateConnectionMap.get(target).destinatorContext;
+    targetCtx.queueMessage(closeMsg);
+    targetCtx.processOut();
+    targetCtx.silentlyClose();
+    privateConnectionMap.remove(target);
+  }
 
   private void logoutHandler() {
     var msg = new LogOutMessage(new Message(login, ""));
@@ -251,13 +289,16 @@ public class ClientChatHack {
     }
 
     var receiver = splited[0];
+    if (receiver.equals(login))
+      return;
+
     var message = Arrays.stream(splited).skip(1).collect(Collectors.joining(" "));
 
     var dmMsg = new DirectMessage(login, receiver, message);
     if (!existPrivateConnection(receiver)) {
       sendPrivateConnectionRequest(receiver);
       // add first message
-      privateConnectionMap.get(receiver).getMessageQueue().add(dmMsg.toBuffer());
+      privateConnectionMap.get(receiver).pendingDirectMessages.add(dmMsg.toBuffer());
       return;
     }
     handlerPrivateFrameSending(dmMsg, receiver);
@@ -265,13 +306,13 @@ public class ClientChatHack {
 
   private void handlerPrivateFrameSending(IPrivateFrame frame, String receiver) {
     var privateConnection = privateConnectionMap.get(receiver);
-    switch (privateConnection.getState()) {
+    switch (privateConnection.state) {
       case SUCCEED:
-        privateConnectionMap.get(receiver).getDestinatorContext().queueMessage(frame.toBuffer());
+        privateConnectionMap.get(receiver).destinatorContext.queueMessage(frame.toBuffer());
         break;
       case PENDING:
       case WAITING_COMFIRM_TOKEN:
-        privateConnectionMap.get(receiver).getMessageQueue().add(frame.toBuffer());
+        privateConnectionMap.get(receiver).pendingDirectMessages.add(frame.toBuffer());
         break;
       default:
         throw new AssertionError();
@@ -329,11 +370,11 @@ public class ClientChatHack {
       socket.configureBlocking(false);
       var key = socket.register(selector, SelectionKey.OP_CONNECT);
 
-      privateConnectionMap.get(receiver).setState(WAITING_COMFIRM_TOKEN);
-      privateConnectionMap.get(receiver).setToken(token);
+      privateConnectionMap.get(receiver).state = WAITING_COMFIRM_TOKEN;
+      privateConnectionMap.get(receiver).token = token;
       var ctx = new PrivateConnectionContext(key, this, token, receiver);
       key.attach(ctx);
-      privateConnectionMap.get(receiver).setDestinatorContext(ctx);
+      privateConnectionMap.get(receiver).destinatorContext = ctx;
       socket.connect(response.getTargetAddress());
     } catch (IOException e) {
       logger.info("Failed to connect incomming client");
@@ -367,18 +408,46 @@ public class ClientChatHack {
     console.setDaemon(true);
     console.start();// run stdin thread
 
+    var lastCheck = System.currentTimeMillis();
     while (!Thread.interrupted()) {
       // printKeys();
       try {
         if (uniqueContext.isClosed()) {
           console.interrupt();
           selector.close();
+          serverSocketChannel.close();
+          sc.close();
           return;
         }
         selector.select(this::treatKey);
         processCommands();
+        var currentTime = System.currentTimeMillis();
+        if (currentTime >= lastCheck + TIMEOUT) {
+          lastCheck = currentTime;
+          clearInvalidSelectionKey();
+        }
       } catch (UncheckedIOException tunneled) {
         throw tunneled.getCause();
+      }
+    }
+  }
+
+  /**
+   * Remove in map private connection with invalid key
+   */
+  private void clearInvalidSelectionKey() {
+    for (var key : selector.keys()) {
+      if (!key.isValid()) {
+        var target = privateConnectionMap
+          .entrySet()
+          .stream()
+          .filter(p -> p.getValue().destinatorContext.getKey().equals(key))
+          .findFirst();
+        target.ifPresent(t ->
+        {
+          t.getValue().destinatorContext.silentlyClose();
+          privateConnectionMap.remove(t.getKey());
+        });
       }
     }
   }

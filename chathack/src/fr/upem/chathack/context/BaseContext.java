@@ -41,8 +41,9 @@ public abstract class BaseContext implements IContext {
 
   @Override
   public void updateInterestOps() {
-    if (!key.isValid())
+    if (!key.isValid()) {
       return;
+    }
 
     /**
      * Si la key est pas authentifier, on cancel() la cle et on le remet a valid() quand cle est key

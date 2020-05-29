@@ -1,6 +1,8 @@
 package fr.upem.chathack.model;
 
 import java.nio.ByteBuffer;
+import java.util.List;
+import fr.upem.chathack.reader.builder.Box;
 
 /**
  * 
@@ -26,6 +28,15 @@ public class Message {
     bb.put(from.toBuffer());
     bb.put(content.toBuffer());
     return bb.flip();
+  }
+
+  public static Message of(List<Box<?>> params) {
+    if (params.size() != 2) {
+      throw new IllegalArgumentException(params + " size is invalid");
+    }
+    var from = (LongSizedString) params.get(0).getBoxedValue();
+    var value = (LongSizedString) params.get(1).getBoxedValue();
+    return new Message(from, value);
   }
 
   public LongSizedString getFrom() {

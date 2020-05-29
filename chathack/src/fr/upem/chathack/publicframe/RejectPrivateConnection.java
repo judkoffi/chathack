@@ -1,9 +1,11 @@
 package fr.upem.chathack.publicframe;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import fr.upem.chathack.frame.IPublicFrame;
 import fr.upem.chathack.model.LongSizedString;
-import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.reader.builder.Box;
+import fr.upem.chathack.utils.OpCode;
 import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
 /**
@@ -17,12 +19,21 @@ public class RejectPrivateConnection implements IPublicFrame {
   public RejectPrivateConnection(LongSizedString appliant, LongSizedString receiver) {
     this.appliant = appliant;
     this.receiver = receiver;
-
   }
 
   public RejectPrivateConnection(String appliant, String receiver) {
     this.appliant = new LongSizedString(appliant);
     this.receiver = new LongSizedString(receiver);
+  }
+
+  public static RejectPrivateConnection of(List<Box<?>> params) {
+    if (params.size() != 2) {
+      throw new IllegalArgumentException(params + " size is invalid");
+    }
+
+    var receiver = (LongSizedString) params.get(0).getBoxedValue();
+    var applicant = (LongSizedString) params.get(1).getBoxedValue();
+    return new RejectPrivateConnection(applicant, receiver);
   }
 
   @Override
@@ -47,5 +58,10 @@ public class RejectPrivateConnection implements IPublicFrame {
 
   public String getReceiver() {
     return receiver.getValue();
+  }
+
+  @Override
+  public String toString() {
+    return "Private exchange refused by " + receiver;
   }
 }

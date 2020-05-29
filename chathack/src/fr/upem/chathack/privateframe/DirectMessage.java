@@ -1,10 +1,12 @@
 package fr.upem.chathack.privateframe;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import fr.upem.chathack.frame.IPrivateFrame;
 import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.model.Message;
-import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.reader.builder.Box;
+import fr.upem.chathack.utils.OpCode;
 import fr.upem.chathack.visitor.IPrivateFrameVisitor;
 
 /**
@@ -22,6 +24,18 @@ public class DirectMessage implements IPrivateFrame {
   public DirectMessage(LongSizedString target, Message content) {
     this.destinator = target;
     this.message = content;
+  }
+
+  public static DirectMessage of(List<Box<?>> params) {
+    if (params.size() != 3) {
+      throw new IllegalArgumentException(params + " size is invalid");
+    }
+
+    var destinator = (LongSizedString) params.get(0).getBoxedValue();
+    var from = (LongSizedString) params.get(1).getBoxedValue();
+    var content = (LongSizedString) params.get(2).getBoxedValue();
+    var message = new Message(from, content);
+    return new DirectMessage(destinator, message);
   }
 
   @Override

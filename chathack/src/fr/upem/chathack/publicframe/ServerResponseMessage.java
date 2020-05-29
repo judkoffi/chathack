@@ -1,9 +1,11 @@
 package fr.upem.chathack.publicframe;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import fr.upem.chathack.frame.IPublicFrame;
 import fr.upem.chathack.model.LongSizedString;
-import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.reader.builder.Box;
+import fr.upem.chathack.utils.OpCode;
 import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
 /**
@@ -15,8 +17,8 @@ import fr.upem.chathack.visitor.IPublicFrameVisitor;
  * Class use to represent a frame send by the server to send message to client (notification, error)
  */
 public class ServerResponseMessage implements IPublicFrame {
-  private final LongSizedString value;
   private final boolean errorMessage;
+  private final LongSizedString value;
 
   public ServerResponseMessage(LongSizedString value, boolean errorMessage) {
     this.value = value;
@@ -26,6 +28,16 @@ public class ServerResponseMessage implements IPublicFrame {
   public ServerResponseMessage(String value, boolean errorMessage) {
     this.value = new LongSizedString(value);
     this.errorMessage = errorMessage;
+  }
+
+  public static ServerResponseMessage of(List<Box<?>> params) {
+    if (params.size() != 2) {
+      throw new IllegalArgumentException(params + " size is invalid");
+    }
+
+    boolean isError = (Byte) params.get(0).getBoxedValue() == OpCode.SERVER_ERROR_RESPONSE_TYPE;
+    var value = (LongSizedString) params.get(1).getBoxedValue();
+    return new ServerResponseMessage(value, isError);
   }
 
   @Override

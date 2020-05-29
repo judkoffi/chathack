@@ -52,15 +52,26 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
   }
 
   @Override
+  public void processOut() {
+    while (!queue.isEmpty()) {
+      var bb = queue.peek();
+      if (bbout.remaining() < bb.remaining())
+        return;
+      queue.remove();
+      bbout.put(bb);
+      bb.flip();
+    }
+  }
+
+  @Override
   public void visit(BroadcastMessage message) {
     if (server.isConnected(message.getFromLogin())) {
-      // var bb = message.toBuffer().asReadOnlyBuffer();
-      // donner une vue (sans possibiliter de write sur le buffer)
-      server.broadcast(message.toBuffer());
+      var bb = message.toBuffer().asReadOnlyBuffer();
+      server.broadcast(bb);
     } else {
       var msg = new ServerResponseMessage("Not connected", true).toBuffer();
       queueMessage(msg);
-      silenceInputClose();
+      silentlyfflushClose();
     }
   }
 
@@ -69,7 +80,7 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
     if (server.isExistLogin(message.getLogin())) {
       var msg = new ServerResponseMessage("Login not available", true).toBuffer();
       queueMessage(msg);
-      silenceInputClose();
+      silentlyfflushClose();
       return;
     }
     server.registerAnonymousClient(message.getLogin(), key);
@@ -80,7 +91,7 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
     if (server.isExistLogin(message.getLogin().getValue())) {
       var msg = new ServerResponseMessage("Login not available", true).toBuffer();
       queueMessage(msg);
-      silenceInputClose();
+      silentlyfflushClose();
       return;
     }
     server.registerAuthenticatedClient(message, key);
@@ -96,19 +107,18 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
     return super.hashCode();
   }
 
-  private void silenceInputClose() {
-    try {
-      server.removeClientByKey(key);
-      sc.shutdownInput();
-    } catch (IOException e) {
-      //
-    }
-  }
-
   @Override
   public void silentlyClose() {
     try {
-      server.removeClientByKey(key);
+      sc.close();
+    } catch (IOException e) {
+      // ignore exception
+    }
+  }
+
+  public void silentlyfflushClose() {
+    try {
+      doWrite();// force writing to flush bbout
       sc.close();
     } catch (IOException e) {
       // ignore exception
@@ -121,7 +131,7 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
     if (!server.isConnected(requestMessage.getAppliant().getValue())) {
       var msg = new ServerResponseMessage("You must be authentificated", true).toBuffer();
       queueMessage(msg);
-      silenceInputClose();
+      silentlyfflushClose();
       return;
     }
 

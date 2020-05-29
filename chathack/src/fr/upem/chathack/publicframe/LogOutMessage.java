@@ -3,7 +3,7 @@ package fr.upem.chathack.publicframe;
 import java.nio.ByteBuffer;
 import fr.upem.chathack.frame.IPublicFrame;
 import fr.upem.chathack.model.Message;
-import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.utils.OpCode;
 import fr.upem.chathack.visitor.IPublicFrameVisitor;
 
 /**

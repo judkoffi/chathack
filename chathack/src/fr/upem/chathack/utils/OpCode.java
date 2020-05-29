@@ -1,4 +1,4 @@
-package fr.upem.chathack.model;
+package fr.upem.chathack.utils;
 
 /**
  * 
@@ -21,12 +21,9 @@ public class OpCode {
   public static final byte DIRECT_MESSAGE = (byte) 8;
   public static final byte FILE_SEND = (byte) 9;
   public static final byte CLIENT_LOG_OUT = (byte) 10;
+  public static final byte PRIVATE_CONNECTION_CLOSE = (byte) 11;
 
   public static final byte REJECTED_PRIVATE_CLIENT_CONNECTION = (byte) -4;
-
-  /********************************
-   * ServerRequest Opcode
-   *******************************/
 
 
 

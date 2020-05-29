@@ -2,8 +2,21 @@ package fr.upem.chathack.reader.trame;
 
 import java.nio.ByteBuffer;
 import fr.upem.chathack.frame.IPublicFrame;
-import fr.upem.chathack.model.OpCode;
+import fr.upem.chathack.model.Message;
+import fr.upem.chathack.publicframe.AcceptPrivateConnection;
+import fr.upem.chathack.publicframe.AnonymousConnection;
+import fr.upem.chathack.publicframe.AuthentificatedConnection;
+import fr.upem.chathack.publicframe.BroadcastMessage;
+import fr.upem.chathack.publicframe.LogOutMessage;
+import fr.upem.chathack.publicframe.RejectPrivateConnection;
+import fr.upem.chathack.publicframe.RequestPrivateConnection;
 import fr.upem.chathack.reader.IReader;
+import fr.upem.chathack.reader.InetSocketAddressReader;
+import fr.upem.chathack.reader.LongReader;
+import fr.upem.chathack.reader.LongSizedStringReader;
+import fr.upem.chathack.reader.builder.ReaderBuilder;
+import fr.upem.chathack.utils.OpCode;
+
 /**
  * Class use to read all public frame exchange between client and server
  *
@@ -15,32 +28,69 @@ public class ServerFrameReader implements IReader<IPublicFrame> {
   }
 
   /**
-   * Readers
+   * Base readers
    */
-  private final BroadcastMessageReader broadcastMessageReader;
-  private final AnonymousConnectionReader anonymousReader;
-  private final AuthentificatedConnectionReader authenticatedReader;
-  private final RequestPrivateConnectionReader requestConnectionReader;
-  private final AcceptPrivateConnectionReader acceptPrivateConnectionReader;
-  private final RejectPrivateConnectionReader rejectPrivateConnectionReader;
-  private final LogOutMessageReader logOutMessageReader;
+  private final LongSizedStringReader longSizedStringReader = new LongSizedStringReader();
+  private final LongReader longReader = new LongReader();
+  private final InetSocketAddressReader socketAddressReader = new InetSocketAddressReader();
 
-  private State state;
+  /**
+   * Builded readers
+   */
+  private final IReader<BroadcastMessage> broadcastMessageReader = ReaderBuilder
+    .<BroadcastMessage>create()
+    .addSubReader(longSizedStringReader)
+    .addSubReader(longSizedStringReader)
+    .addConstructor(params -> new BroadcastMessage(Message.of(params)))
+    .build();
+
+  private final IReader<AnonymousConnection> anonymousReader = ReaderBuilder
+    .<AnonymousConnection>create()
+    .addSubReader(longSizedStringReader)
+    .addConstructor(AnonymousConnection::of)
+    .build();
+
+  private final IReader<AuthentificatedConnection> authenticatedReader = ReaderBuilder
+    .<AuthentificatedConnection>create()
+    .addSubReader(longSizedStringReader)
+    .addSubReader(longSizedStringReader)
+    .addConstructor(AuthentificatedConnection::of)
+    .build();
+
+  private final IReader<RequestPrivateConnection> requestConnectionReader = ReaderBuilder
+    .<RequestPrivateConnection>create()
+    .addSubReader(longSizedStringReader)
+    .addSubReader(longSizedStringReader)
+    .addConstructor(RequestPrivateConnection::of)
+    .build();
+
+  private final IReader<AcceptPrivateConnection> acceptPrivateConnectionReader = ReaderBuilder
+    .<AcceptPrivateConnection>create()
+    .addSubReader(longSizedStringReader)// receiver
+    .addSubReader(socketAddressReader)// ip + port
+    .addSubReader(longReader)// token
+    .addSubReader(longSizedStringReader)// from
+    .addConstructor(AcceptPrivateConnection::of)
+    .build();
+
+  private final IReader<RejectPrivateConnection> rejectPrivateConnectionReader = ReaderBuilder
+    .<RejectPrivateConnection>create()
+    .addSubReader(longSizedStringReader)
+    .addSubReader(longSizedStringReader)
+    .addConstructor(RejectPrivateConnection::of)
+    .build();
+
+  private final IReader<LogOutMessage> logOutMessageReader = ReaderBuilder
+    .<LogOutMessage>create()
+    .addSubReader(longSizedStringReader)
+    .addSubReader(longSizedStringReader)
+    .addConstructor(params -> new LogOutMessage(Message.of(params)))
+    .build();
+
+  private State state = State.WAITING_OPCODE;
   private IReader<? extends IPublicFrame> currentFrameReader;
   private IPublicFrame value;
 
-
-
-  public ServerFrameReader() {
-    this.broadcastMessageReader = new BroadcastMessageReader();
-    this.anonymousReader = new AnonymousConnectionReader();
-    this.authenticatedReader = new AuthentificatedConnectionReader();
-    this.requestConnectionReader = new RequestPrivateConnectionReader();
-    this.acceptPrivateConnectionReader = new AcceptPrivateConnectionReader();
-    this.rejectPrivateConnectionReader = new RejectPrivateConnectionReader();
-    this.logOutMessageReader = new LogOutMessageReader();
-    this.state = State.WAITING_OPCODE;
-  }
 
   @Override
   public ProcessStatus process(ByteBuffer bb) {
