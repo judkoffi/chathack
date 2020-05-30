@@ -63,7 +63,6 @@ public class RequestPrivateConnection implements IPublicFrame {
   public boolean equals(Object obj) {
     if (!(obj instanceof RequestPrivateConnection))
       return false;
-
     RequestPrivateConnection request = (RequestPrivateConnection) obj;
     return request.appliant.equals(appliant) && request.receiver.equals(receiver);
   }

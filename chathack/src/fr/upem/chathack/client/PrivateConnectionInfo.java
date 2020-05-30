@@ -9,7 +9,7 @@ import java.util.ArrayDeque;
  */
 public class PrivateConnectionInfo {
 
-  public enum PrivateConnectionState {
+  enum PrivateConnectionState {
     PENDING, WAITING_COMFIRM_TOKEN, SUCCEED
   }
 

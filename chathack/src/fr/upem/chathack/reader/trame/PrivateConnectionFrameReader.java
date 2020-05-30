@@ -51,7 +51,6 @@ public class PrivateConnectionFrameReader implements IReader<IPrivateFrame> {
 
   private final IReader<ConfirmDiscoverMessage> confirmDiscoverMessageReader = ReaderBuilder
     .<ConfirmDiscoverMessage>create()
-    .addSubReader(longSizedStringReader)// destinator
     .addSubReader(longSizedStringReader)// sender
     .addConstructor(ConfirmDiscoverMessage::of)
     .build();

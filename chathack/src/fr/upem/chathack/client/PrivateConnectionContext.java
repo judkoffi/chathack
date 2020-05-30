@@ -77,7 +77,6 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
         case REFILL:
           return;
         case ERROR:
-        	System.err.println("process private context erreur");
           silentlyClose();
           return;
       }
@@ -96,7 +95,7 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
       var connectionInfo = client.privateConnectionMap.get(login);
       connectionInfo.state = SUCCEED;
       connectionInfo.destinatorContext = this;
-      var confirmMsg = new ConfirmDiscoverMessage(login, client.login);
+      var confirmMsg = new ConfirmDiscoverMessage(client.login);
       queueMessage(confirmMsg.toBuffer());
     } else {
       System.err.println("bad token");
@@ -137,9 +136,8 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
     System.out.println("received private connection close");
     var from = closePrivateConnectionMessage.getFrom();
     var value = client.privateConnectionMap.get(from);
-    if(value != null) {
-    	value.destinatorContext.silentlyClose();
+    if (value != null) {
+      value.destinatorContext.silentlyClose();
     }
-    
   }
 }

@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -50,7 +49,7 @@ public class ClientChatHack {
   // Map use to keep information about private connection between clients
   final Map<String, PrivateConnectionInfo> privateConnectionMap = new HashMap<>();
 
-  // Map use to keep information about pending private connection between clients
+  // List use to keep information about pending private connection between clients
   final ArrayList<RequestPrivateConnection> pendingPrivateRequests = new ArrayList<>();
 
   private static final int TIMEOUT = 500; // 500 ms
@@ -155,11 +154,11 @@ public class ClientChatHack {
     }
 
     ByteBuffer fileContent = readFile(filePath);
-    if(fileContent.limit() > Helper.LIMIT_FILE_CONTENT_SIZE) {
-    	System.err.println("file is too big. It must be under " + Helper.LIMIT_SIZE_MSG);
-    	return;
+    if (fileContent.limit() > Helper.LIMIT_FILE_CONTENT_SIZE) {
+      System.err.println("file is too big. It must be under " + Helper.LIMIT_SIZE_MSG);
+      return;
     }
-    	
+
     var fileMsg = new FileMessage(filename, receiver, fileContent);
     if (!existPrivateConnection(receiver)) {
       sendPrivateConnectionRequest(receiver);
@@ -198,10 +197,10 @@ public class ClientChatHack {
       closeHandler(line);
       return;
     }
-    
-    if(line.startsWith("/help")) {
-    	System.out.println(Helper.COMMAND_LIST);
-    	return;
+
+    if (line.startsWith("/help")) {
+      System.out.println(Helper.COMMAND_LIST);
+      return;
     }
 
     var isAcceptCommand = line.startsWith("/accept");
@@ -264,18 +263,15 @@ public class ClientChatHack {
     }
 
     var target = splited[1];
+    if (target.equals(login))
+      return;
+
     if (!privateConnectionMap.containsKey(target))
       return;
 
     var closeMsg = new ClosePrivateConnectionMessage(login).toBuffer();
     var targetCtx = privateConnectionMap.get(target).destinatorContext;
     targetCtx.queueMessage(closeMsg);
-//    try {
-//		targetCtx.processOut();
-//	} catch (IOException e) {
-//		
-//	}
-    //targetCtx.silentlyClose();
     privateConnectionMap.remove(target);
   }
 
@@ -426,7 +422,7 @@ public class ClientChatHack {
 
     var lastCheck = System.currentTimeMillis();
     while (!Thread.interrupted()) {
-      //printKeys();
+      // printKeys();
       try {
         if (uniqueContext.isClosed()) {
           console.interrupt();
@@ -469,7 +465,7 @@ public class ClientChatHack {
   }
 
   private void treatKey(SelectionKey key) {
-    //printSelectedKey(key);
+    // printSelectedKey(key);
     try {
       if (key.isValid() && key.isAcceptable()) {
         doAccept(key);
