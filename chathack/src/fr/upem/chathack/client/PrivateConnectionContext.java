@@ -43,8 +43,8 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
     if (!sc.finishConnect()) {
       return;
     }
-    var currentToken = client.privateConnectionMap.get(receiver).token;
-    var discoverMsg = new DiscoverMessage(client.login, currentToken);
+    var currentInfo = client.privateConnectionMap.get(receiver);
+    var discoverMsg = new DiscoverMessage(client.login, currentInfo.token);
     queueMessage(discoverMsg.toBuffer());
     updateInterestOps();
   }
@@ -76,15 +76,16 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
   @Override
   public void visit(DiscoverMessage message) {
     var login = message.getLogin();
-    if (client.privateConnectionMap.get(login).token == message.getToken()) {
-      var connectionInfo = client.privateConnectionMap.get(login);
+    var connectionInfo = client.privateConnectionMap.get(login);
+    connectionInfo.destinatorContext = this;
+    if (connectionInfo.token == message.getToken()) {
       connectionInfo.state = SUCCEED;
-      connectionInfo.destinatorContext = this;
       var confirmMsg = new ConfirmDiscoverMessage(client.login);
       queueMessage(confirmMsg.toBuffer());
     } else {
       System.err.println("bad token");
-      silentlyClose();
+      connectionInfo.destinatorContext.silentlyClose();
+      client.privateConnectionMap.remove(login);
     }
   }
 

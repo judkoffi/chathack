@@ -1,6 +1,7 @@
 package fr.upem.chathack.dbframe;
 
 import java.nio.ByteBuffer;
+
 import fr.upem.chathack.frame.IDatabaseFrame;
 import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.utils.OpCode;

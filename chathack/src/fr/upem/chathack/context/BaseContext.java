@@ -45,12 +45,6 @@ public abstract class BaseContext implements IContext {
       return;
     }
 
-    /**
-     * Si la key est pas authentifier, on cancel() la cle et on le remet a valid() quand cle est key
-     * est authentifier<br>
-     * Faite attention a pas fermer les cle cancel
-     */
-
     int interestOps = 0;
 
     if (!closed && bbin.hasRemaining()) {
