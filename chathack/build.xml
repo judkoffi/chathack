@@ -1,4 +1,4 @@
-<project name="chathack-app" basedir="." default="job">
+<project name="chathack-app" basedir="." default="make">
     <description>
     ChatHack client and server jar task
     </description>
@@ -15,7 +15,7 @@
 
     <target name="compile">
         <mkdir dir="${classes.dir}"/>
-        <javac srcdir="${src.dir}" destdir="${classes.dir}"/>
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${classes.dir}"/>
     </target>
 
     <target name="jars">
@@ -32,5 +32,5 @@
         </jar>
     </target>
 
-    <target name="job" depends="clean,compile,jars"/>
+    <target name="make" depends="clean,compile,jars"/>
 </project>
