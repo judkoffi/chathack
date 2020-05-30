@@ -22,36 +22,21 @@ import fr.upem.chathack.visitor.IPrivateFrameVisitor;
 public class PrivateConnectionContext extends BaseContext implements IPrivateFrameVisitor {
   private final ClientChatHack client;
   private final PrivateConnectionFrameReader reader = new PrivateConnectionFrameReader();
-  private long token; // token use to certify private connection established between two clients
-
-  // Destinator in private connection
-  private String receiver;
+  private String receiver;// Destinator in private connection
 
   public PrivateConnectionContext(SelectionKey key, ClientChatHack client) {
     super(key);
     this.client = client;
   }
 
-  public PrivateConnectionContext(SelectionKey key, ClientChatHack client, long token) {
+  public PrivateConnectionContext(SelectionKey key, ClientChatHack client, String receiver) {
     super(key);
     this.client = client;
-    this.token = token;
-  }
-
-  public PrivateConnectionContext(SelectionKey key, ClientChatHack client, long token,
-      String receiver) {
-    super(key);
-    this.client = client;
-    this.token = token;
     this.receiver = receiver;
   }
 
   private void handler(IPrivateFrame frame) {
     frame.accept(this);
-  }
-
-  public long getToken() {
-    return token;
   }
 
   public void doConnect() throws IOException {

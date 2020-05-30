@@ -15,9 +15,9 @@ public class PrivateConnectionInfo {
 
   String receiver;
   PrivateConnectionState state;
-  long token;
+  long token; // token use to certify private connection established between two clients
   PrivateConnectionContext destinatorContext;
-  ArrayDeque<ByteBuffer> pendingDirectMessages;
+  final ArrayDeque<ByteBuffer> pendingDirectMessages;
 
   public PrivateConnectionInfo(String receiver) {
     this.receiver = receiver;

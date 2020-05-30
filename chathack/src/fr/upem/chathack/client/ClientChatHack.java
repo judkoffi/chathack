@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -121,20 +122,20 @@ public class ClientChatHack {
     }
   }
 
-  private ByteBuffer readFile(Path filePath) {
+  private Optional<ByteBuffer> readFile(Path filePath) {
     try (var reader = new RandomAccessFile(filePath.toFile(), "r");
         var channel = reader.getChannel()) {
       int bufferSize = (int) channel.size();
       ByteBuffer buff = ByteBuffer.allocate(bufferSize);
       channel.read(buff);
       buff.flip();
-      return buff;
+      return Optional.of(buff);
     } catch (FileNotFoundException e) {
       logger.info(filePath + " file does not exist");
     } catch (IOException e) {
       logger.info(e.getMessage());
     }
-    return null;
+    return Optional.empty();
   }
 
 
@@ -153,19 +154,21 @@ public class ClientChatHack {
       return;
     }
 
-    ByteBuffer fileContent = readFile(filePath);
-    if (fileContent.limit() > Helper.LIMIT_FILE_CONTENT_SIZE) {
-      System.err.println("file is too big. It must be under " + Helper.LIMIT_SIZE_MSG);
-      return;
-    }
+    readFile(filePath).ifPresent(fileContent ->
+    {
+      if (fileContent.limit() > Helper.LIMIT_FILE_CONTENT_SIZE) {
+        System.err.println("file is too big. It must be under " + Helper.LIMIT_SIZE_MSG);
+        return;
+      }
 
-    var fileMsg = new FileMessage(filename, login, fileContent);
-    if (!existPrivateConnection(receiver)) {
-      sendPrivateConnectionRequest(receiver);
-      privateConnectionMap.get(receiver).pendingDirectMessages.add(fileMsg.toBuffer());
-      return;
-    }
-    handlerPrivateFrameSending(fileMsg, receiver);
+      var fileMsg = new FileMessage(filename, login, fileContent);
+      if (!existPrivateConnection(receiver)) {
+        sendPrivateConnectionRequest(receiver);
+        privateConnectionMap.get(receiver).pendingDirectMessages.add(fileMsg.toBuffer());
+        return;
+      }
+      handlerPrivateFrameSending(fileMsg, receiver);
+    });
   }
 
 
@@ -384,7 +387,7 @@ public class ClientChatHack {
 
       privateConnectionMap.get(receiver).state = WAITING_COMFIRM_TOKEN;
       privateConnectionMap.get(receiver).token = token;
-      var ctx = new PrivateConnectionContext(key, this, token, receiver);
+      var ctx = new PrivateConnectionContext(key, this, receiver);
       key.attach(ctx);
       privateConnectionMap.get(receiver).destinatorContext = ctx;
       socket.connect(response.getTargetAddress());
