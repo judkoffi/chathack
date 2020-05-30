@@ -13,18 +13,18 @@ import fr.upem.chathack.visitor.IPrivateFrameVisitor;
  */
 public class FileMessage implements IPrivateFrame {
   private final LongSizedString filename;
-  private final LongSizedString destinator;
+  private final LongSizedString sender;
   private ByteBuffer content;
 
-  public FileMessage(LongSizedString filename, LongSizedString destinator, ByteBuffer content) {
+  public FileMessage(LongSizedString filename, LongSizedString sender, ByteBuffer content) {
     this.filename = filename;
-    this.destinator = destinator;
+    this.sender = sender;
     this.content = content;
   }
 
-  public FileMessage(String filename, String destinator, ByteBuffer buffer) {
+  public FileMessage(String filename, String sender, ByteBuffer buffer) {
     this.filename = new LongSizedString(filename);
-    this.destinator = new LongSizedString(destinator);
+    this.sender = new LongSizedString(sender);
     this.content = buffer;
   }
 
@@ -41,11 +41,11 @@ public class FileMessage implements IPrivateFrame {
 
   @Override
   public ByteBuffer toBuffer() {
-    var size = Byte.BYTES + filename.getTrameSize() + destinator.getTrameSize() + Integer.BYTES
+    var size = Byte.BYTES + filename.getTrameSize() + sender.getTrameSize() + Integer.BYTES
         + content.limit();
     var bb = ByteBuffer.allocate((int) size);
     bb.put(OpCode.FILE_SEND);
-    bb.put(destinator.toBuffer());
+    bb.put(sender.toBuffer());
     bb.put(filename.toBuffer());
     bb.putInt(content.limit());
     bb.put(content);
@@ -63,6 +63,10 @@ public class FileMessage implements IPrivateFrame {
 
   public ByteBuffer getContent() {
     return content;
+  }
+
+  public String getSender() {
+    return sender.getValue();
   }
 
   @Override

@@ -159,7 +159,7 @@ public class ClientChatHack {
       return;
     }
 
-    var fileMsg = new FileMessage(filename, receiver, fileContent);
+    var fileMsg = new FileMessage(filename, login, fileContent);
     if (!existPrivateConnection(receiver)) {
       sendPrivateConnectionRequest(receiver);
       privateConnectionMap.get(receiver).pendingDirectMessages.add(fileMsg.toBuffer());

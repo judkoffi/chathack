@@ -128,7 +128,9 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
     } catch (IOException e) {
       System.err.println(e.getMessage());
     }
-    System.out.println("file reveiced and store at " + filePath);
+
+    System.out
+      .println("file reveiced from " + fileMessage.getSender() + " and store at " + filePath);
   }
 
   @Override

@@ -11,7 +11,6 @@ public class ByteReader implements IReader<Byte> {
   private final ByteBuffer internalbb = ByteBuffer.allocate(Byte.BYTES); // write-mode
   private byte value;
 
-
   @Override
   public ProcessStatus process(ByteBuffer bb) {
     if (state == State.DONE || state == State.ERROR) {

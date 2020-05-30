@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import fr.upem.chathack.utils.Helper;
 
 /**
  * Class use to read InetSocketAddress type
@@ -14,7 +15,7 @@ public class InetSocketAddressReader implements IReader<InetSocketAddress> {
     WAITING_IP_SIZE, WAITING_IP, WAITING_PORT, DONE, ERROR
   }
 
-  private final ByteBuffer address = ByteBuffer.allocate(Byte.BYTES * 16);
+  private final ByteBuffer address = ByteBuffer.allocate(Helper.IP_ADDR_SIZE);
   private int port;
   private State state;
   private int ipSize;
@@ -35,6 +36,10 @@ public class InetSocketAddressReader implements IReader<InetSocketAddress> {
           return status;
         }
         ipSize = intReader.get();
+        if (ipSize <= 0 || ipSize > Helper.IP_ADDR_SIZE) {
+          state = State.ERROR;
+          return ProcessStatus.ERROR;
+        }
         intReader.reset();
         state = State.WAITING_IP;
       }
@@ -60,13 +65,16 @@ public class InetSocketAddressReader implements IReader<InetSocketAddress> {
         address.flip();
         state = State.WAITING_PORT;
       }
-
       case WAITING_PORT: {
         var status = intReader.process(bb);
         if (status != ProcessStatus.DONE) {
           return status;
         }
         port = intReader.get();
+        if (port <= 0 || port > Helper.MAX_PORT_VALUE) {
+          state = State.ERROR;
+          return ProcessStatus.ERROR;
+        }
         try {
           value = parseInetAddr();
         } catch (UnknownHostException e) {

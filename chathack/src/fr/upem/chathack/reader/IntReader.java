@@ -42,10 +42,6 @@ public class IntReader implements IReader<Integer> {
 
     internalbb.flip();
     value = internalbb.getInt();
-    if(value <= 0 || value >= Integer.MAX_VALUE) {
-    	state = State.ERROR;
-    	return ProcessStatus.ERROR;
-    }
     state = State.DONE;
     return ProcessStatus.DONE;
   }

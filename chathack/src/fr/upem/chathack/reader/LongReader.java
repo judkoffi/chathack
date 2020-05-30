@@ -40,13 +40,8 @@ public class LongReader implements IReader<Long> {
       return ProcessStatus.REFILL;
     }
 
-    
     internalbb.flip();
     value = internalbb.getLong();
-    if(value <= 0 || value >= Long.MAX_VALUE) {
-    	state = State.ERROR;
-    	return ProcessStatus.ERROR;
-    }
     state = State.DONE;
     return ProcessStatus.DONE;
   }
