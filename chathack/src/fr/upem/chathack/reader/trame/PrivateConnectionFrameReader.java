@@ -36,7 +36,6 @@ public class PrivateConnectionFrameReader implements IReader<IPrivateFrame> {
    */
   private final IReader<DirectMessage> directMessageReader = ReaderBuilder
     .<DirectMessage>create()
-    .addSubReader(longSizedStringReader)// destinator
     .addSubReader(longSizedStringReader)// from
     .addSubReader(longSizedStringReader)// message
     .addConstructor(DirectMessage::of)

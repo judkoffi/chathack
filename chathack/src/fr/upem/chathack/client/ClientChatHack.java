@@ -306,7 +306,7 @@ public class ClientChatHack {
 
     var message = Arrays.stream(splited).skip(1).collect(Collectors.joining(" "));
 
-    var dmMsg = new DirectMessage(login, receiver, message);
+    var dmMsg = new DirectMessage(login, message);
     if (!existPrivateConnection(receiver)) {
       sendPrivateConnectionRequest(receiver);
       // add first message

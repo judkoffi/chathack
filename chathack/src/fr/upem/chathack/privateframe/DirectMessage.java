@@ -13,48 +13,34 @@ import fr.upem.chathack.visitor.IPrivateFrameVisitor;
  * Class use to represent a private message frame send between two clients
  */
 public class DirectMessage implements IPrivateFrame {
-  private final LongSizedString destinator;
   private final Message message;
 
-  public DirectMessage(String fromLogin, String targetLogin, String message) {
-    this.destinator = new LongSizedString(targetLogin);
+  public DirectMessage(String fromLogin, String message) {
     this.message = new Message(fromLogin, message);
   }
 
-  public DirectMessage(LongSizedString target, Message content) {
-    this.destinator = target;
+  public DirectMessage(Message content) {
     this.message = content;
   }
 
   public static DirectMessage of(List<Box<?>> params) {
-    if (params.size() != 3) {
+    if (params.size() != 2) {
       throw new IllegalArgumentException(params + " size is invalid");
     }
 
-    var destinator = (LongSizedString) params.get(0).getBoxedValue();
-    var from = (LongSizedString) params.get(1).getBoxedValue();
-    var content = (LongSizedString) params.get(2).getBoxedValue();
+    var from = (LongSizedString) params.get(0).getBoxedValue();
+    var content = (LongSizedString) params.get(1).getBoxedValue();
     var message = new Message(from, content);
-    return new DirectMessage(destinator, message);
+    return new DirectMessage(message);
   }
 
   @Override
   public ByteBuffer toBuffer() {
-    var size = Byte.BYTES + message.getTrameSize() + destinator.getTrameSize();
+    var size = Byte.BYTES + message.getTrameSize();
     var bb = ByteBuffer.allocate((int) size);
     bb.put(OpCode.DIRECT_MESSAGE);
-    bb.put(destinator.toBuffer());
     bb.put(message.toBuffer());
     return bb.flip();
-  }
-
-  /**
-   * Getter of destinator of private message
-   * 
-   * @return: a {@link String } represent a login of destinator of private message
-   */
-  public String getDestinator() {
-    return destinator.getValue();
   }
 
   @Override
