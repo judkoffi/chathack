@@ -7,7 +7,10 @@ import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.reader.builder.Box;
 import fr.upem.chathack.utils.OpCode;
 import fr.upem.chathack.visitor.IPrivateFrameVisitor;
-
+/**
+ * Class used to represent a frame closing a private connection between clients
+ *
+ */
 public class ClosePrivateConnectionMessage implements IPrivateFrame {
   private final LongSizedString from;
 

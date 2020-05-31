@@ -34,9 +34,7 @@ import fr.upem.chathack.utils.OpCode;
  * Class use to represent a server of protocol ChatHack
  */
 public class ServerChatHack {
-
-
-
+	
   private static final Logger logger = Logger.getLogger(ServerChatHack.class.getName());
   private static final int TIMEOUT = 500; // 500 ms
   private final Selector selector;

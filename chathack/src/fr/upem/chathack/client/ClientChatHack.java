@@ -138,7 +138,10 @@ public class ClientChatHack {
     return Optional.empty();
   }
 
-
+/**
+ * method in charge of handling the file given (find file, create path, checking size, create FileMessage...)
+ * @param line
+ */
   private void fileHandler(String line) {
     var splited = line.split(" ");
     if (splited.length < 3) {

@@ -2,7 +2,10 @@ package fr.upem.chathack.reader;
 
 import static fr.upem.chathack.utils.Helper.LIMIT_FILE_CONTENT_SIZE;
 import java.nio.ByteBuffer;
-
+/**
+ * Class used to read ByteBuffer type
+ *
+ */
 public class BufferReader implements IReader<ByteBuffer> {
   private enum State {
     WAITING_SIZE, WAITING_CONTENT, DONE, ERROR

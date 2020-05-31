@@ -1,5 +1,9 @@
 package fr.upem.chathack.reader.builder;
-
+/**
+ * Class used to stock values get from reader
+ *
+ * @param <E>
+ */
 public class Box<E> {
   final E value;
 

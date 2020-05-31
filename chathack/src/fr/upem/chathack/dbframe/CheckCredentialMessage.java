@@ -5,7 +5,10 @@ import java.nio.ByteBuffer;
 import fr.upem.chathack.frame.IDatabaseFrame;
 import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.utils.OpCode;
-
+/**
+ * Class used to verify login and password given by user
+ *
+ */
 public class CheckCredentialMessage implements IDatabaseFrame {
   private final LongSizedString login;
   private final LongSizedString password;

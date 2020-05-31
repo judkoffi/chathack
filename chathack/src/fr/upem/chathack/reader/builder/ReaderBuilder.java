@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.IReader.ProcessStatus;
 
-public class ReaderBuilder<T> implements IEmptyBuilder<T>, ISubBuilder<T>, IBuidler<T> {
+public class ReaderBuilder<T> implements IEmptyBuilder<T>, ISubBuilder<T>, IBuilder<T> {
 
   private enum State {
     PROCESSING, DONE, ERROR
@@ -37,7 +37,7 @@ public class ReaderBuilder<T> implements IEmptyBuilder<T>, ISubBuilder<T>, IBuid
   }
 
   @Override
-  public IBuidler<T> addConstructor(IConstructor<T> constructor) {
+  public IBuilder<T> addConstructor(IConstructor<T> constructor) {
     this.constructor = constructor;
     return this;
   }

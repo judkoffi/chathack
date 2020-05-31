@@ -1,7 +1,10 @@
 package fr.upem.chathack.reader;
 
 import java.nio.ByteBuffer;
-
+/**
+ * Class used to read Byte type
+ *
+ */
 public class ByteReader implements IReader<Byte> {
   private enum State {
     DONE, WAITING, ERROR
