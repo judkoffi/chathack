@@ -5,6 +5,7 @@
 ``` 
 - RFC revision 1 ---> christelle_nguyen_judicael_koffi.pdf
 - RFC revision 2 ---> rfc-v2.pdf
+- RFC revision 3 ---> rfc-v3.pdf
 ``` 
 
 ## code source
