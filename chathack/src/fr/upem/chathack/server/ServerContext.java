@@ -167,7 +167,7 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
 
   @Override
   public void visit(LogOutMessage disconnectionMessage) {
-    var from = disconnectionMessage.getMessage().getFrom().getValue();
+    var from = disconnectionMessage.getLogin();
     if (!server.map.containsKey(from)) {
       silentlyClose();
       return;

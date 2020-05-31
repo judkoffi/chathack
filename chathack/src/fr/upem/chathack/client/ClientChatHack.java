@@ -284,7 +284,7 @@ public class ClientChatHack {
   }
 
   private void logoutHandler() {
-    var msg = new LogOutMessage(new Message(login, ""));
+    var msg = new LogOutMessage(login);
     uniqueContext.queueMessage(msg.toBuffer());
   }
 

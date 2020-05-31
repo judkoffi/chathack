@@ -24,6 +24,7 @@ import fr.upem.chathack.dbframe.CheckCredentialMessage;
 import fr.upem.chathack.dbframe.CheckLoginMessage;
 import fr.upem.chathack.dbframe.DatabaseResponseMessage;
 import fr.upem.chathack.publicframe.AuthentificatedConnection;
+import fr.upem.chathack.publicframe.LogOutMessage;
 import fr.upem.chathack.publicframe.RequestPrivateConnection;
 import fr.upem.chathack.publicframe.ServerResponseMessage;
 import fr.upem.chathack.utils.Helper;
@@ -222,6 +223,8 @@ public class ServerChatHack {
         target.ifPresent(t ->
         {
           t.getValue().context.silentlyClose();
+          var logoutMsg = new LogOutMessage(t.getKey());
+          broadcast(logoutMsg.toBuffer());
           map.remove(t.getKey());
         });
       }

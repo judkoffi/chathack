@@ -5,6 +5,7 @@ import fr.upem.chathack.frame.IPublicFrame;
 import fr.upem.chathack.model.Message;
 import fr.upem.chathack.publicframe.AcceptPrivateConnection;
 import fr.upem.chathack.publicframe.BroadcastMessage;
+import fr.upem.chathack.publicframe.LogOutMessage;
 import fr.upem.chathack.publicframe.RejectPrivateConnection;
 import fr.upem.chathack.publicframe.RequestPrivateConnection;
 import fr.upem.chathack.publicframe.ServerResponseMessage;
@@ -74,6 +75,12 @@ public class ClientFrameReader implements IReader<IPublicFrame> {
     .addConstructor(ServerResponseMessage::of)
     .build();
 
+  private final IReader<LogOutMessage> logOutMessageReader = ReaderBuilder
+    .<LogOutMessage>create()
+    .addSubReader(longSizedStringReader)
+    .addConstructor(LogOutMessage::of)
+    .build();
+
   private State state = State.WAITING_OPCODE;
   private IReader<? extends IPublicFrame> currentFrameReader;
   private IPublicFrame value;
@@ -104,6 +111,9 @@ public class ClientFrameReader implements IReader<IPublicFrame> {
             break;
           case OpCode.REJECTED_PRIVATE_CLIENT_CONNECTION:
             currentFrameReader = rejectPrivateConnectionReader;
+            break;
+          case OpCode.CLIENT_LOG_OUT:
+            currentFrameReader = logOutMessageReader;
             break;
           default:
             throw new IllegalArgumentException("unknown opcode " + opcode);
@@ -144,5 +154,6 @@ public class ClientFrameReader implements IReader<IPublicFrame> {
     longReader.reset();
     socketAddressReader.reset();
     byteReader.reset();
+    logOutMessageReader.reset();
   }
 }

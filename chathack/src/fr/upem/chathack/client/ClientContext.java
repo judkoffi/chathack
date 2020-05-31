@@ -114,5 +114,8 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
   }
 
   @Override
-  public void visit(LogOutMessage disconnectionMessage) {}
+  public void visit(LogOutMessage disconnectionMessage) {
+    var login = disconnectionMessage.getLogin();
+    client.privateConnectionMap.remove(login);
+  }
 }

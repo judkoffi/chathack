@@ -83,8 +83,7 @@ public class ServerFrameReader implements IReader<IPublicFrame> {
   private final IReader<LogOutMessage> logOutMessageReader = ReaderBuilder
     .<LogOutMessage>create()
     .addSubReader(longSizedStringReader)
-    .addSubReader(longSizedStringReader)
-    .addConstructor(params -> new LogOutMessage(Message.of(params)))
+    .addConstructor(LogOutMessage::of)
     .build();
 
   private State state = State.WAITING_OPCODE;
