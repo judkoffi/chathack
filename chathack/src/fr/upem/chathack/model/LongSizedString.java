@@ -32,7 +32,7 @@ public class LongSizedString {
     return bb.flip();
   }
 
-  /*
+  /**
    * For DB requests
    */
   public ByteBuffer toIntBuffer() {

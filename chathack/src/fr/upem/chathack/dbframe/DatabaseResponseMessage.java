@@ -2,12 +2,13 @@ package fr.upem.chathack.dbframe;
 
 import java.nio.ByteBuffer;
 import java.util.List;
+import fr.upem.chathack.frame.IFrame;
 import fr.upem.chathack.reader.builder.Box;
 
 /**
  * Class use to represent frame exchange between server and database server
  */
-public class DatabaseResponseMessage {
+public class DatabaseResponseMessage implements IFrame {
   private final byte opcode;
   private final long result;
   private final ByteBuffer bb;
@@ -39,6 +40,7 @@ public class DatabaseResponseMessage {
     bb.putLong(result);
   }
 
+  @Override
   public ByteBuffer toBuffer() {
     return bb.duplicate().flip();
   }

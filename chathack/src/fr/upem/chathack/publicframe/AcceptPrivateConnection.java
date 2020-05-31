@@ -80,6 +80,15 @@ public class AcceptPrivateConnection implements IPublicFrame {
     return token;
   }
 
+  /**
+   * Getter of Ip and port of sender socket server
+   * 
+   * @return: an {@link InetSocketAddress} object
+   */
+  public InetSocketAddress getTargetAddress() {
+    return targetAddress;
+  }
+
   @Override
   public ByteBuffer toBuffer() {
     var bytes = targetAddress.getAddress().getAddress();
@@ -106,9 +115,5 @@ public class AcceptPrivateConnection implements IPublicFrame {
   @Override
   public String toString() {
     return "AcceptResponse " + applicant + " " + receiver + " " + targetAddress;
-  }
-
-  public InetSocketAddress getTargetAddress() {
-    return targetAddress;
   }
 }

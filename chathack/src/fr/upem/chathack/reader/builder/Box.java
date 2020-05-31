@@ -13,9 +13,10 @@ public class Box<E> {
   }
 
   /**
+   * Factory method to create an instance of box
    * 
    * @param <E>: type of value to be box
-   * @param value: value to be boc
+   * @param value: value to be box
    * @return: a instance of {@link Box}
    */
   public static <E> Box<E> of(E value) {

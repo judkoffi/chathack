@@ -430,7 +430,7 @@ public class ClientChatHack {
 
     var lastCheck = System.currentTimeMillis();
     while (!Thread.interrupted()) {
-       // printKeys();
+      // printKeys();
       try {
         if (uniqueContext.isClosed()) {
           console.interrupt();
@@ -473,7 +473,7 @@ public class ClientChatHack {
   }
 
   private void treatKey(SelectionKey key) {
-       // printSelectedKey(key);
+    // printSelectedKey(key);
     try {
       if (key.isValid() && key.isAcceptable()) {
         doAccept(key);
@@ -518,7 +518,7 @@ public class ClientChatHack {
     return String.join("|", list);
   }
 
-  public void printKeys() {
+  private void printKeys() {
     Set<SelectionKey> selectionKeySet = selector.keys();
     if (selectionKeySet.isEmpty()) {
       System.out.println("The selector contains no key : this should not happen!");
@@ -546,7 +546,7 @@ public class ClientChatHack {
     }
   }
 
-  public void printSelectedKey(SelectionKey key) {
+  private void printSelectedKey(SelectionKey key) {
     SelectableChannel channel = key.channel();
     if (channel instanceof ServerSocketChannel) {
       System.out.println("\tServerSocketChannel can perform : " + possibleActionsToString(key));

@@ -12,7 +12,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
@@ -71,14 +70,18 @@ public class ServerChatHack {
   /**
    * Send a message to a client by given his selection key
    * 
-   * @param msg
-   * @param key
+   * @param msg: message to be send to target client
+   * @param key: target client selection key
    */
   public void sendMessageToClient(ByteBuffer msg, SelectionKey key) {
     findContextByKey(key).ifPresent(c -> c.queueMessage(msg));
   }
 
-
+  /**
+   * Send broadcast message to all connected client
+   * 
+   * @param bb: message to be send
+   */
   public void broadcast(ByteBuffer bb) {
     selector
       .keys()
@@ -93,15 +96,31 @@ public class ServerChatHack {
       });
   }
 
-
+  /**
+   * Check if a login is present in server map
+   * 
+   * @param login: client login
+   * @return: true if client is already connect and false if not
+   */
   public boolean isExistLogin(String login) {
     return map.containsKey(login);
   }
 
+  /**
+   * Check if a client is authenticated
+   * 
+   * @param login: client login
+   * @return: true if client is already connect and false if not
+   */
   public boolean isConnected(String login) {
     return map.get(login) != null && map.get(login).isAuthenticated;
   }
 
+  /**
+   * Send a private connection request to target client
+   * 
+   * @param request: a request to be send
+   */
   public void sendPrivateConnectionRequest(RequestPrivateConnection request) {
     var target = request.getReceiver().getValue();
     map.get(target).context.queueMessage(request.toBuffer());
@@ -119,29 +138,28 @@ public class ServerChatHack {
       .findFirst();
   }
 
-  public void removeClientByKey(SelectionKey key) {
-    findLoginByKey(key).ifPresent(map::remove);
-  }
-
-  private Optional<String> findLoginByKey(SelectionKey key) {
-    return map
-      .entrySet()
-      .stream()
-      .filter(entry -> entry.getValue().key.equals(key))
-      .map(Map.Entry::getKey)
-      .findFirst();
-  }
-
   /*****************************
    * Authentication methods
    ******************************/
 
+  /**
+   * Method use register an anonymous client connection
+   * 
+   * @param login: client login
+   * @param clientKey: client selection key
+   */
   public void registerAnonymousClient(String login, SelectionKey clientKey) {
     map.put(login, new ClientInfo(true, clientKey, getNextMapId()));
     var msg = new CheckLoginMessage(login, map.get(login).id);
     databaseContext.queueMessage(msg.toBuffer());
   }
 
+  /**
+   * Method use register an authenticated client connection
+   * 
+   * @param login: client login
+   * @param clientKey: client selection key
+   */
   public void registerAuthenticatedClient(AuthentificatedConnection message, SelectionKey key) {
     var login = message.getLogin().getValue();
     map.put(login, new ClientInfo(false, key, getNextMapId()));
@@ -150,6 +168,11 @@ public class ServerChatHack {
     databaseContext.queueMessage(msg.toBuffer());
   }
 
+  /**
+   * Method use to return a response after client register
+   * 
+   * @param trame: an {@link DatabaseResponseMessage} object
+   */
   public void responseCheckLogin(DatabaseResponseMessage trame) {
     var clt = map.entrySet().stream().filter(p -> p.getValue().id == trame.getResult()).findFirst();
     if (clt.isEmpty())
@@ -160,6 +183,11 @@ public class ServerChatHack {
     findContextByKey(key).ifPresent(c -> handlerDbResponse(c, trame.getOpCode(), entry));
   }
 
+  /**
+   * Server launch method
+   * 
+   * @throws IOException
+   */
   public void launch() throws IOException {
     logger.info("server running on port " + serverSocketChannel.socket().getLocalPort());
     serverSocketChannel.configureBlocking(false);

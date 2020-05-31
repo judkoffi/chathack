@@ -10,6 +10,7 @@ import java.util.List;
 @FunctionalInterface
 public interface IConstructor<T> {
   /**
+   * Gets a result
    * 
    * @param parameters: a list of value to use to construct a value
    * @return: an instance of T

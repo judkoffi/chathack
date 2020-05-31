@@ -116,6 +116,9 @@ public class ServerContext extends BaseContext implements IPublicFrameVisitor {
     }
   }
 
+  /**
+   * Perform write of content output buffer and close connection
+   */
   public void silentlyfflushClose() {
     try {
       doWrite();// force writing to flush bbout

@@ -47,6 +47,11 @@ public class ClosePrivateConnectionMessage implements IPrivateFrame {
     return bb.flip();
   }
 
+  /**
+   * Getter of from value
+   * 
+   * @return: login of from client
+   */
   public String getFrom() {
     return from.getValue();
   }

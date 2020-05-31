@@ -13,10 +13,29 @@ import java.text.StringCharacterIterator;
 public class Helper {
   private Helper() {}
 
+  /**
+   * Max IP address size
+   */
   public static final int IP_ADDR_SIZE = Byte.BYTES * 16;
+
+  /**
+   * Default buffer size
+   */
   public static final int BUFFER_SIZE = 50_000_000; // 50 mb
+
+  /**
+   * Default file size
+   */
   public static final int LIMIT_FILE_CONTENT_SIZE = 30_000_000; // 30 mb
+
+  /**
+   * Default buffer size convert to be more readable for an human
+   */
   public static final String LIMIT_SIZE_MSG = humanReadableByteCountSI(LIMIT_FILE_CONTENT_SIZE);
+
+  /**
+   * Default use charset of ChatHack protocol
+   */
   public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
   private static final String FOX =
@@ -33,6 +52,9 @@ public class Helper {
           + "        \\/     \\/     \\/             \\/      \\/     \\/     \\/";
 
 
+  /**
+   * Message of available command of a client
+   */
   public static final String COMMAND_LIST = "\nCommands list: \n" + "public message => no prefix\n"
       + "@login msg => private message\n" + "/requests => list private connection\n"
       + "/accept login => accept private connection\n"
@@ -41,9 +63,25 @@ public class Helper {
       + "/close login => close private connection between client\n"
       + "/help => display command list\n";
 
+
+
+  /**
+   * Message to be display to a new conencted client
+   */
   public static final String WELCOME_MESSAGE = FOX + "\n" + TITLE + "\n" + COMMAND_LIST;
+
+
+  /**
+   * Max value of port
+   */
   public static final int MAX_PORT_VALUE = 65535;
 
+  /**
+   * Clone a given buffer
+   * 
+   * @param bb: buffer to be clone
+   * @return: cloned buffer
+   */
   public static ByteBuffer cloneByteBuffer(ByteBuffer bb) {
     int capacity = bb.limit();
     int pos = bb.position();
@@ -58,6 +96,12 @@ public class Helper {
     return copy;
   }
 
+  /**
+   * Convert a byte value to be more readable for an human
+   * 
+   * @param byte: byte value
+   * @return: a {@link String} of given value
+   */
   public static String humanReadableByteCountSI(long bytes) {
     if (-1000 < bytes && bytes < 1000) {
       return bytes + " B";

@@ -5,6 +5,7 @@ package fr.upem.chathack.reader.builder;
  */
 public interface ISubBuilder<T> extends IEmptyBuilder<T> {
   /**
+   * add producer of target message which will reader by builded reader
    * 
    * @param constructor: method use to construct instance of message reader by current building
    *        reader

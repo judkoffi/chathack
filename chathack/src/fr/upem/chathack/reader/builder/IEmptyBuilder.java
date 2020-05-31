@@ -9,6 +9,7 @@ import fr.upem.chathack.reader.IReader;
  */
 public interface IEmptyBuilder<T> {
   /**
+   * add a sub reader
    * 
    * @param <V>: type of sub reader
    * @param reader: reader component
