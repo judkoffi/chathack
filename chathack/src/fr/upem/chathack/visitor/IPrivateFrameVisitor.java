@@ -44,6 +44,13 @@ public interface IPrivateFrameVisitor extends IFrameVisitor {
 
 
 
+  /**
+   * method use to handle a private connection close message received in private connection between
+   * client
+   * 
+   * @param closePrivateConnectionMessage:a {@link ClosePrivateConnectionMessage} represent a
+   *        received confirmation close
+   */
   public void visit(ClosePrivateConnectionMessage closePrivateConnectionMessage);
 
 }

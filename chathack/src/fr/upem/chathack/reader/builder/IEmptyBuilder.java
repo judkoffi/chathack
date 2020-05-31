@@ -8,5 +8,11 @@ import fr.upem.chathack.reader.IReader;
  * @param <T>: Type of value returned by build reader
  */
 public interface IEmptyBuilder<T> {
+  /**
+   * 
+   * @param <V>: type of sub reader
+   * @param reader: reader component
+   * @return: current {@link ReaderBuilder} after add parameter reader as a component of this
+   */
   <V> ISubBuilder<T> addSubReader(IReader<V> reader);
 }

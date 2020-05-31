@@ -26,6 +26,12 @@ public class RejectPrivateConnection implements IPublicFrame {
     this.receiver = new LongSizedString(receiver);
   }
 
+  /**
+   * Method factory to create an instance of RejectPrivateConnection
+   * 
+   * @param params: a list of constructor arguments
+   * @return: a {@link RejectPrivateConnection} object
+   */
   public static RejectPrivateConnection of(List<Box<?>> params) {
     if (params.size() != 2) {
       throw new IllegalArgumentException(params + " size is invalid");
@@ -52,10 +58,20 @@ public class RejectPrivateConnection implements IPublicFrame {
     frameVisitor.visit(this);
   }
 
+  /**
+   * Getter of appliant login value
+   * 
+   * @return: appliant login
+   */
   public String getAppliant() {
     return appliant.getValue();
   }
 
+  /**
+   * Getter of receiver login value
+   * 
+   * @return: receiver login
+   */
   public String getReceiver() {
     return receiver.getValue();
   }

@@ -35,6 +35,12 @@ public class AcceptPrivateConnection implements IPublicFrame {
     this.token = token;
   }
 
+  /**
+   * Method factory to create an instance of AcceptPrivateConnection
+   * 
+   * @param params: a list of constructor arguments
+   * @return: a {@link AcceptPrivateConnection} object
+   */
   public static AcceptPrivateConnection of(List<Box<?>> params) {
     if (params.size() != 4) {
       throw new IllegalArgumentException(params + " size is invalid");
@@ -45,6 +51,33 @@ public class AcceptPrivateConnection implements IPublicFrame {
     var targetAddress = (InetSocketAddress) params.get(1).getBoxedValue();
     var token = (Long) params.get(2).getBoxedValue();
     return new AcceptPrivateConnection(applicant, receiver, targetAddress, token);
+  }
+
+  /**
+   * Getter of applicant login
+   * 
+   * @return: applicant login value
+   */
+  public String getAppliant() {
+    return applicant.getValue();
+  }
+
+  /**
+   * Getter of receiver login
+   * 
+   * @return: receiver login value
+   */
+  public String getReceiver() {
+    return receiver.getValue();
+  }
+
+  /**
+   * Getter of token value
+   * 
+   * @return: token value
+   */
+  public long getToken() {
+    return token;
   }
 
   @Override
@@ -68,18 +101,6 @@ public class AcceptPrivateConnection implements IPublicFrame {
   @Override
   public void accept(IPublicFrameVisitor frameVisitor) {
     frameVisitor.visit(this);
-  }
-
-  public String getAppliant() {
-    return applicant.getValue();
-  }
-
-  public String getReceiver() {
-    return receiver.getValue();
-  }
-
-  public long getToken() {
-    return token;
   }
 
   @Override

@@ -20,6 +20,11 @@ public class LongSizedString {
     this.size = contentBuffer.limit();
   }
 
+  /**
+   * Method use to convert a model class to buffer
+   * 
+   * @return: a {@link ByteBuffer} represent current model class
+   */
   public ByteBuffer toBuffer() {
     var bb = ByteBuffer.allocate(Long.BYTES + (int) size);
     bb.putLong(size);
@@ -37,6 +42,11 @@ public class LongSizedString {
     return bb.flip();
   }
 
+  /**
+   * Method use to get current size
+   * 
+   * @return: a long represent content size
+   */
   public long getContentSize() {
     return contentBuffer.limit();
   }
@@ -50,6 +60,11 @@ public class LongSizedString {
     return (Long.BYTES + size);
   }
 
+  /**
+   * Getter on value field
+   * 
+   * @return: a {@link Sting } represent content value
+   */
   public String getValue() {
     return content;
   }

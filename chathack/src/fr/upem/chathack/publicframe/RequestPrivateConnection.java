@@ -27,6 +27,12 @@ public class RequestPrivateConnection implements IPublicFrame {
     this.receiver = new LongSizedString(receiver);
   }
 
+  /**
+   * Method factory to create an instance of RequestPrivateConnection
+   * 
+   * @param params: a list of constructor arguments
+   * @return: a {@link RequestPrivateConnection} object
+   */
   public static RequestPrivateConnection of(List<Box<?>> params) {
     if (params.size() != 2) {
       throw new IllegalArgumentException(params + " size is invalid");
@@ -51,10 +57,20 @@ public class RequestPrivateConnection implements IPublicFrame {
     frameVisitor.visit(this);
   }
 
+  /**
+   * Getter of appliant login
+   * 
+   * @return: appliant login
+   */
   public LongSizedString getAppliant() {
     return appliant;
   }
 
+  /**
+   * Getter of receiver login
+   * 
+   * @return: receiver login
+   */
   public LongSizedString getReceiver() {
     return receiver;
   }

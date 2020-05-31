@@ -7,6 +7,7 @@ import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.reader.builder.Box;
 import fr.upem.chathack.utils.OpCode;
 import fr.upem.chathack.visitor.IPrivateFrameVisitor;
+
 /**
  * Class used to represent a frame closing a private connection between clients
  *
@@ -22,6 +23,12 @@ public class ClosePrivateConnectionMessage implements IPrivateFrame {
     this.from = from;
   }
 
+  /**
+   * Method factory to create an instance of ClosePrivateConnectionMessage
+   * 
+   * @param params: a list of constructor arguments
+   * @return: a {@link ClosePrivateConnectionMessage} object
+   */
   public static ClosePrivateConnectionMessage of(List<Box<?>> params) {
     if (params.size() != 1) {
       throw new IllegalArgumentException(params + " size is invalid");
@@ -39,14 +46,14 @@ public class ClosePrivateConnectionMessage implements IPrivateFrame {
     bb.put(from.toBuffer());
     return bb.flip();
   }
-  
+
   public String getFrom() {
-	return from.getValue();
-}
+    return from.getValue();
+  }
 
   @Override
   public void accept(IPrivateFrameVisitor frameVisitor) {
     frameVisitor.visit(this);
   }
-  
+
 }

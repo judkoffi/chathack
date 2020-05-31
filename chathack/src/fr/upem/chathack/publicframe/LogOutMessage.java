@@ -30,6 +30,11 @@ public class LogOutMessage implements IPublicFrame {
     frameVisitor.visit(this);
   }
 
+  /**
+   * Getter of message value
+   * 
+   * @return: message value
+   */
   public Message getMessage() {
     return message;
   }

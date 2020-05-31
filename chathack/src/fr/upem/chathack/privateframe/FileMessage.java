@@ -28,6 +28,13 @@ public class FileMessage implements IPrivateFrame {
     this.content = buffer;
   }
 
+
+  /**
+   * Method factory to create an instance of FileMessage
+   * 
+   * @param params: a list of constructor arguments
+   * @return: a {@link FileMessage} object
+   */
   public static FileMessage of(List<Box<?>> params) {
     if (params.size() != 3) {
       throw new IllegalArgumentException(params + " size is invalid");
@@ -38,6 +45,34 @@ public class FileMessage implements IPrivateFrame {
     var buffer = (ByteBuffer) params.get(2).getBoxedValue();
     return new FileMessage(filename, dest, buffer);
   }
+
+  /**
+   * Getter of filename
+   * 
+   * @return: filename value
+   */
+  public String getFilename() {
+    return filename.getValue();
+  }
+
+  /**
+   * Getter of file content
+   * 
+   * @return: file content buffer
+   */
+  public ByteBuffer getContent() {
+    return content;
+  }
+
+  /**
+   * Getter of sender login
+   * 
+   * @return: sender login value
+   */
+  public String getSender() {
+    return sender.getValue();
+  }
+
 
   @Override
   public ByteBuffer toBuffer() {
@@ -55,18 +90,6 @@ public class FileMessage implements IPrivateFrame {
   @Override
   public void accept(IPrivateFrameVisitor frameVisitor) {
     frameVisitor.visit(this);
-  }
-
-  public String getFilename() {
-    return filename.getValue();
-  }
-
-  public ByteBuffer getContent() {
-    return content;
-  }
-
-  public String getSender() {
-    return sender.getValue();
   }
 
   @Override

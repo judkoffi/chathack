@@ -1,7 +1,6 @@
 package fr.upem.chathack.context;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import fr.upem.chathack.dbframe.DatabaseResponseMessage;
 import fr.upem.chathack.reader.ByteReader;
@@ -31,10 +30,6 @@ public class DatabaseContext extends BaseContext {
     this.server = server;
   }
 
-  public void checkLogin(ByteBuffer bb) {
-    queueMessage(bb);
-  }
-
   @Override
   public void processIn() {
     for (;;) {
@@ -54,6 +49,11 @@ public class DatabaseContext extends BaseContext {
     }
   }
 
+  /**
+   * Method use to do connection when selector notify with OP_CONNECT
+   * 
+   * @throws IOException
+   */
   public void doConnect() throws IOException {
     if (!sc.finishConnect()) {
       return; // the selector gave a bad hint

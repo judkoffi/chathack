@@ -12,10 +12,21 @@ public class Box<E> {
     this.value = value;
   }
 
+  /**
+   * 
+   * @param <E>: type of value to be box
+   * @param value: value to be boc
+   * @return: a instance of {@link Box}
+   */
   public static <E> Box<E> of(E value) {
     return new Box<>(value);
   }
 
+  /**
+   * Getter of boxed value
+   * 
+   * @return: value boxed
+   */
   public E getBoxedValue() {
     return value;
   }

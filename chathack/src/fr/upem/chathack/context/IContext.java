@@ -18,6 +18,11 @@ public interface IContext {
    */
   public void processOut();
 
+  /**
+   * Method use to add buffer in context output buffer
+   * 
+   * @param bb: buffer to be send
+   */
   public void queueMessage(ByteBuffer bb);
 
   /**
@@ -31,15 +36,21 @@ public interface IContext {
   public void silentlyClose();
 
   /**
-   * Method use to read from socket channel
-   * 
+   * Performs the read action on sc
+   *
+   * The convention is that both buffers are in write-mode before the call to doRead and after the
+   * call
+   *
    * @throws IOException
    */
   public void doRead() throws IOException;
 
   /**
-   * Method use to write in socket channel
-   * 
+   * Performs the write action on sc
+   *
+   * The convention is that both buffers are in write-mode before the call to doWrite and after the
+   * call
+   *
    * @throws IOException
    */
   public void doWrite() throws IOException;

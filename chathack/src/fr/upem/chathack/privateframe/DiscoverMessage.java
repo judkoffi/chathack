@@ -26,6 +26,12 @@ public class DiscoverMessage implements IPrivateFrame {
     this.token = token;
   }
 
+  /**
+   * Method factory to create an instance of DiscoverMessage
+   * 
+   * @param params: a list of constructor arguments
+   * @return: a {@link DiscoverMessage} object
+   */
   public static DiscoverMessage of(List<Box<?>> params) {
     if (params.size() != 2) {
       throw new IllegalArgumentException(params + " size is invalid");
@@ -36,8 +42,22 @@ public class DiscoverMessage implements IPrivateFrame {
     return new DiscoverMessage(destinator, token);
   }
 
+  /**
+   * Getter of login value
+   * 
+   * @return: login value
+   */
   public String getLogin() {
     return login.getValue();
+  }
+
+  /**
+   * Getter of token value
+   * 
+   * @return: token value
+   */
+  public long getToken() {
+    return token;
   }
 
   @Override
@@ -58,9 +78,5 @@ public class DiscoverMessage implements IPrivateFrame {
   @Override
   public String toString() {
     return "discover login " + getLogin() + " key: " + token;
-  }
-
-  public long getToken() {
-    return token;
   }
 }

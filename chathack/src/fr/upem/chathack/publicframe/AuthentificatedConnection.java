@@ -25,6 +25,12 @@ public class AuthentificatedConnection implements IPublicFrame {
     this.password = new LongSizedString(password);
   }
 
+  /**
+   * Method factory to create an instance of AuthentificatedConnection
+   * 
+   * @param params: a list of constructor arguments
+   * @return: a {@link AuthentificatedConnection} object
+   */
   public static AuthentificatedConnection of(List<Box<?>> params) {
     if (params.size() != 2) {
       throw new IllegalArgumentException(params + " size is invalid");
@@ -49,10 +55,20 @@ public class AuthentificatedConnection implements IPublicFrame {
     frameVisitor.visit(this);
   }
 
+  /**
+   * Getter of login value
+   * 
+   * @return: login value
+   */
   public LongSizedString getLogin() {
     return login;
   }
 
+  /**
+   * Getter of password value
+   * 
+   * @return: password value
+   */
   public LongSizedString getPassword() {
     return password;
   }

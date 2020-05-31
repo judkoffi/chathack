@@ -37,6 +37,12 @@ public class ReaderBuilder<T> implements IEmptyBuilder<T>, ISubBuilder<T>, IBuil
   private IConstructor<T> constructor;
   private final ArrayList<SubReader<?>> subReaders = new ArrayList<>();
 
+  /**
+   * Factory method use to create an instance od {@link ReaderBuilder}
+   * 
+   * @param <T>: type of targer reader
+   * @return: an empty {@link ReaderBuilder}
+   */
   public static <T> ReaderBuilder<T> create() {
     return new ReaderBuilder<>();
   }

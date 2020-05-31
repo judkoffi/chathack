@@ -30,6 +30,11 @@ public class BroadcastMessage implements IPublicFrame {
     frameVisitor.visit(this);
   }
 
+  /**
+   * Getter of from login value
+   * 
+   * @return: from login value
+   */
   public String getFromLogin() {
     return message.getFrom().getValue();
   }

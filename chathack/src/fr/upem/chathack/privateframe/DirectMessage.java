@@ -23,6 +23,12 @@ public class DirectMessage implements IPrivateFrame {
     this.message = content;
   }
 
+  /**
+   * Method factory to create an instance of DirectMessage
+   * 
+   * @param params: a list of constructor arguments
+   * @return: a {@link DirectMessage} object
+   */
   public static DirectMessage of(List<Box<?>> params) {
     if (params.size() != 2) {
       throw new IllegalArgumentException(params + " size is invalid");

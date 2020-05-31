@@ -22,6 +22,11 @@ public class Message {
     this.content = new LongSizedString(value);
   }
 
+  /**
+   * Method use to convert a model class to buffer
+   * 
+   * @return: a {@link ByteBuffer} represent current model class
+   */
   public ByteBuffer toBuffer() {
     var size = from.getTrameSize() + content.getTrameSize();
     var bb = ByteBuffer.allocate((int) size);
@@ -30,6 +35,12 @@ public class Message {
     return bb.flip();
   }
 
+  /**
+   * Method factory to create an instance of Message
+   * 
+   * @param params: a list of constructor arguments
+   * @return: a {@link Message} object
+   */
   public static Message of(List<Box<?>> params) {
     if (params.size() != 2) {
       throw new IllegalArgumentException(params + " size is invalid");
@@ -39,10 +50,20 @@ public class Message {
     return new Message(from, value);
   }
 
+  /**
+   * Getter on from field
+   * 
+   * @return: from field
+   */
   public LongSizedString getFrom() {
     return from;
   }
 
+  /**
+   * Method use to get current frame total size
+   * 
+   * @return: a long represent total frame size
+   */
   public long getTrameSize() {
     return (from.getTrameSize() + content.getTrameSize());
   }

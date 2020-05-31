@@ -68,6 +68,12 @@ public class ServerChatHack {
       .orElse((long) 1); // map empty
   }
 
+  /**
+   * Send a message to a client by given his selection key
+   * 
+   * @param msg
+   * @param key
+   */
   public void sendMessageToClient(ByteBuffer msg, SelectionKey key) {
     findContextByKey(key).ifPresent(c -> c.queueMessage(msg));
   }
@@ -133,7 +139,7 @@ public class ServerChatHack {
   public void registerAnonymousClient(String login, SelectionKey clientKey) {
     map.put(login, new ClientInfo(true, clientKey, getNextMapId()));
     var msg = new CheckLoginMessage(login, map.get(login).id);
-    databaseContext.checkLogin(msg.toBuffer());
+    databaseContext.queueMessage(msg.toBuffer());
   }
 
   public void registerAuthenticatedClient(AuthentificatedConnection message, SelectionKey key) {
@@ -141,7 +147,7 @@ public class ServerChatHack {
     map.put(login, new ClientInfo(false, key, getNextMapId()));
     var id = map.get(login).id;
     var msg = new CheckCredentialMessage(message.getLogin(), message.getPassword(), id);
-    databaseContext.checkLogin(msg.toBuffer());
+    databaseContext.queueMessage(msg.toBuffer());
   }
 
   public void responseCheckLogin(DatabaseResponseMessage trame) {
@@ -162,7 +168,7 @@ public class ServerChatHack {
 
     var lastCheck = System.currentTimeMillis();
     while (!Thread.interrupted()) {
-       // System.out.println("Starting select");
+      // System.out.println("Starting select");
       printKeys();
       try {
         selector.select(this::treatKey);
@@ -253,7 +259,7 @@ public class ServerChatHack {
   }
 
   private void treatKey(SelectionKey key) {
-     printSelectedKey(key);
+    printSelectedKey(key);
     try {
       if (key.isValid() && key.isAcceptable()) {
         doAccept(key);
@@ -325,7 +331,7 @@ public class ServerChatHack {
     return String.join("|", list);
   }
 
-  public void printKeys() {
+  private void printKeys() {
     Set<SelectionKey> selectionKeySet = selector.keys();
     if (selectionKeySet.isEmpty()) {
       System.out.println("The selector contains no key : this should not happen!");
@@ -353,7 +359,7 @@ public class ServerChatHack {
     }
   }
 
-  public void printSelectedKey(SelectionKey key) {
+  private void printSelectedKey(SelectionKey key) {
     SelectableChannel channel = key.channel();
     if (channel instanceof ServerSocketChannel) {
       System.out.println("\tServerSocketChannel can perform : " + possibleActionsToString(key));

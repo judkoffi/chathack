@@ -19,6 +19,12 @@ public class DatabaseResponseMessage {
     fillBuffer();
   }
 
+  /**
+   * Method factory to create an instance of DatabaseResponseMessage
+   * 
+   * @param params: a list of constructor arguments
+   * @return: a {@link DatabaseResponseMessage}
+   */
   public static DatabaseResponseMessage of(List<Box<?>> params) {
     if (params.size() != 2) {
       throw new IllegalArgumentException(params + "size is not valid");
@@ -37,10 +43,21 @@ public class DatabaseResponseMessage {
     return bb.duplicate().flip();
   }
 
+  /**
+   * 
+   * field result getter
+   * 
+   * @return: current frame result value
+   */
   public long getResult() {
     return result;
   }
 
+  /**
+   * field opcode getter
+   * 
+   * @return: current frame opcode value
+   */
   public byte getOpCode() {
     return opcode;
   }

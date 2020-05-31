@@ -7,6 +7,11 @@ import fr.upem.chathack.visitor.IPrivateFrameVisitor;
  */
 
 public interface IPrivateFrame extends IFrame {
+  /**
+   * Method use accept a {@link IPrivateFrameVisitor} visitor
+   * 
+   * @param frameVisitor: a private frame visitor
+   */
   public void accept(IPrivateFrameVisitor frameVisitor);
 }
 

@@ -58,6 +58,11 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
     return closed;
   }
 
+  /**
+   * Method use to do connection when selector notify with OP_CONNECT
+   * 
+   * @throws IOException
+   */
   public void doConnect() throws IOException {
     if (!sc.finishConnect()) {
       return;

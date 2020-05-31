@@ -30,6 +30,12 @@ public class ServerResponseMessage implements IPublicFrame {
     this.errorMessage = errorMessage;
   }
 
+  /**
+   * Method factory to create an instance of ServerResponseMessage
+   * 
+   * @param params: a list of constructor arguments
+   * @return: a {@link ServerResponseMessage} object
+   */
   public static ServerResponseMessage of(List<Box<?>> params) {
     if (params.size() != 2) {
       throw new IllegalArgumentException(params + " size is invalid");
@@ -59,6 +65,11 @@ public class ServerResponseMessage implements IPublicFrame {
     frameVisitor.visit(this);
   }
 
+  /**
+   * Return true if current message is to notify and error and false if not
+   * 
+   * @return: a boolean
+   */
   public boolean isErrorMessage() {
     return errorMessage;
   }

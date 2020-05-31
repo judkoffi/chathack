@@ -22,6 +22,12 @@ public class ConfirmDiscoverMessage implements IPrivateFrame {
     this.sender = sender;
   }
 
+  /**
+   * Method factory to create an instance of ConfirmDiscoverMessage
+   * 
+   * @param params: a list of constructor arguments
+   * @return: a {@link ConfirmDiscoverMessage} object
+   */
   public static ConfirmDiscoverMessage of(List<Box<?>> params) {
     if (params.size() != 1) {
       throw new IllegalArgumentException(params + " size is invalid");
@@ -40,6 +46,11 @@ public class ConfirmDiscoverMessage implements IPrivateFrame {
     return bb.flip();
   }
 
+  /**
+   * Getter of sender login
+   * 
+   * @return: sender login
+   */
   public String getSender() {
     return sender.getValue();
   }

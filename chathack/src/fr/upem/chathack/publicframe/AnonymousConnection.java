@@ -19,6 +19,12 @@ public class AnonymousConnection implements IPublicFrame {
     this.sizedString = sizedString;
   }
 
+  /**
+   * Method factory to create an instance of AnonymousConnection
+   * 
+   * @param params: a list of constructor arguments
+   * @return: a {@link AnonymousConnection} object
+   */
   public static AnonymousConnection of(List<Box<?>> params) {
     if (params.size() != 1) {
       throw new IllegalArgumentException(params + " size is invalid");
@@ -30,6 +36,11 @@ public class AnonymousConnection implements IPublicFrame {
     this.sizedString = new LongSizedString(login);
   }
 
+  /**
+   * Getter of login value
+   * 
+   * @return: login value
+   */
   public String getLogin() {
     return sizedString.getValue();
   }

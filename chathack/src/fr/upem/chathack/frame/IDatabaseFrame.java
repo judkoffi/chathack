@@ -1,5 +1,8 @@
 package fr.upem.chathack.frame;
 
+/**
+ * Interface use to represent super type of all frame exchange between server and database server
+ */
 public interface IDatabaseFrame extends IFrame {
   /***
    * Pour demander, si une paire login/mot de passe est correcte, le client envoie:<br>

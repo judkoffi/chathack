@@ -24,6 +24,11 @@ public abstract class BaseContext implements IContext {
     this.sc = (SocketChannel) key.channel();
   }
 
+  /**
+   * Getter of current context selection key
+   * 
+   * @return: current context selection key
+   */
   public SelectionKey getKey() {
     return key;
   }
@@ -63,14 +68,6 @@ public abstract class BaseContext implements IContext {
     key.interestOps(interestOps);
   }
 
-  /**
-   * Performs the read action on sc
-   *
-   * The convention is that both buffers are in write-mode before the call to doRead and after the
-   * call
-   *
-   * @throws IOException
-   */
   @Override
   public void doRead() throws IOException {
     var read = sc.read(bbin);
@@ -80,14 +77,6 @@ public abstract class BaseContext implements IContext {
     updateInterestOps();
   }
 
-  /**
-   * Performs the write action on sc
-   *
-   * The convention is that both buffers are in write-mode before the call to doWrite and after the
-   * call
-   *
-   * @throws IOException
-   */
   @Override
   public void doWrite() throws IOException {
     bbout.flip();

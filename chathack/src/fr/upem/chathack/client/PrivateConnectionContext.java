@@ -39,6 +39,12 @@ public class PrivateConnectionContext extends BaseContext implements IPrivateFra
     frame.accept(this);
   }
 
+  /**
+   * Method use to do connection when selector notify with OP_CONNECT and send
+   * {@link DiscoverMessage} to client connected
+   * 
+   * @throws IOException
+   */
   public void doConnect() throws IOException {
     if (!sc.finishConnect()) {
       return;
