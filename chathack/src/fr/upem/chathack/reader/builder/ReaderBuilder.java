@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import fr.upem.chathack.reader.IReader;
 import fr.upem.chathack.reader.IReader.ProcessStatus;
 
+/**
+ * Class use to building a complex reader by add some basic readers
+ * 
+ * @param <T>: Type of target reader value
+ */
 public class ReaderBuilder<T> implements IEmptyBuilder<T>, ISubBuilder<T>, IBuilder<T> {
 
   private enum State {

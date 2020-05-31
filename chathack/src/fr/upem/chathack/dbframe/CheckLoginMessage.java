@@ -4,10 +4,11 @@ import java.nio.ByteBuffer;
 import fr.upem.chathack.frame.IDatabaseFrame;
 import fr.upem.chathack.model.LongSizedString;
 import fr.upem.chathack.utils.OpCode;
+
 /**
- * Class used to check if a login is followed by a message for connection
- *
+ * Class used to check if a login is present in database
  */
+
 public class CheckLoginMessage implements IDatabaseFrame {
   private final LongSizedString login;
   private final long id;
