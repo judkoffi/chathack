@@ -74,6 +74,15 @@ public class ServerResponseMessage implements IPublicFrame {
     return errorMessage;
   }
 
+  /**
+   * Get message
+   * 
+   * @return: a {@link String} contains received message
+   */
+  public String getValue() {
+    return value.getValue();
+  }
+
   @Override
   public String toString() {
     return errorMessage ? "ERROR: " + value.getValue() : value.getValue();

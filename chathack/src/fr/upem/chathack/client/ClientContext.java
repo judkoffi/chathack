@@ -80,6 +80,16 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
   public void visit(ServerResponseMessage serverMessage) {
     if (serverMessage.isErrorMessage()) {
       System.err.println(serverMessage);
+      var splited = serverMessage.getValue().split(":");
+      if (splited.length >= 2) {
+        var login = splited[1];
+        client.privateConnectionMap.remove(login);
+        client.pendingPrivateRequests
+          .stream()
+          .filter(req -> req.getReceiver().getValue().equals(login))
+          .findFirst()
+          .ifPresent(client.pendingPrivateRequests::remove);
+      }
     } else {
       System.out.println(serverMessage);
     }
@@ -117,5 +127,10 @@ public class ClientContext extends BaseContext implements IPublicFrameVisitor {
   public void visit(LogOutMessage disconnectionMessage) {
     var login = disconnectionMessage.getLogin();
     client.privateConnectionMap.remove(login);
+    client.pendingPrivateRequests
+      .stream()
+      .filter(req -> req.getReceiver().getValue().equals(login))
+      .findFirst()
+      .ifPresent(client.pendingPrivateRequests::remove);
   }
 }

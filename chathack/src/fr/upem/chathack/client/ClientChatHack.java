@@ -332,6 +332,10 @@ public class ClientChatHack {
         break;
       case PENDING:
       case WAITING_COMFIRM_TOKEN:
+        var req = new RequestPrivateConnection(login, receiver);
+        if (!pendingPrivateRequests.contains(req)) {
+          uniqueContext.queueMessage(req.toBuffer());
+        }
         privateConnectionMap.get(receiver).pendingDirectMessages.add(frame.toBuffer());
         break;
       default:
