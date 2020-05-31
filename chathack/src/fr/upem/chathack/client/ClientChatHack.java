@@ -461,8 +461,10 @@ public class ClientChatHack {
         var target = privateConnectionMap
           .entrySet()
           .stream()
+          .filter(p -> p.getValue().destinatorContext != null)
           .filter(p -> p.getValue().destinatorContext.getKey().equals(key))
           .findFirst();
+
         target.ifPresent(t ->
         {
           t.getValue().destinatorContext.silentlyClose();

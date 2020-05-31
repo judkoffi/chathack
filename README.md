@@ -14,9 +14,9 @@ Tout ce qu'il y a sous chathack/src/
 ```
 
 ## commandes
-### Dans chathack/data/
+### Dans chathack/jars/
 ```    
-java -jar ServerMDP.jar 8888 password.txt ---> pour lancer la base de données
+java -jar ServerMDP.jar 8888 ../password.txt ---> pour lancer la base de données
 ```       
 
 ### Dans chathack/bin/
