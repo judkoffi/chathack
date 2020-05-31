@@ -34,7 +34,7 @@ import fr.upem.chathack.utils.OpCode;
  * Class use to represent a server of protocol ChatHack
  */
 public class ServerChatHack {
-	
+
   private static final Logger logger = Logger.getLogger(ServerChatHack.class.getName());
   private static final int TIMEOUT = 500; // 500 ms
   private final Selector selector;
@@ -133,7 +133,6 @@ public class ServerChatHack {
   public void registerAnonymousClient(String login, SelectionKey clientKey) {
     map.put(login, new ClientInfo(true, clientKey, getNextMapId()));
     var msg = new CheckLoginMessage(login, map.get(login).id);
-    // var bb = DatabaseRequestBuilder.checkLoginRequest(map.get(login).id, login);
     databaseContext.checkLogin(msg.toBuffer());
   }
 
@@ -142,7 +141,6 @@ public class ServerChatHack {
     map.put(login, new ClientInfo(false, key, getNextMapId()));
     var id = map.get(login).id;
     var msg = new CheckCredentialMessage(message.getLogin(), message.getPassword(), id);
-    // var bb = DatabaseRequestBuilder.checkCredentialsRequest(map.get(login).id, message);
     databaseContext.checkLogin(msg.toBuffer());
   }
 
@@ -157,13 +155,14 @@ public class ServerChatHack {
   }
 
   public void launch() throws IOException {
+    logger.info("server running on port " + serverSocketChannel.socket().getLocalPort());
     serverSocketChannel.configureBlocking(false);
     serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
     dbConnection();
 
     var lastCheck = System.currentTimeMillis();
     while (!Thread.interrupted()) {
-      // System.out.println("Starting select");
+       // System.out.println("Starting select");
       printKeys();
       try {
         selector.select(this::treatKey);
@@ -254,7 +253,7 @@ public class ServerChatHack {
   }
 
   private void treatKey(SelectionKey key) {
-    printSelectedKey(key);
+     printSelectedKey(key);
     try {
       if (key.isValid() && key.isAcceptable()) {
         doAccept(key);

@@ -138,10 +138,12 @@ public class ClientChatHack {
     return Optional.empty();
   }
 
-/**
- * method in charge of handling the file given (find file, create path, checking size, create FileMessage...)
- * @param line
- */
+  /**
+   * method in charge of handling the file given (find file, create path, checking size, create
+   * FileMessage...)
+   * 
+   * @param line
+   */
   private void fileHandler(String line) {
     var splited = line.split(" ");
     if (splited.length < 3) {
@@ -428,7 +430,7 @@ public class ClientChatHack {
 
     var lastCheck = System.currentTimeMillis();
     while (!Thread.interrupted()) {
-      // printKeys();
+       // printKeys();
       try {
         if (uniqueContext.isClosed()) {
           console.interrupt();
@@ -455,7 +457,7 @@ public class ClientChatHack {
    */
   private void clearInvalidSelectionKey() {
     for (var key : selector.keys()) {
-      if (!key.isValid()) {
+      if (key != null && !key.isValid()) {
         var target = privateConnectionMap
           .entrySet()
           .stream()
@@ -471,7 +473,7 @@ public class ClientChatHack {
   }
 
   private void treatKey(SelectionKey key) {
-    // printSelectedKey(key);
+       // printSelectedKey(key);
     try {
       if (key.isValid() && key.isAcceptable()) {
         doAccept(key);
